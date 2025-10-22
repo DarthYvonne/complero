@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan:*)",
+      "Bash(npm run build:*)",
+      "Bash(where:*)",
+      "Bash(C:UsersAnders.configherdbinphp.bat artisan make:model LessonTab -m)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:model LessonTab -m)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan migrate)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_creator_id_to_mailing_lists_table --table=mailing_lists)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/DashboardController)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/CourseController)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/ResourceController)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/MailingListController)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/LessonController)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan config:clear)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

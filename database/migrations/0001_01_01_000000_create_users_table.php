@@ -17,6 +17,11 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['admin', 'creator', 'member'])->default('member');
+            $table->string('website')->nullable();
+            $table->text('bio')->nullable();
+            $table->string('imported_from')->nullable();
+            $table->string('external_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

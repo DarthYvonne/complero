@@ -1,0 +1,248 @@
+<x-app-layout>
+@section('breadcrumbs')
+    <span style="margin: 0 8px;">/</span>
+    <a href="{{ route('admin.resources.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Materiale</a>
+    <span style="margin: 0 8px;">/</span>
+    <strong style="color: #333; font-weight: 600;">Opret materiale</strong>
+@endsection
+
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
+                        Opret materiale
+                    </h1>
+                    <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
+                        Opret nyt downloadbart materiale
+                    </p>
+                </div>
+                <a href="{{ route('admin.resources.index') }}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til materiale
+                </a>
+            </div>
+        </div>
+
+        <!-- Resource Form -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="{{ route('admin.resources.store') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+
+                            <!-- Title -->
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Titel <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       class="form-control @error('title') is-invalid @enderror"
+                                       id="title"
+                                       name="title"
+                                       value="{{ old('title') }}"
+                                       required>
+                                @error('title')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Beskrivelse <span class="text-danger">*</span></label>
+                                <div id="description-editor" style="min-height: 200px; background: white;"></div>
+                                <textarea class="form-control @error('description') is-invalid @enderror"
+                                          id="description"
+                                          name="description"
+                                          style="display: none;"
+                                          required>{{ old('description') }}</textarea>
+                                @error('description')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Image Upload -->
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Materiale billede</label>
+                                <input type="file"
+                                       class="form-control @error('image') is-invalid @enderror"
+                                       id="image"
+                                       name="image"
+                                       accept="image/*">
+                                @error('image')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text" style="font-weight: 300;">Maksimal filstørrelse: 2MB. Anbefalet format: JPG eller PNG</div>
+                            </div>
+
+                            <!-- Price -->
+                            <div class="mb-3">
+                                <label for="price" class="form-label">Pris (€)</label>
+                                <input type="number"
+                                       class="form-control @error('price') is-invalid @enderror"
+                                       id="price"
+                                       name="price"
+                                       value="{{ old('price', '0') }}"
+                                       step="0.01"
+                                       min="0">
+                                @error('price')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text" style="font-weight: 300;">Sæt til 0 for gratis materiale</div>
+                            </div>
+
+                            <!-- Downloadable Files -->
+                            <div class="mb-3">
+                                <label for="files" class="form-label">Downloade filer</label>
+                                <input type="file"
+                                       class="form-control @error('files.*') is-invalid @enderror"
+                                       id="files"
+                                       name="files[]"
+                                       multiple>
+                                @error('files.*')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text" style="font-weight: 300;">Upload PDF'er, e-bøger, skabeloner eller andre filer (max 10MB per fil)</div>
+                            </div>
+
+                            <!-- Mailing List -->
+                            <div class="mb-3">
+                                <label for="mailing_list_id" class="form-label">Tilgængelig for</label>
+                                <select class="form-select @error('mailing_list_id') is-invalid @enderror"
+                                        id="mailing_list_id"
+                                        name="mailing_list_id">
+                                    <option value="">Alle (gratis for alle)</option>
+                                    @foreach($mailingLists as $list)
+                                        <option value="{{ $list->id }}" {{ old('mailing_list_id') == $list->id ? 'selected' : '' }}>
+                                            For medlemmer af {{ $list->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('mailing_list_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text" style="font-weight: 300;">Vælg en mailing liste for at begrænse adgang, eller lad feltet være tomt for gratis adgang for alle</div>
+                            </div>
+
+                            <!-- Checkboxes -->
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="is_free"
+                                           name="is_free"
+                                           value="1"
+                                           {{ old('is_free', true) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_free">
+                                        Dette materiale er gratis
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="is_published"
+                                           name="is_published"
+                                           value="1"
+                                           {{ old('is_published') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_published">
+                                        Publicer materiale (gør det synligt for brugere)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-circle-check me-1"></i> Opret ressource
+                                </button>
+                                <a href="{{ route('admin.resources.index') }}" class="btn btn-outline-secondary">
+                                    Annuller
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Sidebar -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px;">
+                            <i class="fa-solid fa-circle-info" style="color: #be185d;"></i> Hjælp
+                        </h5>
+                        <div style="font-size: 14px; font-weight: 300; color: #666;">
+                            <p><strong>Titel:</strong> Vælg en klar og beskrivende titel for ressourcen.</p>
+                            <p><strong>Beskrivelse:</strong> Forklar hvad ressourcen indeholder, og hvem den er til.</p>
+                            <p><strong>Billede:</strong> Upload et attraktivt billede der repræsenterer ressourcen.</p>
+                            <p><strong>Filer:</strong> Upload de filer som brugerne kan downloade (PDF'er, e-bøger, skabeloner, osv.).</p>
+                            <p><strong>Pris:</strong> Sæt prisen til 0 for gratis ressourcer.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .card {
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .btn-primary {
+            background: #be185d;
+            border-color: #be185d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background: #9f1239;
+            border-color: #9f1239;
+        }
+        .form-label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Quill editor for description
+            const quill = new Quill('#description-editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        ['link'],
+                        ['clean']
+                    ]
+                },
+                placeholder: 'Skriv en beskrivelse af ressourcen...'
+            });
+
+            // Load existing content if any
+            const existingContent = document.querySelector('#description').value;
+            if (existingContent) {
+                quill.root.innerHTML = existingContent;
+            }
+
+            // Sync Quill content to hidden textarea on form submission
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                document.querySelector('#description').value = quill.root.innerHTML;
+            });
+
+            // Also sync on text change (for validation)
+            quill.on('text-change', function() {
+                document.querySelector('#description').value = quill.root.innerHTML;
+            });
+        });
+    </script>
+    @endpush
+</x-app-layout>

@@ -1,0 +1,100 @@
+<x-app-layout>
+@section('breadcrumbs')
+    <span style="margin: 0 8px;">/</span>
+    <strong style="color: #333; font-weight: 600;">Materiale</strong>
+@endsection
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
+                        Materiale
+                    </h1>
+                    <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
+                        E-bøger, guider og skabeloner
+                    </p>
+                </div>
+                @if(Auth::user() && in_array(Auth::user()->role, ['admin', 'creator']))
+                    <a href="{{ route('admin.resources.create') }}" class="btn btn-primary">
+                        <i class="fa-solid fa-circle-plus me-1"></i> Tilføj materiale
+                    </a>
+                @endif
+            </div>
+        </div>
+
+        <!-- Resources Grid -->
+        <div class="row g-3">
+            @forelse($resources as $resource)
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        @if($resource->image_url)
+                            <img src="{{ Storage::url($resource->image_url) }}" class="card-img-top" alt="{{ $resource->title }}" style="height: 200px; object-fit: cover;">
+                        @else
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fa-solid fa-file-lines text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                        @endif
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 10px;">
+                                {{ $resource->title }}
+                            </h5>
+                            <p class="card-text" style="font-size: 14px; font-weight: 300; color: #666; margin-bottom: 15px;">
+                                {{ Str::limit($resource->description, 100) }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span style="font-size: 13px; font-weight: 300; color: #999;">
+                                    <i class="fa-solid fa-user"></i> {{ $resource->creator->name }}
+                                </span>
+                                <span style="font-size: 16px; font-weight: 600; color: #333;">
+                                    @if($resource->is_free)
+                                        Gratis
+                                    @else
+                                        €{{ number_format($resource->price, 2) }}
+                                    @endif
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-top">
+                            <a href="{{ route('resources.show', $resource) }}" class="btn btn-primary w-100">
+                                <i class="fa-solid fa-arrow-right me-1"></i> Se ressource
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-12">
+                    <div class="card text-center py-5">
+                        <div class="card-body">
+                            <i class="fa-solid fa-glasses" style="font-size: 4rem; color: #d1d5db;"></i>
+                            <h5 class="mt-3 mb-2">Ingen ressourcer tilgængelige endnu</h5>
+                            <p class="text-muted mb-0" style="font-weight: 300;">Ressourcer vil blive tilgængelige snart</p>
+                        </div>
+                    </div>
+                </div>
+            @endforelse
+        </div>
+    </div>
+
+    <style>
+        .card {
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .btn-primary {
+            background: #be185d;
+            border-color: #be185d;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+        .btn-primary:hover {
+            background: #9f1239;
+            border-color: #9f1239;
+        }
+    </style>
+</x-app-layout>

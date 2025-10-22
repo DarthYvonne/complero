@@ -1,0 +1,129 @@
+<x-app-layout>
+@section('breadcrumbs')
+    <span style="margin: 0 8px;">/</span>
+    <a href="{{ route('admin.mailing-lists.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Mailing lister</a>
+    <span style="margin: 0 8px;">/</span>
+    <strong style="color: #333; font-weight: 600;">Opret liste</strong>
+@endsection
+
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
+                        <i class="fa-solid fa-circle-plus" style="color: #be185d;"></i> Opret mailing liste
+                    </h1>
+                    <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
+                        Opret en ny mailing liste for medlemmer
+                    </p>
+                </div>
+                <a href="{{ route('admin.mailing-lists.index') }}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til lister
+                </a>
+            </div>
+        </div>
+
+        <!-- Mailing List Form -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="{{ route('admin.mailing-lists.store') }}" method="POST">
+                            @csrf
+
+                            <!-- Name -->
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Navn <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       class="form-control @error('name') is-invalid @enderror"
+                                       id="name"
+                                       name="name"
+                                       value="{{ old('name') }}"
+                                       required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Beskrivelse</label>
+                                <textarea class="form-control @error('description') is-invalid @enderror"
+                                          id="description"
+                                          name="description"
+                                          rows="4">{{ old('description') }}</textarea>
+                                @error('description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Status -->
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="is_active"
+                                           name="is_active"
+                                           value="1"
+                                           {{ old('is_active', true) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_active">
+                                        Listen er aktiv
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-circle-check me-1"></i> Opret liste
+                                </button>
+                                <a href="{{ route('admin.mailing-lists.index') }}" class="btn btn-outline-secondary">
+                                    Annuller
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Sidebar -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px;">
+                            <i class="fa-solid fa-circle-info" style="color: #be185d;"></i> Hjælp
+                        </h5>
+                        <div style="font-size: 14px; font-weight: 300; color: #666;">
+                            <p><strong>Navn:</strong> Vælg et klart navn for din mailing liste.</p>
+                            <p><strong>Beskrivelse:</strong> Forklar hvad denne liste bruges til.</p>
+                            <p><strong>Status:</strong> Deaktivér listen for midlertidigt at stoppe nyt indhold fra at blive tilgængeligt.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .card {
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .btn-primary {
+            background: #be185d;
+            border-color: #be185d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background: #9f1239;
+            border-color: #9f1239;
+        }
+        .form-label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+</x-app-layout>
