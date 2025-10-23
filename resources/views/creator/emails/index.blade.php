@@ -146,18 +146,16 @@
                                     </thead>
                                     <tbody>
                                         @foreach($emails as $email)
-                                            <tr style="cursor: pointer;"
-                                                onclick="showEmailModal(
-                                                    '{{ addslashes($email->subject) }}',
-                                                    {!! json_encode($email->body_html) !!},
-                                                    '{{ $email->mailingList ? $email->mailingList->name : 'Ingen liste' }}',
-                                                    {{ $email->recipients_count }},
-                                                    {{ $email->unique_opens }},
-                                                    {{ $email->total_opens }},
-                                                    {{ $email->unique_clicks }},
-                                                    {{ $email->total_clicks }},
-                                                    '{{ $email->sent_at ? $email->sent_at->format('d/m/Y H:i') : 'Ikke sendt' }}'
-                                                )">
+                                            <tr class="email-row" style="cursor: pointer;"
+                                                data-email-id="{{ $email->id }}"
+                                                data-subject="{{ $email->subject }}"
+                                                data-list="{{ $email->mailingList ? $email->mailingList->name : 'Ingen liste' }}"
+                                                data-recipients="{{ $email->recipients_count }}"
+                                                data-unique-opens="{{ $email->unique_opens }}"
+                                                data-total-opens="{{ $email->total_opens }}"
+                                                data-unique-clicks="{{ $email->unique_clicks }}"
+                                                data-total-clicks="{{ $email->total_clicks }}"
+                                                data-sent-at="{{ $email->sent_at ? $email->sent_at->format('d/m/Y H:i') : 'Ikke sendt' }}">
                                                 <td>
                                                     <strong style="font-weight: 500;">{{ $email->subject }}</strong>
                                                 </td>
@@ -200,6 +198,17 @@
                         @endif
                     </div>
                 </div>
+
+                <!-- Email Bodies Data (stored as JSON for modal display) -->
+                @if($emails->count() > 0)
+                <script type="application/json" id="emailBodiesData">
+                {
+                    @foreach($emails as $email)
+                    "{{ $email->id }}": {!! json_encode($email->body_html) !!}{{ $loop->last ? '' : ',' }}
+                    @endforeach
+                }
+                </script>
+                @endif
             </div>
         </div>
     </div>
@@ -339,37 +348,64 @@
             });
         });
 
-        // Function to show email modal
-        function showEmailModal(subject, body, list, recipients, uniqueOpens, totalOpens, uniqueClicks, totalClicks, sentAt) {
-            // Populate modal fields
-            document.getElementById('modalSubject').textContent = subject;
-            document.getElementById('modalBody').innerHTML = body;
-            document.getElementById('modalList').textContent = list;
-            document.getElementById('modalRecipients').textContent = recipients;
-            document.getElementById('modalSentAt').textContent = sentAt;
-
-            // Opens
-            if (uniqueOpens > 0) {
-                document.getElementById('modalUniqueOpens').textContent = uniqueOpens;
-                document.getElementById('modalTotalOpens').textContent = ' (' + totalOpens + ')';
-            } else {
-                document.getElementById('modalUniqueOpens').textContent = '-';
-                document.getElementById('modalTotalOpens').textContent = '';
+        // Parse email bodies from JSON
+        let emailBodies = {};
+        const emailBodiesElement = document.getElementById('emailBodiesData');
+        if (emailBodiesElement) {
+            try {
+                emailBodies = JSON.parse(emailBodiesElement.textContent);
+            } catch (e) {
+                console.error('Failed to parse email bodies:', e);
             }
-
-            // Clicks
-            if (uniqueClicks > 0) {
-                document.getElementById('modalUniqueClicks').textContent = uniqueClicks;
-                document.getElementById('modalTotalClicks').textContent = ' (' + totalClicks + ')';
-            } else {
-                document.getElementById('modalUniqueClicks').textContent = '-';
-                document.getElementById('modalTotalClicks').textContent = '';
-            }
-
-            // Show modal
-            var modal = new bootstrap.Modal(document.getElementById('emailModal'));
-            modal.show();
         }
+
+        // Add click handlers to email rows
+        document.querySelectorAll('.email-row').forEach(function(row) {
+            row.addEventListener('click', function() {
+                // Get data from attributes
+                const emailId = this.dataset.emailId;
+                const subject = this.dataset.subject;
+                const list = this.dataset.list;
+                const recipients = this.dataset.recipients;
+                const uniqueOpens = parseInt(this.dataset.uniqueOpens);
+                const totalOpens = parseInt(this.dataset.totalOpens);
+                const uniqueClicks = parseInt(this.dataset.uniqueClicks);
+                const totalClicks = parseInt(this.dataset.totalClicks);
+                const sentAt = this.dataset.sentAt;
+
+                // Get the HTML body from the parsed JSON data
+                const body = emailBodies[emailId] || '<p>Email indhold ikke tilgængeligt</p>';
+
+                // Populate modal fields
+                document.getElementById('modalSubject').textContent = subject;
+                document.getElementById('modalBody').innerHTML = body;
+                document.getElementById('modalList').textContent = list;
+                document.getElementById('modalRecipients').textContent = recipients;
+                document.getElementById('modalSentAt').textContent = sentAt;
+
+                // Opens
+                if (uniqueOpens > 0) {
+                    document.getElementById('modalUniqueOpens').textContent = uniqueOpens;
+                    document.getElementById('modalTotalOpens').textContent = ' (' + totalOpens + ')';
+                } else {
+                    document.getElementById('modalUniqueOpens').textContent = '-';
+                    document.getElementById('modalTotalOpens').textContent = '';
+                }
+
+                // Clicks
+                if (uniqueClicks > 0) {
+                    document.getElementById('modalUniqueClicks').textContent = uniqueClicks;
+                    document.getElementById('modalTotalClicks').textContent = ' (' + totalClicks + ')';
+                } else {
+                    document.getElementById('modalUniqueClicks').textContent = '-';
+                    document.getElementById('modalTotalClicks').textContent = '';
+                }
+
+                // Show modal
+                var modal = new bootstrap.Modal(document.getElementById('emailModal'));
+                modal.show();
+            });
+        });
     </script>
     @endpush
 

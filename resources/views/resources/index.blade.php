@@ -40,7 +40,7 @@
                                     <a href="{{ route('resources.show', $resource) }}" style="color: {{ $resourceColor }}; text-decoration: underline;">læs resten</a>
                                 @endif
                             </div>
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
                                 <span style="font-size: 13px; font-weight: 300; color: #999;">
                                     <span style="color: {{ $resourceColor }}; font-weight: 600;">Af:</span> {{ $resource->creator->organization_name ?: $resource->creator->name }}
                                 </span>
@@ -52,13 +52,13 @@
                                     @endif
                                 </span>
                             </div>
+                            <a href="{{ route('resources.show', $resource) }}" class="btn w-100 resource-btn" style="background: {{ $resourceColor }}; border-color: {{ $resourceColor }}; color: #ffffff;"
+                               onmouseover="this.style.background='{{ $hoverColor }}'; this.style.borderColor='{{ $hoverColor }}';"
+                               onmouseout="this.style.background='{{ $resourceColor }}'; this.style.borderColor='{{ $resourceColor }}';">
+                                <i class="fa-solid fa-arrow-right me-1"></i> Se materiale
+                            </a>
                         </div>
                     </div>
-                    <a href="{{ route('resources.show', $resource) }}" class="btn w-100 resource-btn" style="margin-top: 15px; background: {{ $resourceColor }}; border-color: {{ $resourceColor }}; color: #ffffff;"
-                       onmouseover="this.style.background='{{ $hoverColor }}'; this.style.borderColor='{{ $hoverColor }}';"
-                       onmouseout="this.style.background='{{ $resourceColor }}'; this.style.borderColor='{{ $resourceColor }}';">
-                        <i class="fa-solid fa-arrow-right me-1"></i> Se materiale
-                    </a>
                 </div>
             @empty
                 <div class="col-12">

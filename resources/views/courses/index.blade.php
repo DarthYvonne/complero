@@ -39,7 +39,7 @@
                                     <a href="{{ route('courses.show', $course) }}" style="color: {{ $courseColor }}; text-decoration: underline;">læs resten</a>
                                 @endif
                             </div>
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
                                 <span style="font-size: 13px; font-weight: 300; color: #999;">
                                     <span style="color: {{ $courseColor }}; font-weight: 600;">Af:</span> {{ $course->creator->organization_name ?: $course->creator->name }}
                                 </span>
@@ -51,13 +51,13 @@
                                     @endif
                                 </span>
                             </div>
+                            <a href="{{ route('courses.show', $course) }}" class="btn w-100 course-btn" style="background: {{ $courseColor }}; border-color: {{ $courseColor }}; color: {{ $courseColor === '#F2CC21' ? '#000000' : '#ffffff' }};"
+                               onmouseover="this.style.background='{{ $hoverColor }}'; this.style.borderColor='{{ $hoverColor }}';"
+                               onmouseout="this.style.background='{{ $courseColor }}'; this.style.borderColor='{{ $courseColor }}';">
+                                <i class="fa-solid fa-arrow-right me-1"></i> Se forløb
+                            </a>
                         </div>
                     </div>
-                    <a href="{{ route('courses.show', $course) }}" class="btn w-100 course-btn" style="margin-top: 15px; background: {{ $courseColor }}; border-color: {{ $courseColor }}; color: {{ $courseColor === '#F2CC21' ? '#000000' : '#ffffff' }};"
-                       onmouseover="this.style.background='{{ $hoverColor }}'; this.style.borderColor='{{ $hoverColor }}';"
-                       onmouseout="this.style.background='{{ $courseColor }}'; this.style.borderColor='{{ $courseColor }}';">
-                        <i class="fa-solid fa-arrow-right me-1"></i> Se forløb
-                    </a>
                 </div>
             @empty
                 <div class="col-12">
