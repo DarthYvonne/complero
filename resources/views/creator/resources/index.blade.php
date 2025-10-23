@@ -1,24 +1,44 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <strong style="color: #333; font-weight: 600;">Downloads</strong>
+    <strong style="color: #333; font-weight: 600;">Materialer</strong>
 @endsection
 
     <div class="container-fluid">
         <!-- Page Header -->
         <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                        Downloads
+                        Materialer
                     </h1>
                     <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
-                        Administrer alt download på platformen
+                        Administrer alle materialer på platformen
                     </p>
                 </div>
-                <a href="{{ route('creator.resources.create') }}" class="btn btn-primary">
-                    <i class="fa-solid fa-circle-plus me-1"></i> Opret download
-                </a>
+                <div class="d-flex gap-2 align-items-center">
+                    @if(auth()->user()->role === 'admin' && request()->routeIs('admin.resources.index') && $creators->count() > 0)
+                        <!-- Creator Filter -->
+                        <form method="GET" action="{{ route('admin.resources.index') }}">
+                            <select name="creator_id" class="form-select" style="width: 250px;" onchange="this.form.submit()">
+                                <option value="">Alle creators</option>
+                                @foreach($creators as $creator)
+                                    <option value="{{ $creator->id }}" {{ request('creator_id') == $creator->id ? 'selected' : '' }}>
+                                        {{ $creator->organization_name ?: $creator->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </form>
+                        @if(request('creator_id'))
+                            <a href="{{ route('admin.resources.index') }}" class="btn btn-outline-secondary">
+                                <i class="fa-solid fa-times"></i>
+                            </a>
+                        @endif
+                    @endif
+                    <a href="{{ request()->routeIs('admin.resources.index') ? route('admin.resources.create') : route('creator.resources.create') }}" class="btn btn-primary">
+                        <i class="fa-solid fa-circle-plus me-1"></i> Opret materiale
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -33,53 +53,16 @@
         <!-- Resources Grid -->
         <div class="row g-3">
             @forelse($resources as $resource)
-                @php
-                    $resourceColor = '#be185d'; // Resources always use magenta
-                @endphp
-                <div class="col-md-6 col-lg-4">
-                    <div class="card clickable-card" data-href="{{ route('creator.resources.show', $resource) }}" style="cursor: pointer;">
-                        <img src="{{ $resource->image }}" class="card-img-top" alt="{{ $resource->title }}" style="height: 200px; object-fit: cover;">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                                    <i class="fa-solid fa-photo-film" style="color: {{ $resourceColor }};"></i> {{ $resource->title }}
-                                </h5>
-                                @if($resource->is_published)
-                                    <span class="badge bg-success">Publiceret</span>
-                                @else
-                                    <span class="badge bg-secondary">Kladde</span>
-                                @endif
-                            </div>
-                            <div class="card-text" style="font-size: 14px; font-weight: 300; color: #666; margin-bottom: 15px;">
-                                {!! Str::limit(strip_tags($resource->description), 200) !!}
-                                @if(strlen(strip_tags($resource->description)) > 200)
-                                    <a href="{{ route('creator.resources.show', $resource) }}" style="color: {{ $resourceColor }}; text-decoration: underline;">læs resten</a>
-                                @endif
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span style="font-size: 13px; font-weight: 300; color: #999;">
-                                    <span style="color: var(--primary-color); font-weight: 600;">Af:</span> {{ $resource->creator->organization_name ?: $resource->creator->name }}
-                                </span>
-                                <span style="font-size: 16px; font-weight: 600; color: #333;">
-                                    @if($resource->is_free)
-                                        Gratis for medlemmer
-                                    @else
-                                        €{{ number_format($resource->price, 2) }}
-                                    @endif
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <x-resource-card :resource="$resource" />
             @empty
                 <div class="col-12">
                     <div class="card text-center py-5">
                         <div class="card-body">
                             <i class="fa-solid fa-glasses" style="font-size: 4rem; color: #d1d5db;"></i>
-                            <h5 class="mt-3 mb-2">Intet download endnu</h5>
-                            <p class="text-muted mb-3" style="font-weight: 300;">Kom i gang med at oprette dit første download</p>
+                            <h5 class="mt-3 mb-2">Intet materiale endnu</h5>
+                            <p class="text-muted mb-3" style="font-weight: 300;">Kom i gang med at oprette dit første materiale</p>
                             <a href="{{ route('creator.resources.create') }}" class="btn btn-primary">
-                                <i class="fa-solid fa-circle-plus me-1"></i> Opret download
+                                <i class="fa-solid fa-circle-plus me-1"></i> Opret materiale
                             </a>
                         </div>
                     </div>

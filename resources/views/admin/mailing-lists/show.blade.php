@@ -134,7 +134,7 @@
                 <div class="card">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                         <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-photo-film" style="color: var(--primary-color);"></i> Downloads @if($mailingList->resources->count() > 0)(<b>{{ $mailingList->resources->count() }}</b>)@endif
+                            <i class="fa-solid fa-photo-film" style="color: var(--primary-color);"></i> Materialer @if($mailingList->resources->count() > 0)(<b>{{ $mailingList->resources->count() }}</b>)@endif
                         </h5>
                     </div>
                     <div class="card-body">
@@ -156,7 +156,7 @@
                         @else
                             <div class="text-center py-4">
                                 <i class="fa-solid fa-photo-film" style="font-size: 3rem; color: #d1d5db;"></i>
-                                <p class="mt-3 mb-0" style="font-weight: 300; color: #666;">Ingen downloads tildelt denne liste endnu</p>
+                                <p class="mt-3 mb-0" style="font-weight: 300; color: #666;">Ingen materialer tildelt denne liste endnu</p>
                             </div>
                         @endif
                     </div>

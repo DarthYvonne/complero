@@ -14,10 +14,14 @@ class MailingListController extends Controller
      */
     public function index()
     {
-        $mailingLists = MailingList::where('creator_id', auth()->id())
-            ->withCount(['members', 'courses', 'resources'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = MailingList::withCount(['members', 'courses', 'resources'])->orderBy('created_at', 'desc');
+
+        // Only scope to own content if NOT admin
+        if (auth()->user()->role !== 'admin') {
+            $query->where('creator_id', auth()->id());
+        }
+
+        $mailingLists = $query->get();
 
         return view('creator.mailing-lists.index', compact('mailingLists'));
     }
@@ -58,22 +62,31 @@ class MailingListController extends Controller
      */
     public function show(MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til denne mailing liste');
         }
 
         $mailingList->load(['activeMembers', 'courses', 'resources']);
 
-        // Get available courses and resources (created by this user, not yet assigned to this list)
-        $availableCourses = \App\Models\Course::where('creator_id', auth()->id())
-            ->where('mailing_list_id', '!=', $mailingList->id)
-            ->orWhereNull('mailing_list_id')
-            ->get();
+        // Get available courses and resources (not yet assigned to this list)
+        $courseQuery = \App\Models\Course::where(function($q) use ($mailingList) {
+            $q->where('mailing_list_id', '!=', $mailingList->id)
+              ->orWhereNull('mailing_list_id');
+        });
 
-        $availableResources = \App\Models\Resource::where('creator_id', auth()->id())
-            ->where('mailing_list_id', '!=', $mailingList->id)
-            ->orWhereNull('mailing_list_id')
-            ->get();
+        $resourceQuery = \App\Models\Resource::where(function($q) use ($mailingList) {
+            $q->where('mailing_list_id', '!=', $mailingList->id)
+              ->orWhereNull('mailing_list_id');
+        });
+
+        // Only show own content if NOT admin
+        if (auth()->user()->role !== 'admin') {
+            $courseQuery->where('creator_id', auth()->id());
+            $resourceQuery->where('creator_id', auth()->id());
+        }
+
+        $availableCourses = $courseQuery->get();
+        $availableResources = $resourceQuery->get();
 
         return view('creator.mailing-lists.show', compact('mailingList', 'availableCourses', 'availableResources'));
     }
@@ -83,7 +96,7 @@ class MailingListController extends Controller
      */
     public function edit(MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til at redigere denne mailing liste');
         }
 
@@ -95,7 +108,7 @@ class MailingListController extends Controller
      */
     public function update(Request $request, MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til at redigere denne mailing liste');
         }
 
@@ -121,7 +134,7 @@ class MailingListController extends Controller
      */
     public function destroy(MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til at slette denne mailing liste');
         }
 
@@ -137,7 +150,7 @@ class MailingListController extends Controller
      */
     public function addMember(Request $request, MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403);
         }
 
@@ -165,7 +178,7 @@ class MailingListController extends Controller
      */
     public function removeMember(MailingList $mailingList, User $user)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403);
         }
 
@@ -179,7 +192,7 @@ class MailingListController extends Controller
      */
     public function signupForms(MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til denne mailing liste');
         }
 
@@ -195,7 +208,7 @@ class MailingListController extends Controller
      */
     public function qrCode(MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til denne mailing liste');
         }
 
@@ -207,7 +220,7 @@ class MailingListController extends Controller
      */
     public function import(MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til denne mailing liste');
         }
 
@@ -234,7 +247,7 @@ class MailingListController extends Controller
      */
     public function parseImport(Request $request, MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403);
         }
 
@@ -272,7 +285,7 @@ class MailingListController extends Controller
      */
     public function processImport(Request $request, MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403);
         }
 
@@ -389,7 +402,7 @@ class MailingListController extends Controller
      */
     public function updateSignupFormTemplate(Request $request, MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403);
         }
 
@@ -409,7 +422,7 @@ class MailingListController extends Controller
      */
     public function updateSignupFormData(Request $request, MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403);
         }
 
@@ -418,6 +431,8 @@ class MailingListController extends Controller
             'image' => ['nullable', 'string'],
             'header' => ['nullable', 'string', 'max:255'],
             'body' => ['nullable', 'string', 'max:500'],
+            'buttonText' => ['nullable', 'string', 'max:50'],
+            'buttonColor' => ['nullable', 'string', 'regex:/^#[0-9A-F]{6}$/i'],
         ]);
 
         // Get existing data or empty array
@@ -428,6 +443,8 @@ class MailingListController extends Controller
             'image' => $validated['image'] ?? null,
             'header' => $validated['header'] ?? null,
             'body' => $validated['body'] ?? null,
+            'buttonText' => $validated['buttonText'] ?? null,
+            'buttonColor' => $validated['buttonColor'] ?? null,
         ];
 
         $mailingList->update([
@@ -442,7 +459,7 @@ class MailingListController extends Controller
      */
     public function uploadSignupFormImage(Request $request, MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403);
         }
 
@@ -459,11 +476,31 @@ class MailingListController extends Controller
     }
 
     /**
+     * Update offer membership setting
+     */
+    public function updateOfferMembership(Request $request, MailingList $mailingList)
+    {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'offer_membership' => ['required', 'boolean'],
+        ]);
+
+        $mailingList->update([
+            'offer_membership' => $validated['offer_membership'],
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Assign courses to mailing list
      */
     public function assignCourses(Request $request, MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403);
         }
 
@@ -473,9 +510,14 @@ class MailingListController extends Controller
         ]);
 
         // Update courses to belong to this mailing list
-        \App\Models\Course::whereIn('id', $validated['course_ids'])
-            ->where('creator_id', auth()->id())
-            ->update(['mailing_list_id' => $mailingList->id]);
+        $query = \App\Models\Course::whereIn('id', $validated['course_ids']);
+
+        // Only scope to own content if NOT admin
+        if (auth()->user()->role !== 'admin') {
+            $query->where('creator_id', auth()->id());
+        }
+
+        $query->update(['mailing_list_id' => $mailingList->id]);
 
         return back()->with('success', 'Forløb tilbudt succesfuldt');
     }
@@ -485,7 +527,7 @@ class MailingListController extends Controller
      */
     public function assignResources(Request $request, MailingList $mailingList)
     {
-        if ($mailingList->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
             abort(403);
         }
 
@@ -495,9 +537,14 @@ class MailingListController extends Controller
         ]);
 
         // Update resources to belong to this mailing list
-        \App\Models\Resource::whereIn('id', $validated['resource_ids'])
-            ->where('creator_id', auth()->id())
-            ->update(['mailing_list_id' => $mailingList->id]);
+        $query = \App\Models\Resource::whereIn('id', $validated['resource_ids']);
+
+        // Only scope to own content if NOT admin
+        if (auth()->user()->role !== 'admin') {
+            $query->where('creator_id', auth()->id());
+        }
+
+        $query->update(['mailing_list_id' => $mailingList->id]);
 
         return back()->with('success', 'Downloads tilbudt succesfuldt');
     }

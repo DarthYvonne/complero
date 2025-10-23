@@ -3,16 +3,29 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\MailingList;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::orderBy('created_at', 'desc')->paginate(20);
-        return view('admin.users.index', compact('users'));
+        $query = User::query();
+
+        // Filter by mailing list if selected
+        if ($request->filled('mailing_list')) {
+            $query->whereHas('mailingLists', function ($q) use ($request) {
+                $q->where('mailing_list_id', $request->mailing_list)
+                  ->where('status', 'active');
+            });
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->paginate(20);
+        $mailingLists = MailingList::orderBy('name')->get();
+
+        return view('admin.users.index', compact('users', 'mailingLists'));
     }
 
     public function edit(User $user)

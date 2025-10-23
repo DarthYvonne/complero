@@ -59,20 +59,53 @@
                 <div class="card mb-4" id="uploadSection">
                     <div class="card-header bg-white py-3">
                         <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-file" style="color: var(--primary-color);"></i> Vælg fil
+                            Importer brugere fra en fil
                         </h5>
                     </div>
                     <div class="card-body">
                         <form id="uploadForm" enctype="multipart/form-data">
                             @csrf
-                            <div class="mb-3">
-                                <input type="file" class="form-control" id="importFile" name="file" accept=".csv,.xlsx,.xls" required>
-                                <div class="form-text">Accepterede formater: CSV, Excel (.xlsx, .xls)</div>
+
+                            <!-- File Upload Drop Zone -->
+                            <div class="upload-zone" id="upload-zone" onclick="document.getElementById('importFile').click()">
+                                <input type="file"
+                                       class="d-none"
+                                       id="importFile"
+                                       name="file"
+                                       accept=".csv,.xlsx,.xls"
+                                       required
+                                       onchange="handleFileSelect(this)">
+                                <div class="text-center py-4">
+                                    <i class="fa-solid fa-cloud-arrow-up" style="font-size: 3rem; color: #cbd5e1;"></i>
+                                    <p class="mb-1 mt-3" style="font-weight: 500; color: #64748b;">
+                                        Klik for at vælge fil
+                                    </p>
+                                    <p class="small text-muted mb-0">
+                                        CSV eller Excel (.xlsx, .xls)
+                                    </p>
+                                </div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fa-solid fa-arrow-right me-1"></i> Næste: Kortlæg felter
-                            </button>
+                            <!-- File Preview -->
+                            <div id="file-preview" class="mt-3" style="display: none;">
+                                <div class="alert alert-info d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fa-solid fa-file me-2"></i>
+                                        <span id="file-name"></span>
+                                    </div>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="clearFileUpload()">
+                                        <i class="fa-solid fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-3">
+                                <button type="submit" class="btn btn-primary">
+                                    Upload
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -92,14 +125,14 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label" style="font-weight: 500;">
-                                        Email <span class="text-danger">*</span>
+                                        Vælg den kolonne der indeholder email <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select" id="emailField" name="email_field" required>
                                         <option value="">Vælg kolonne...</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label" style="font-weight: 500;">Navn</label>
+                                    <label class="form-label" style="font-weight: 500;">Vælg den kolonne der indeholder navn</label>
                                     <select class="form-select" id="nameField" name="name_field">
                                         <option value="">Vælg kolonne...</option>
                                     </select>
@@ -146,54 +179,18 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <!-- Instructions -->
-                <div class="card mb-3">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-circle-info" style="color: var(--primary-color);"></i> Vejledning
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div style="font-weight: 300; color: #666; font-size: 14px;">
-                            <p><strong style="font-weight: 500;">1. Forbered din fil</strong></p>
-                            <p>Sørg for at din fil har en kolonne med email-adresser. Du kan også inkludere navne.</p>
-
-                            <p class="mt-3"><strong style="font-weight: 500;">2. Upload filen</strong></p>
-                            <p>Vælg en CSV eller Excel fil fra din computer.</p>
-
-                            <p class="mt-3"><strong style="font-weight: 500;">3. Kortlæg felter</strong></p>
-                            <p>Vælg hvilke kolonner der matcher email og navn.</p>
-
-                            <p class="mb-0 mt-3"><strong style="font-weight: 500;">4. Importér</strong></p>
-                            <p class="mb-0">Gennemse forhåndsvisningen og klik på "Importér medlemmer".</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Download Template -->
-                <div class="card">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-download" style="color: var(--primary-color);"></i> Skabelon
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <p style="font-weight: 300; color: #666; font-size: 14px; margin-bottom: 15px;">
-                            Download en skabelon-fil som eksempel på hvordan din fil skal være formateret.
-                        </p>
-                        <a href="{{ route('creator.mailing-lists.download-template') }}" class="btn btn-outline-primary btn-sm w-100">
-                            <i class="fa-solid fa-file-csv me-1"></i> Download CSV skabelon
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
     <style>
+        .nav-tabs .nav-link {
+            background-color: transparent !important;
+        }
+
+        .nav-tabs .nav-link.active {
+            background-color: transparent !important;
+        }
+
         .card {
             border-radius: 8px;
             border: 1px solid #e0e0e0;
@@ -216,11 +213,40 @@
             font-weight: 600;
             border-bottom: 2px solid #dee2e6;
         }
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: #f8fafc;
+        }
+        .upload-zone:hover {
+            border-color: var(--primary-color);
+            background-color: #f1f5f9;
+        }
+        .upload-zone:hover i {
+            color: var(--primary-color) !important;
+        }
     </style>
 
     <script>
         let fileHeaders = [];
         let fileRows = [];
+
+        // Handle file selection
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('file-name').textContent = file.name;
+                document.getElementById('file-preview').style.display = 'block';
+            }
+        }
+
+        // Clear file upload
+        function clearFileUpload() {
+            document.getElementById('importFile').value = '';
+            document.getElementById('file-preview').style.display = 'none';
+        }
 
         // Handle file upload
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {

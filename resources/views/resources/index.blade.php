@@ -1,7 +1,7 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <strong style="color: #333; font-weight: 600;">Downloads</strong>
+    <strong style="color: #333; font-weight: 600;">Materialer</strong>
 @endsection
     <div class="container-fluid">
         <!-- Page Header -->
@@ -9,14 +9,9 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 0;">
-                        <i class="fa-solid fa-photo-film" style="color: var(--primary-color);"></i> Downloads
+                        <i class="fa-solid fa-photo-film" style="color: var(--primary-color);"></i> Materialer
                     </h1>
                 </div>
-                @if(Auth::user() && in_array(Auth::user()->role, ['admin', 'creator']))
-                    <a href="{{ route('admin.resources.create') }}" class="btn btn-primary">
-                        <i class="fa-solid fa-circle-plus me-1"></i> Tilføj download
-                    </a>
-                @endif
             </div>
         </div>
 
@@ -59,10 +54,10 @@
                             </div>
                         </div>
                     </div>
-                    <a href="{{ route('resources.show', $resource) }}" class="btn w-100" style="margin-top: 15px; background: {{ $resourceColor }}; border-color: {{ $resourceColor }}; color: #ffffff; font-size: 14px; font-weight: 500; border-radius: 6px;"
+                    <a href="{{ route('resources.show', $resource) }}" class="btn w-100 resource-btn" style="margin-top: 15px; background: {{ $resourceColor }}; border-color: {{ $resourceColor }}; color: #ffffff;"
                        onmouseover="this.style.background='{{ $hoverColor }}'; this.style.borderColor='{{ $hoverColor }}';"
                        onmouseout="this.style.background='{{ $resourceColor }}'; this.style.borderColor='{{ $resourceColor }}';">
-                        <i class="fa-solid fa-arrow-right me-1"></i> Se download
+                        <i class="fa-solid fa-arrow-right me-1"></i> Se materiale
                     </a>
                 </div>
             @empty
@@ -70,8 +65,8 @@
                     <div class="card text-center py-5">
                         <div class="card-body">
                             <i class="fa-solid fa-glasses" style="font-size: 4rem; color: #d1d5db;"></i>
-                            <h5 class="mt-3 mb-2">Intet download tilgængeligt endnu</h5>
-                            <p class="text-muted mb-0" style="font-weight: 300;">Downloads vil blive tilgængeligt snart</p>
+                            <h5 class="mt-3 mb-2">Intet materiale tilgængeligt endnu</h5>
+                            <p class="text-muted mb-0" style="font-weight: 300;">Materialer vil blive tilgængeligt snart</p>
                         </div>
                     </div>
                 </div>

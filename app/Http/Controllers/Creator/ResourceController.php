@@ -12,22 +12,40 @@ use Illuminate\Support\Facades\Storage;
 
 class ResourceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $resources = Resource::where('creator_id', auth()->id())
-            ->with('creator', 'files')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = Resource::with('creator', 'files')->orderBy('created_at', 'desc');
 
-        return view('creator.resources.index', compact('resources'));
+        // Only scope to own content if NOT admin
+        if (auth()->user()->role !== 'admin') {
+            $query->where('creator_id', auth()->id());
+        } else {
+            // Admin can filter by creator
+            if ($request->filled('creator_id')) {
+                $query->where('creator_id', $request->creator_id);
+            }
+        }
+
+        $resources = $query->get();
+
+        // Get all creators for filter dropdown (only for admins)
+        $creators = auth()->user()->role === 'admin'
+            ? \App\Models\User::whereIn('role', ['creator', 'admin'])->orderBy('name')->get()
+            : collect();
+
+        return view('creator.resources.index', compact('resources', 'creators'));
     }
 
     public function create()
     {
-        $mailingLists = MailingList::where('creator_id', auth()->id())
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
+        $query = MailingList::where('is_active', true)->orderBy('name');
+
+        // Only show own mailing lists if NOT admin
+        if (auth()->user()->role !== 'admin') {
+            $query->where('creator_id', auth()->id());
+        }
+
+        $mailingLists = $query->get();
 
         return view('creator.resources.create', compact('mailingLists'));
     }
@@ -45,11 +63,15 @@ class ResourceController extends Controller
             'files.*' => ['nullable', 'file', 'max:10240'],
         ]);
 
-        // Ensure the mailing list belongs to this creator if specified
+        // Ensure the mailing list belongs to this creator if specified (unless admin)
         if ($validated['mailing_list_id'] ?? null) {
-            $mailingList = MailingList::where('id', $validated['mailing_list_id'])
-                ->where('creator_id', auth()->id())
-                ->firstOrFail();
+            $query = MailingList::where('id', $validated['mailing_list_id']);
+
+            if (auth()->user()->role !== 'admin') {
+                $query->where('creator_id', auth()->id());
+            }
+
+            $mailingList = $query->firstOrFail();
         }
 
         $resource = Resource::create([
@@ -88,7 +110,7 @@ class ResourceController extends Controller
 
     public function show(Resource $resource)
     {
-        if ($resource->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $resource->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til denne ressource');
         }
 
@@ -98,29 +120,34 @@ class ResourceController extends Controller
 
     public function edit(Resource $resource)
     {
-        if ($resource->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $resource->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til at redigere denne ressource');
         }
 
         $resource->load('tabs');
-        $mailingLists = MailingList::where('creator_id', auth()->id())
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
+        $query = MailingList::where('is_active', true)->orderBy('name');
+
+        // Only show own mailing lists if NOT admin
+        if (auth()->user()->role !== 'admin') {
+            $query->where('creator_id', auth()->id());
+        }
+
+        $mailingLists = $query->get();
 
         return view('creator.resources.edit', compact('resource', 'mailingLists'));
     }
 
     public function update(Request $request, Resource $resource)
     {
-        if ($resource->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $resource->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til at redigere denne ressource');
         }
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'mailing_list_id' => ['nullable', 'exists:mailing_lists,id'],
+            'mailing_list_ids' => ['nullable', 'array'],
+            'mailing_list_ids.*' => ['exists:mailing_lists,id'],
             'image' => ['nullable', 'image', 'max:2048'],
             'price' => ['nullable', 'numeric', 'min:0'],
             'is_free' => ['nullable', 'boolean'],
@@ -129,21 +156,36 @@ class ResourceController extends Controller
             'remove_image' => ['boolean'],
         ]);
 
-        // Ensure the mailing list belongs to this creator if specified
-        if ($validated['mailing_list_id'] ?? null) {
-            $mailingList = MailingList::where('id', $validated['mailing_list_id'])
-                ->where('creator_id', auth()->id())
-                ->firstOrFail();
+        // Ensure the mailing lists belong to this creator if specified (unless admin)
+        if (!empty($validated['mailing_list_ids'])) {
+            $query = MailingList::whereIn('id', $validated['mailing_list_ids']);
+
+            if (auth()->user()->role !== 'admin') {
+                $query->where('creator_id', auth()->id());
+            }
+
+            // Verify all mailing lists are valid
+            $validMailingLists = $query->pluck('id')->toArray();
+            if (count($validMailingLists) !== count($validated['mailing_list_ids'])) {
+                abort(403, 'En eller flere mailing lister tilhører ikke dig');
+            }
         }
 
         $resource->update([
             'title' => $validated['title'],
             'description' => $validated['description'],
-            'mailing_list_id' => $request->input('mailing_list_id') ?: null,
             'price' => $validated['price'] ?? 0,
             'is_free' => $request->has('is_free'),
             'is_published' => $request->has('is_published'),
         ]);
+
+        // Sync mailing lists
+        if (!empty($validated['mailing_list_ids'])) {
+            $resource->mailingLists()->sync($validated['mailing_list_ids']);
+        } else {
+            // No selection, clear all
+            $resource->mailingLists()->sync([]);
+        }
 
         // Handle image removal
         if ($request->has('remove_image') && $request->remove_image) {
@@ -184,7 +226,7 @@ class ResourceController extends Controller
 
     public function destroy(Resource $resource)
     {
-        if ($resource->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $resource->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til at slette denne ressource');
         }
 
@@ -205,7 +247,7 @@ class ResourceController extends Controller
 
     public function deleteFile(Resource $resource, ResourceFile $file)
     {
-        if ($resource->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $resource->creator_id !== auth()->id()) {
             abort(403);
         }
 
@@ -217,7 +259,7 @@ class ResourceController extends Controller
 
     public function storeTab(Request $request, Resource $resource)
     {
-        if ($resource->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $resource->creator_id !== auth()->id()) {
             abort(403);
         }
 

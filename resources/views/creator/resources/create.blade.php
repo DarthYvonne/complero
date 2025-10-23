@@ -1,9 +1,9 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('creator.resources.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Downloads</a>
+    <a href="{{ route('creator.resources.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Materialer</a>
     <span style="margin: 0 8px;">/</span>
-    <strong style="color: #333; font-weight: 600;">Opret download</strong>
+    <strong style="color: #333; font-weight: 600;">Opret materiale</strong>
 @endsection
 
     <div class="container-fluid">
@@ -12,14 +12,14 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                        Opret download
+                        Opret materiale
                     </h1>
                     <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
-                        Opret nyt downloadbart download
+                        Opret nyt materiale
                     </p>
                 </div>
                 <a href="{{ route('creator.resources.index') }}" class="btn btn-outline-secondary">
-                    <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til download
+                    <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til materialer
                 </a>
             </div>
         </div>
@@ -62,7 +62,7 @@
 
                             <!-- Image Upload -->
                             <div class="mb-3">
-                                <label for="image" class="form-label">Downloads billede</label>
+                                <label for="image" class="form-label">Materialets billede</label>
                                 <input type="file"
                                        class="form-control @error('image') is-invalid @enderror"
                                        id="image"
@@ -87,12 +87,12 @@
                                 @error('price')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                                <div class="form-text" style="font-weight: 300;">Sæt til 0 for gratis download</div>
+                                <div class="form-text" style="font-weight: 300;">Sæt til 0 for gratis materiale</div>
                             </div>
 
                             <!-- Downloadable Files -->
                             <div class="mb-3">
-                                <label for="files" class="form-label">Downloade filer</label>
+                                <label for="files" class="form-label">Filer</label>
                                 <input type="file"
                                        class="form-control @error('files.*') is-invalid @enderror"
                                        id="files"
@@ -133,7 +133,7 @@
                                            value="1"
                                            {{ old('is_free', true) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="is_free">
-                                        Dette download er gratis
+                                        Dette materiale er gratis
                                     </label>
                                 </div>
 
@@ -145,7 +145,7 @@
                                            value="1"
                                            {{ old('is_published') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="is_published">
-                                        Publicer download (gør det synligt for brugere)
+                                        Publicer materiale (gør det synligt for brugere)
                                     </label>
                                 </div>
                             </div>
@@ -153,7 +153,7 @@
                             <!-- Submit Buttons -->
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fa-solid fa-circle-check me-1"></i> Opret download
+                                    <i class="fa-solid fa-circle-check me-1"></i> Opret materiale
                                 </button>
                                 <a href="{{ route('creator.resources.index') }}" class="btn btn-outline-secondary">
                                     Annuller
@@ -172,11 +172,11 @@
                             <i class="fa-solid fa-circle-info" style="color: var(--primary-color);"></i> Hjælp
                         </h5>
                         <div style="font-size: 14px; font-weight: 300; color: #666;">
-                            <p><strong>Titel:</strong> Vælg en klar og beskrivende titel for downloadt.</p>
-                            <p><strong>Beskrivelse:</strong> Forklar hvad downloadt indeholder, og hvem det er til.</p>
-                            <p><strong>Billede:</strong> Upload et attraktivt billede der repræsenterer downloadt.</p>
-                            <p><strong>Filer:</strong> Upload de filer som brugerne kan downloade (PDF'er, e-bøger, skabeloner, osv.).</p>
-                            <p><strong>Pris:</strong> Sæt prisen til 0 for gratis download.</p>
+                            <p><strong>Titel:</strong> Vælg en klar og beskrivende titel for materialet.</p>
+                            <p><strong>Beskrivelse:</strong> Forklar hvad materialet indeholder, og hvem det er til.</p>
+                            <p><strong>Billede:</strong> Upload et attraktivt billede der repræsenterer materialet.</p>
+                            <p><strong>Filer:</strong> Upload de filer som brugerne kan hente (PDF'er, e-bøger, skabeloner, osv.).</p>
+                            <p><strong>Pris:</strong> Sæt prisen til 0 for gratis materiale.</p>
                         </div>
                     </div>
                 </div>
@@ -223,7 +223,7 @@
                         ['clean']
                     ]
                 },
-                placeholder: 'Skriv en beskrivelse af downloadt...'
+                placeholder: 'Skriv en beskrivelse af materialet...'
             });
 
             // Load existing content if any

@@ -1,45 +1,47 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('creator.resources.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Downloads</a>
+    <a href="{{ route('creator.resources.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Materialer</a>
     <span style="margin: 0 8px;">/</span>
     <a href="{{ route('creator.resources.show', $resource) }}" style="color: #999; text-decoration: none; transition: color 0.2s;">{{ $resource->title }}</a>
     <span style="margin: 0 8px;">/</span>
     <strong style="color: #333; font-weight: 600;">Rediger</strong>
 @endsection
-
-    <div class="container-fluid">
+    <div class="container">
         <!-- Page Header -->
-        <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                        Rediger download
-                    </h1>
-                    <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
-                        {{ $resource->title }}
-                    </p>
-                </div>
-                <div class="d-flex gap-2">
-                    <a href="{{ route('resources.show', $resource) }}" class="btn btn-outline-primary" target="_blank">
-                        <i class="fa-solid fa-eye me-1"></i> Forhåndsvisning
-                    </a>
-                    <a href="{{ route('creator.resources.show', $resource) }}" class="btn btn-outline-secondary">
-                        <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til download
-                    </a>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
+                            Rediger materiale: <span style="font-weight: 100;">{{ $resource->title }}</span>
+                        </h1>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-circle-check me-1"></i> Gem ændringer
+                        </button>
+                        <a href="{{ route('creator.resources.show', $resource) }}" class="btn btn-outline-secondary">
+                            Annuller
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Resource Form -->
-        <div class="row g-4">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-body">
-                        <form action="{{ route('creator.resources.update', $resource) }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            @method('PATCH')
+        <form action="{{ route('creator.resources.update', $resource) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PATCH')
 
+            <div class="row">
+                <!-- Left Column -->
+                <div class="col-lg-8">
+                    <!-- Basic Information Card -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="mb-0" style="font-weight: 600;">Grundlæggende information</h5>
+                        </div>
+                        <div class="card-body">
                             <!-- Title -->
                             <div class="mb-3">
                                 <label for="title" class="form-label">Titel <span class="text-danger">*</span></label>
@@ -55,7 +57,7 @@
                             </div>
 
                             <!-- Description -->
-                            <div class="mb-3">
+                            <div class="mb-0">
                                 <label for="description" class="form-label">Beskrivelse <span class="text-danger">*</span></label>
                                 <div id="description-editor" style="min-height: 200px; background: white;"></div>
                                 <textarea class="form-control @error('description') is-invalid @enderror"
@@ -67,87 +69,55 @@
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- Current Image -->
-                            @if($resource->image_url)
-                                <div class="mb-3">
-                                    <label class="form-label">Nuværende billede</label>
-                                    <div class="mb-2">
-                                        <img src="{{ Storage::url($resource->image_url) }}" alt="{{ $resource->title }}" class="img-thumbnail" style="max-width: 300px;">
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input"
-                                               type="checkbox"
-                                               id="remove_image"
-                                               name="remove_image"
-                                               value="1">
-                                        <label class="form-check-label" for="remove_image">
-                                            Fjern billede
-                                        </label>
-                                    </div>
-                                </div>
-                            @endif
-
-                            <!-- Image Upload -->
-                            <div class="mb-3">
-                                <label for="image" class="form-label">
-                                    @if($resource->image_url)
-                                        Nyt billede (valgfrit)
-                                    @else
-                                        Downloads billede
-                                    @endif
-                                </label>
-                                <input type="file"
-                                       class="form-control @error('image') is-invalid @enderror"
-                                       id="image"
-                                       name="image"
-                                       accept="image/*">
-                                @error('image')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div class="form-text" style="font-weight: 300;">
-                                    @if($resource->image_url)
-                                        Upload kun hvis du vil erstatte det nuværende billede. Maksimal filstørrelse: 2MB
-                                    @else
-                                        Maksimal filstørrelse: 2MB. Anbefalet format: JPG eller PNG
-                                    @endif
-                                </div>
-                            </div>
-
-                            <!-- Price -->
-                            <div class="mb-3">
-                                <label for="price" class="form-label">Pris (€)</label>
-                                <input type="number"
-                                       class="form-control @error('price') is-invalid @enderror"
-                                       id="price"
-                                       name="price"
-                                       value="{{ old('price', $resource->price) }}"
-                                       step="0.01"
-                                       min="0">
-                                @error('price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div class="form-text" style="font-weight: 300;">Sæt til 0 for gratis download</div>
-                            </div>
-
+                    <!-- Files Card -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="mb-0" style="font-weight: 600;">Filer</h5>
+                        </div>
+                        <div class="card-body">
                             <!-- Current Files -->
                             @if($resource->files->count() > 0)
-                                <div class="mb-3">
-                                    <label class="form-label">Eksisterende filer</label>
+                                <div class="mb-4">
+                                    <label class="form-label">Eksisterende filer ({{ $resource->files->count() }})</label>
                                     <div class="list-group">
                                         @foreach($resource->files as $file)
+                                            @php
+                                                $extension = strtolower(pathinfo($file->filename, PATHINFO_EXTENSION));
+                                                $iconClass = match($extension) {
+                                                    'pdf' => 'fa-file-pdf',
+                                                    'doc', 'docx' => 'fa-file-word',
+                                                    'xls', 'xlsx' => 'fa-file-excel',
+                                                    'ppt', 'pptx' => 'fa-file-powerpoint',
+                                                    'zip', 'rar', '7z' => 'fa-file-zipper',
+                                                    'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp' => 'fa-file-image',
+                                                    'mp4', 'avi', 'mov', 'wmv' => 'fa-file-video',
+                                                    'mp3', 'wav', 'ogg' => 'fa-file-audio',
+                                                    'txt' => 'fa-file-lines',
+                                                    default => 'fa-file',
+                                                };
+                                                $iconColor = match($extension) {
+                                                    'pdf' => '#dc2626',
+                                                    'doc', 'docx' => '#2563eb',
+                                                    'xls', 'xlsx' => '#16a34a',
+                                                    'ppt', 'pptx' => '#ea580c',
+                                                    default => 'var(--primary-color)',
+                                                };
+                                            @endphp
                                             <div class="list-group-item d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <i class="fa-solid fa-file me-2"></i>
-                                                    {{ $file->filename }}
-                                                    <small class="text-muted">({{ number_format($file->file_size / 1024, 2) }} KB)</small>
-                                                </div>
+                                                <a href="{{ Storage::url($file->file_path) }}" target="_blank" class="text-decoration-none flex-grow-1" style="color: inherit;">
+                                                    <i class="fa-solid {{ $iconClass }} me-2" style="color: {{ $iconColor }}; font-size: 1.5rem;"></i>
+                                                    <strong style="font-size: 14px; font-weight: 500;">{{ $file->filename }}</strong>
+                                                    <small class="text-muted ms-2">({{ number_format($file->file_size / 1024, 2) }} KB)</small>
+                                                </a>
                                                 <form action="{{ route('creator.resources.files.destroy', [$resource, $file]) }}" method="POST" class="d-inline"
                                                       onsubmit="return confirm('Er du sikker på, at du vil slette denne fil?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                        <i class="fa-solid fa-trash"></i> Slet
+                                                    <button type="submit" class="btn btn-link text-danger p-0" style="font-size: 14px; text-decoration: none;">
+                                                        <i class="fa-solid fa-trash me-1"></i> Slet
                                                     </button>
                                                 </form>
                                             </div>
@@ -156,207 +126,213 @@
                                 </div>
                             @endif
 
-                            <!-- New File Attachments -->
-                            <div class="mb-3">
-                                <label for="files" class="form-label">Tilføj flere filer</label>
-                                <input type="file"
-                                       class="form-control @error('files.*') is-invalid @enderror"
-                                       id="files"
-                                       name="files[]"
-                                       multiple>
-                                @error('files.*')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div class="form-text" style="font-weight: 300;">Upload PDF'er, e-bøger, skabeloner eller andre filer (max 10MB per fil)</div>
-                            </div>
-
-                            <!-- Mailing List -->
-                            <div class="mb-3">
-                                <label for="mailing_list_id" class="form-label">Tilgængelig for</label>
-                                <select class="form-select @error('mailing_list_id') is-invalid @enderror"
-                                        id="mailing_list_id"
-                                        name="mailing_list_id">
-                                    <option value="">Alle (gratis for alle)</option>
-                                    @foreach($mailingLists as $list)
-                                        <option value="{{ $list->id }}" {{ old('mailing_list_id', $resource->mailing_list_id) == $list->id ? 'selected' : '' }}>
-                                            For medlemmer af {{ $list->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('mailing_list_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div class="form-text" style="font-weight: 300;">Vælg en mailing liste for at begrænse adgang, eller lad feltet være tomt for gratis adgang for alle</div>
-                            </div>
-
-                            <!-- Checkboxes -->
-                            <div class="mb-3">
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           id="is_free"
-                                           name="is_free"
-                                           value="1"
-                                           {{ old('is_free', $resource->is_free) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_free">
-                                        Dette download er gratis
-                                    </label>
-                                </div>
-
-                                <div class="form-check">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           id="is_published"
-                                           name="is_published"
-                                           value="1"
-                                           {{ old('is_published', $resource->is_published) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_published">
-                                        Publicer download (gør det synligt for brugere)
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Submit Buttons -->
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fa-solid fa-circle-check me-1"></i> Gem ændringer
-                                </button>
-                                <a href="{{ route('creator.resources.show', $resource) }}" class="btn btn-outline-secondary">
-                                    Annuller
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Info Sidebar -->
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px;">
-                            <i class="fa-solid fa-circle-info" style="color: var(--primary-color);"></i> Downloadsinfo
-                        </h5>
-                        <div style="font-size: 14px; font-weight: 300; color: #666;">
-                            <div class="mb-3">
-                                <strong class="d-block mb-1">Oprettet</strong>
-                                {{ $resource->created_at->format('d/m/Y H:i') }}
-                            </div>
-
-                            <div class="mb-3">
-                                <strong class="d-block mb-1">Sidst opdateret</strong>
-                                {{ $resource->updated_at->format('d/m/Y H:i') }}
-                            </div>
-
-                            <div class="mb-3">
-                                <strong class="d-block mb-1">Slug</strong>
-                                <code>{{ $resource->slug }}</code>
-                            </div>
-
-                            <div class="mb-3">
-                                <strong class="d-block mb-1">Oprettet af</strong>
-                                {{ $resource->creator->name }}
-                            </div>
-
-                            <div>
-                                <strong class="d-block mb-1">Antal filer</strong>
-                                {{ $resource->files->count() }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Resource Tabs Management -->
-        <div class="card border-0 shadow-sm mt-4">
-            <div class="card-header bg-white border-bottom">
-                <h5 class="mb-0">Ekstra tabs (valgfrit)</h5>
-                <small class="text-muted">Tilføj ekstra tabs til downloadts side. "Intro" tab vises altid med beskrivelsen.</small>
-            </div>
-            <div class="card-body">
-                <!-- Existing Tabs -->
-                @if($resource->tabs->count() > 0)
-                    <div class="mb-4">
-                        <h6 class="mb-3">Eksisterende tabs</h6>
-                        <div class="list-group">
-                            @foreach($resource->tabs as $tab)
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>{{ $tab->title }}</strong>
-                                        <div class="small text-muted mt-1">{{ Str::limit(strip_tags($tab->content), 100) }}</div>
+                            <!-- New File Upload -->
+                            <div class="mb-0">
+                                <div class="upload-zone" id="files-upload-zone" onclick="document.getElementById('files').click()">
+                                    <input type="file"
+                                           class="d-none @error('files.*') is-invalid @enderror"
+                                           id="files"
+                                           name="files[]"
+                                           multiple
+                                           onchange="previewFiles(this)">
+                                    <div class="text-center py-4">
+                                        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 3rem; color: #cbd5e1;"></i>
+                                        <p class="mb-1 mt-3" style="font-weight: 500; color: #64748b;">
+                                            Klik for at uploade filer
+                                        </p>
+                                        <p class="small mb-0" style="color: #94a3b8;">eller træk og slip filer her</p>
+                                        <p class="small text-muted mt-2">Max 10MB per fil. PDF, Word, Excel, etc.</p>
                                     </div>
-                                    <form action="{{ route('creator.resources.tabs.destroy', [$resource, $tab]) }}" method="POST" class="d-inline"
-                                          onsubmit="return confirm('Er du sikker på, at du vil slette denne tab?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="fa-solid fa-trash"></i> Slet
-                                        </button>
-                                    </form>
+                                    <div id="files-preview" class="mt-3" style="display: none;">
+                                        <div class="list-group" id="files-preview-list"></div>
+                                    </div>
                                 </div>
-                            @endforeach
+                                @error('files.*')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
                     </div>
-                @endif
 
-                <!-- Add New Tab Form -->
-                <div>
-                    <h6 class="mb-3">Tilføj ny tab</h6>
-                    <form action="{{ route('creator.resources.tabs.store', $resource) }}" method="POST">
-                        @csrf
-
-                        <!-- Tab Title -->
-                        <div class="mb-3">
-                            <label for="tab_title" class="form-label">Tab titel <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control @error('title') is-invalid @enderror"
-                                   id="tab_title"
-                                   name="title"
-                                   placeholder="F.eks. Ofte stillede spørgsmål"
-                                   required>
-                            @error('title')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                    <!-- Image Card -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="mb-0" style="font-weight: 600;">
+                                @if($resource->image_url)
+                                    Erstat billede
+                                @else
+                                    Upload billede
+                                @endif
+                            </h5>
                         </div>
+                        <div class="card-body">
+                            <!-- Current Image -->
+                            @if($resource->image_url)
+                                <div class="mb-3">
+                                    <div class="position-relative d-inline-block">
+                                        <img src="{{ Storage::url($resource->image_url) }}"
+                                             alt="{{ $resource->title }}"
+                                             class="img-thumbnail"
+                                             style="max-height: 200px; max-width: 100%;">
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
+                                                onclick="removeImage()"
+                                                style="opacity: 0.9;">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <input type="hidden" id="remove_image" name="remove_image" value="0">
+                                </div>
+                            @endif
 
-                        <!-- Tab Content -->
-                        <div class="mb-3">
-                            <label for="tab_content" class="form-label">Tab indhold <span class="text-danger">*</span></label>
-                            <div id="tab-content-editor" style="min-height: 200px; background: white;"></div>
-                            <textarea class="form-control @error('content') is-invalid @enderror"
-                                      id="tab_content"
-                                      name="content"
-                                      style="display: none;"
-                                      required></textarea>
-                            @error('content')
+                            <!-- Image Upload Drop Zone -->
+                            <div class="upload-zone" id="upload-zone" onclick="document.getElementById('image').click()">
+                                <input type="file"
+                                       class="d-none @error('image') is-invalid @enderror"
+                                       id="image"
+                                       name="image"
+                                       accept="image/*"
+                                       onchange="previewImage(this)">
+                                <div class="text-center py-4">
+                                    <i class="fa-solid fa-cloud-arrow-up" style="font-size: 3rem; color: #cbd5e1;"></i>
+                                    <p class="mb-1 mt-3" style="font-weight: 500; color: #64748b;">
+                                        @if($resource->image_url)
+                                            Klik for at uploade nyt billede
+                                        @else
+                                            Klik for at uploade billede
+                                        @endif
+                                    </p>
+                                    <p class="small mb-0" style="color: #94a3b8;">eller træk og slip en fil her</p>
+                                    <p class="small text-muted mt-2">Max 2MB. JPG, PNG eller WebP</p>
+                                </div>
+                                <div id="image-preview" class="mt-3" style="display: none;">
+                                    <img src="" alt="Preview" class="img-thumbnail" style="max-height: 200px;">
+                                </div>
+                            </div>
+                            @error('image')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
+                    </div>
+                </div>
 
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa-solid fa-plus me-1"></i> Tilføj tab
-                        </button>
-                    </form>
+                <!-- Right Column -->
+                <div class="col-lg-4">
+                    <!-- Publish Status Card -->
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="mb-0" style="font-weight: 600;">Publiceret</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div style="font-weight: 500; font-size: 15px; color: #333;">
+                                        <span id="publish-status-text">{{ $resource->is_published ? 'Materialet er publiceret' : 'Materialet er ikke publiceret' }}</span>
+                                    </div>
+                                    <div class="small text-muted mt-1">
+                                        {{ $resource->is_published ? 'Synligt for brugere' : 'Kun synligt for dig' }}
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch" style="font-size: 1.5rem;">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           role="switch"
+                                           id="is_published"
+                                           name="is_published"
+                                           value="1"
+                                           style="cursor: pointer;"
+                                           {{ old('is_published', $resource->is_published) ? 'checked' : '' }}
+                                           onchange="updatePublishStatus(this)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price and Availability Card -->
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="mb-0" style="font-weight: 600;">Pris og tilgængelighed</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Free/Paid Toggle -->
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <div style="font-weight: 500; font-size: 15px; color: #333;">
+                                            <span id="price-type-text">{{ old('is_free', $resource->is_free) ? 'Materialet er gratis' : 'Materialet koster penge' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-check form-switch" style="font-size: 1.5rem;">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               role="switch"
+                                               id="price_switch"
+                                               style="cursor: pointer;"
+                                               {{ old('is_free', $resource->is_free) ? '' : 'checked' }}
+                                               onchange="togglePriceType(this)">
+                                        <input type="hidden" id="is_free" name="is_free" value="{{ old('is_free', $resource->is_free) ? '1' : '0' }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Paid Section -->
+                            <div id="paid-section" style="display: {{ old('is_free', $resource->is_free) ? 'none' : 'block' }};">
+                                <div class="mb-0">
+                                    <label for="price" class="form-label">Beløb (DKK)</label>
+                                    <input type="number"
+                                           class="form-control @error('price') is-invalid @enderror"
+                                           id="price"
+                                           name="price"
+                                           value="{{ old('price', $resource->price ?? '0') }}"
+                                           step="0.01"
+                                           min="0">
+                                    @error('price')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Free Section -->
+                            <div id="free-section" style="display: {{ old('is_free', $resource->is_free) ? 'block' : 'none' }};">
+                                <div class="mb-0">
+                                    @foreach($mailingLists as $list)
+                                        <div class="form-check">
+                                            <input class="form-check-input mailing-list-checkbox"
+                                                   type="checkbox"
+                                                   id="mailing_list_{{ $list->id }}"
+                                                   name="mailing_list_ids[]"
+                                                   value="{{ $list->id }}"
+                                                   {{ $resource->mailingLists->contains($list->id) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="mailing_list_{{ $list->id }}">
+                                                For medlemmer af <a href="{{ route('creator.mailing-lists.show', $list) }}" target="_blank" onclick="event.stopPropagation();" style="color: #0d6efd; text-decoration: underline;">{{ $list->name }}</a>
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                    @error('mailing_list_ids')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 
     <style>
-        .card {
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
             border-radius: 8px;
-            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8fafc;
         }
-        .btn-primary {
-            background: var(--primary-color);
+        .upload-zone:hover {
             border-color: var(--primary-color);
-            font-size: 14px;
-            font-weight: 500;
-        }
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            border-color: var(--primary-hover);
+            background: #f1f5f9;
         }
         .form-label {
             font-weight: 500;
@@ -382,7 +358,7 @@
                         ['clean']
                     ]
                 },
-                placeholder: 'Skriv en beskrivelse af downloadt...'
+                placeholder: 'Skriv en beskrivelse af materialet...'
             });
 
             // Load existing content
@@ -391,44 +367,191 @@
                 quill.root.innerHTML = existingContent;
             }
 
-            // Sync Quill content to hidden textarea on form submission
+            // Sync Quill content to hidden textarea
             const form = document.querySelector('form');
             form.addEventListener('submit', function(e) {
                 document.querySelector('#description').value = quill.root.innerHTML;
             });
 
-            // Also sync on text change (for validation)
             quill.on('text-change', function() {
                 document.querySelector('#description').value = quill.root.innerHTML;
             });
-
-            // Initialize Quill editor for tab content
-            const tabQuill = new Quill('#tab-content-editor', {
-                theme: 'snow',
-                modules: {
-                    toolbar: [
-                        [{ 'header': [1, 2, 3, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        ['blockquote', 'code-block'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'indent': '-1'}, { 'indent': '+1' }],
-                        ['link'],
-                        ['clean']
-                    ]
-                },
-                placeholder: 'Skriv indhold til tab...'
-            });
-
-            // Sync tab Quill content to hidden textarea
-            const tabForm = document.querySelectorAll('form')[1]; // Second form on page
-            tabForm.addEventListener('submit', function(e) {
-                document.querySelector('#tab_content').value = tabQuill.root.innerHTML;
-            });
-
-            tabQuill.on('text-change', function() {
-                document.querySelector('#tab_content').value = tabQuill.root.innerHTML;
-            });
         });
+
+        // Remove image function
+        function removeImage() {
+            if (confirm('Er du sikker på, at du vil fjerne dette billede?')) {
+                document.getElementById('remove_image').value = '1';
+                event.target.closest('.position-relative').style.display = 'none';
+            }
+        }
+
+        // Preview image function
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            const previewImg = preview.querySelector('img');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Update publish status text
+        function updatePublishStatus(checkbox) {
+            const statusText = document.getElementById('publish-status-text');
+            const statusSubtext = statusText.parentElement.nextElementSibling;
+
+            if (checkbox.checked) {
+                statusText.textContent = 'Materialet er publiceret';
+                statusSubtext.textContent = 'Synligt for brugere';
+            } else {
+                statusText.textContent = 'Materialet er ikke publiceret';
+                statusSubtext.textContent = 'Kun synligt for dig';
+            }
+        }
+
+        // Toggle price type
+        function togglePriceType(checkbox) {
+            const paidSection = document.getElementById('paid-section');
+            const freeSection = document.getElementById('free-section');
+            const isFreeField = document.getElementById('is_free');
+            const priceTypeText = document.getElementById('price-type-text');
+
+            if (checkbox.checked) {
+                // Paid
+                paidSection.style.display = 'block';
+                freeSection.style.display = 'none';
+                isFreeField.value = '0';
+                priceTypeText.textContent = 'Materialet koster penge';
+            } else {
+                // Free
+                paidSection.style.display = 'none';
+                freeSection.style.display = 'block';
+                isFreeField.value = '1';
+                priceTypeText.textContent = 'Materialet er gratis';
+            }
+        }
+
+
+        // Preview files function
+        function previewFiles(input) {
+            const preview = document.getElementById('files-preview');
+            const previewList = document.getElementById('files-preview-list');
+
+            if (input.files && input.files.length > 0) {
+                previewList.innerHTML = '';
+                Array.from(input.files).forEach((file, index) => {
+                    const extension = file.name.split('.').pop().toLowerCase();
+
+                    // Determine icon and color
+                    let iconClass = 'fa-file';
+                    let iconColor = 'var(--primary-color)';
+
+                    if (extension === 'pdf') {
+                        iconClass = 'fa-file-pdf';
+                        iconColor = '#dc2626';
+                    } else if (['doc', 'docx'].includes(extension)) {
+                        iconClass = 'fa-file-word';
+                        iconColor = '#2563eb';
+                    } else if (['xls', 'xlsx'].includes(extension)) {
+                        iconClass = 'fa-file-excel';
+                        iconColor = '#16a34a';
+                    } else if (['ppt', 'pptx'].includes(extension)) {
+                        iconClass = 'fa-file-powerpoint';
+                        iconColor = '#ea580c';
+                    } else if (['zip', 'rar', '7z'].includes(extension)) {
+                        iconClass = 'fa-file-zipper';
+                    } else if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(extension)) {
+                        iconClass = 'fa-file-image';
+                    } else if (['mp4', 'avi', 'mov', 'wmv'].includes(extension)) {
+                        iconClass = 'fa-file-video';
+                    } else if (['mp3', 'wav', 'ogg'].includes(extension)) {
+                        iconClass = 'fa-file-audio';
+                    } else if (extension === 'txt') {
+                        iconClass = 'fa-file-lines';
+                    }
+
+                    const fileSize = (file.size / 1024).toFixed(2);
+                    const item = document.createElement('div');
+                    item.className = 'list-group-item';
+                    item.innerHTML = `
+                        <i class="fa-solid ${iconClass} me-2" style="color: ${iconColor}; font-size: 1.5rem;"></i>
+                        <strong style="font-size: 14px; font-weight: 500;">${file.name}</strong>
+                        <small class="text-muted ms-2">(${fileSize} KB)</small>
+                    `;
+                    previewList.appendChild(item);
+                });
+                preview.style.display = 'block';
+            }
+        }
+
+        // Drag and drop functionality for image
+        const uploadZone = document.getElementById('upload-zone');
+        const fileInput = document.getElementById('image');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, () => {
+                uploadZone.style.borderColor = 'var(--primary-color)';
+                uploadZone.style.background = '#f1f5f9';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, () => {
+                uploadZone.style.borderColor = '#cbd5e1';
+                uploadZone.style.background = '#f8fafc';
+            }, false);
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            previewImage(fileInput);
+        }, false);
+
+        // Drag and drop functionality for files
+        const filesUploadZone = document.getElementById('files-upload-zone');
+        const filesInput = document.getElementById('files');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            filesUploadZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            filesUploadZone.addEventListener(eventName, () => {
+                filesUploadZone.style.borderColor = 'var(--primary-color)';
+                filesUploadZone.style.background = '#f1f5f9';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            filesUploadZone.addEventListener(eventName, () => {
+                filesUploadZone.style.borderColor = '#cbd5e1';
+                filesUploadZone.style.background = '#f8fafc';
+            }, false);
+        });
+
+        filesUploadZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            filesInput.files = files;
+            previewFiles(filesInput);
+        }, false);
     </script>
     @endpush
 </x-app-layout>

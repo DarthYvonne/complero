@@ -12,11 +12,6 @@
                         <i class="fa-solid fa-circle-play" style="color: var(--primary-color);"></i> Forløb
                     </h1>
                 </div>
-                @if(Auth::user() && in_array(Auth::user()->role, ['admin', 'creator']))
-                    <a href="{{ route('admin.courses.create') }}" class="btn btn-primary">
-                        <i class="fa-solid fa-circle-plus me-1"></i> Tilføj forløb
-                    </a>
-                @endif
             </div>
         </div>
 

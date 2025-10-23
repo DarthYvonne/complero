@@ -1,23 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php artisan:*)",
-      "Bash(npm run build:*)",
-      "Bash(where:*)",
-      "Bash(C:UsersAnders.configherdbinphp.bat artisan make:model LessonTab -m)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:model LessonTab -m)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan migrate)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_creator_id_to_mailing_lists_table --table=mailing_lists)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/DashboardController)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/CourseController)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/ResourceController)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/MailingListController)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/LessonController)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan config:clear)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_signup_form_settings_to_mailing_lists_table --table=mailing_lists)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan view:clear)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_primary_color_to_courses_table --table=courses)",
-      "Bash(find:*)"
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker --execute=\"echo json_encode(DB::select(''SELECT * FROM mailing_lists LIMIT 1''));\")",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker --execute=\"echo json_encode(DB::select(''SELECT id, name, email, role FROM users''));\")",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker:*)"
     ],
     "deny": [],
     "ask": []

@@ -2,27 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Enrollment extends Model
+class CourseEnrollment extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'user_id',
         'course_id',
         'last_accessed_lesson_id',
-        'enrolled_at',
-        'payment_id',
+        'started_at',
         'completed_at',
-        'progress_percentage',
     ];
 
     protected $casts = [
-        'enrolled_at' => 'datetime',
+        'started_at' => 'datetime',
         'completed_at' => 'datetime',
-        'progress_percentage' => 'integer',
     ];
 
     public function user()

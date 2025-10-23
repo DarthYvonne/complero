@@ -53,7 +53,7 @@
                             <ul class="nav nav-tabs card-header-tabs" id="courseTabs" role="tablist" style="border-bottom: none; margin-bottom: 0;">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="intro-tab" data-bs-toggle="tab" data-bs-target="#intro" type="button" role="tab" aria-controls="intro" aria-selected="true">
-                                        Intro
+                                        {{ $course->intro_title ?? 'Introduktion' }}
                                     </button>
                                 </li>
                                 @foreach($course->tabs as $index => $tab)
@@ -88,9 +88,12 @@
                 </div>
 
                 <!-- Enroll Button -->
-                <button class="btn btn-primary btn-lg w-100">
-                    <i class="fa-solid fa-rocket me-2"></i> Tag forløbet nu
-                </button>
+                <form action="{{ route('courses.enroll', $course) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fa-solid fa-rocket me-2"></i> Tag forløbet nu
+                    </button>
+                </form>
             </div>
 
             <!-- Sidebar -->
@@ -100,18 +103,17 @@
                     <div class="card">
                         <div class="card-header bg-white border-bottom py-3">
                             <h6 class="mb-0" style="font-size: 16px; font-weight: 600; color: #333;">
-                                <i class="fa-solid fa-list"></i> Lektioner
+                                Lektioner
                             </h6>
                         </div>
                         <div class="card-body p-0">
                             <div class="list-group list-group-flush">
-                                @foreach($course->lessons->sortBy('order') as $index => $lesson)
-                                    <a href="{{ route('lessons.show', [$course, $lesson]) }}"
-                                       class="list-group-item list-group-item-action"
-                                       style="border-left: none; border-right: none;">
+                                @foreach($course->lessons->sortBy('order') as $lesson)
+                                    <div class="list-group-item"
+                                       style="border-left: none; border-right: none; padding: 12px 16px;">
                                         <div class="d-flex align-items-start">
                                             <div class="me-2" style="min-width: 24px;">
-                                                <span style="font-size: 13px; font-weight: 300; color: #999;">{{ $index + 1 }}</span>
+                                                <i class="fa-solid fa-tv" style="color: #999;"></i>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <div style="font-size: 14px; font-weight: 400; color: #333;">
@@ -124,7 +126,7 @@
                                                 @endif
                                             </div>
                                         </div>
-                                    </a>
+                                    </div>
                                 @endforeach
                             </div>
                         </div>

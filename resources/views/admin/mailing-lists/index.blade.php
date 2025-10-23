@@ -42,7 +42,7 @@
                                     <th style="font-weight: 600; color: #333;">Beskrivelse</th>
                                     <th style="font-weight: 600; color: #333;">Medlemmer</th>
                                     <th style="font-weight: 600; color: #333;">Forløb</th>
-                                    <th style="font-weight: 600; color: #333;">Downloads</th>
+                                    <th style="font-weight: 600; color: #333;">Materialer</th>
                                     <th style="font-weight: 600; color: #333;">Status</th>
                                     <th style="font-weight: 600; color: #333;">Handlinger</th>
                                 </tr>
@@ -65,7 +65,7 @@
                                             <span class="badge bg-primary">{{ $list->courses_count }} forløb</span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-success">{{ $list->resources_count }} downloads</span>
+                                            <span class="badge bg-success">{{ $list->resources_count }} materialer</span>
                                         </td>
                                         <td>
                                             @if($list->is_active)

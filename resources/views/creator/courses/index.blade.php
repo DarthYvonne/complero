@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <!-- Page Header -->
         <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
                         Forløb
@@ -15,9 +15,29 @@
                         Administrer alle forløb på platformen
                     </p>
                 </div>
-                <a href="{{ route('creator.courses.create') }}" class="btn btn-primary">
-                    <i class="fa-solid fa-circle-plus me-1"></i> Opret forløb
-                </a>
+                <div class="d-flex gap-2 align-items-center">
+                    @if(auth()->user()->role === 'admin' && request()->routeIs('admin.courses.index') && $creators->count() > 0)
+                        <!-- Creator Filter -->
+                        <form method="GET" action="{{ route('admin.courses.index') }}">
+                            <select name="creator_id" class="form-select" style="width: 250px;" onchange="this.form.submit()">
+                                <option value="">Alle creators</option>
+                                @foreach($creators as $creator)
+                                    <option value="{{ $creator->id }}" {{ request('creator_id') == $creator->id ? 'selected' : '' }}>
+                                        {{ $creator->organization_name ?: $creator->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </form>
+                        @if(request('creator_id'))
+                            <a href="{{ route('admin.courses.index') }}" class="btn btn-outline-secondary">
+                                <i class="fa-solid fa-times"></i>
+                            </a>
+                        @endif
+                    @endif
+                    <a href="{{ request()->routeIs('admin.courses.index') ? route('admin.courses.create') : route('creator.courses.create') }}" class="btn btn-primary">
+                        <i class="fa-solid fa-circle-plus me-1"></i> Opret forløb
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -32,44 +52,7 @@
         <!-- Courses Grid -->
         <div class="row g-3">
             @forelse($courses as $course)
-                @php
-                    $courseColor = $course->primary_color ?? '#be185d';
-                @endphp
-                <div class="col-md-6 col-lg-4">
-                    <div class="card clickable-card" data-href="{{ route('creator.courses.show', $course) }}" style="cursor: pointer;">
-                        <img src="{{ $course->image }}" class="card-img-top" alt="{{ $course->title }}" style="height: 200px; object-fit: cover;">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                                    <i class="fa-solid fa-circle-play" style="color: {{ $courseColor }};"></i> {{ $course->title }}
-                                </h5>
-                                @if($course->is_published)
-                                    <span class="badge bg-success">Publiceret</span>
-                                @else
-                                    <span class="badge bg-secondary">Kladde</span>
-                                @endif
-                            </div>
-                            <div class="card-text" style="font-size: 14px; font-weight: 300; color: #666; margin-bottom: 15px;">
-                                {!! Str::limit(strip_tags($course->description), 200) !!}
-                                @if(strlen(strip_tags($course->description)) > 200)
-                                    <a href="{{ route('creator.courses.show', $course) }}" style="color: {{ $courseColor }}; text-decoration: underline;">læs resten</a>
-                                @endif
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span style="font-size: 13px; font-weight: 300; color: #999;">
-                                    <span style="color: {{ $courseColor }}; font-weight: 600;">Af:</span> {{ $course->creator->organization_name ?: $course->creator->name }}
-                                </span>
-                                <span style="font-size: 16px; font-weight: 600; color: #333;">
-                                    @if($course->is_free)
-                                        Gratis for medlemmer
-                                    @else
-                                        €{{ number_format($course->price, 2) }}
-                                    @endif
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <x-course-card :course="$course" />
             @empty
                 <div class="col-12">
                     <div class="card text-center py-5">

@@ -1,7 +1,7 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('creator.resources.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Downloads</a>
+    <a href="{{ route('creator.resources.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Materialer</a>
     <span style="margin: 0 8px;">/</span>
     <strong style="color: #333; font-weight: 600;">{{ $resource->title }}</strong>
 @endsection
@@ -12,12 +12,22 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                        Download: <span style="font-weight: 100;">{{ $resource->title }}</span>
+                        Materiale: <span style="font-weight: 100;">{{ $resource->title }}</span>
                     </h1>
                     <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
-                        <i class="fa-solid fa-user"></i> Oprettet af {{ $resource->creator->name }}
-                        <span style="margin: 0 8px;">•</span>
-                        <i class="fa-solid fa-calendar"></i> {{ $resource->created_at->format('d/m/Y') }}
+                        Af: {{ $resource->creator->name }}
+                        <span class="mx-2">•</span>
+                        {{ $resource->files->count() }} {{ $resource->files->count() === 1 ? 'fil' : 'filer' }}
+                        <span class="mx-2">•</span>
+                        Pris: @if($resource->is_free)
+                            @if($resource->mailing_list_id)
+                                Gratis for medlemmer af {{ $resource->mailingList->name }}
+                            @else
+                                Gratis for alle
+                            @endif
+                        @else
+                            {{ number_format($resource->price, 2) }} DKK
+                        @endif
                     </p>
                 </div>
                 <div class="d-flex gap-2">
@@ -28,7 +38,7 @@
                         <i class="fa-solid fa-pen me-1"></i> Rediger
                     </a>
                     <a href="{{ route('creator.resources.index') }}" class="btn btn-outline-secondary">
-                        <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til download
+                        <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til materialer
                     </a>
                 </div>
             </div>
@@ -89,10 +99,7 @@
                     @else
                         <!-- No tabs, just show description -->
                         <div class="card-body">
-                            <h5 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px;">
-                                <i class="fa-solid fa-align-left" style="color: var(--primary-color);"></i> Beskrivelse
-                            </h5>
-                            <div style="font-size: 14px; font-weight: 300; color: #666;">{!! $resource->description !!}</div>
+                            <div style="font-size: 16px; font-weight: 300; color: #666;">{!! $resource->description !!}</div>
                         </div>
                     @endif
                 </div>
@@ -101,36 +108,49 @@
                 <div class="card">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                         <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-download" style="color: var(--primary-color);"></i> Filer til download
-                            <span class="badge bg-secondary ms-2">{{ $resource->files->count() }}</span>
+                            Filer til download ({{ $resource->files->count() }})
                         </h5>
                     </div>
                     <div class="card-body">
                         @if($resource->files->count() > 0)
                             <div class="list-group list-group-flush">
                                 @foreach($resource->files as $file)
+                                    @php
+                                        $extension = strtolower(pathinfo($file->filename, PATHINFO_EXTENSION));
+                                        $iconClass = match($extension) {
+                                            'pdf' => 'fa-file-pdf',
+                                            'doc', 'docx' => 'fa-file-word',
+                                            'xls', 'xlsx' => 'fa-file-excel',
+                                            'ppt', 'pptx' => 'fa-file-powerpoint',
+                                            'zip', 'rar', '7z' => 'fa-file-zipper',
+                                            'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp' => 'fa-file-image',
+                                            'mp4', 'avi', 'mov', 'wmv' => 'fa-file-video',
+                                            'mp3', 'wav', 'ogg' => 'fa-file-audio',
+                                            'txt' => 'fa-file-lines',
+                                            default => 'fa-file',
+                                        };
+                                        $iconColor = match($extension) {
+                                            'pdf' => '#dc2626',
+                                            'doc', 'docx' => '#2563eb',
+                                            'xls', 'xlsx' => '#16a34a',
+                                            'ppt', 'pptx' => '#ea580c',
+                                            default => 'var(--primary-color)',
+                                        };
+                                    @endphp
                                     <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <i class="fa-solid fa-file me-2" style="color: var(--primary-color);"></i>
+                                        <a href="{{ Storage::url($file->file_path) }}" target="_blank" class="text-decoration-none flex-grow-1" style="color: inherit;">
+                                            <i class="fa-solid {{ $iconClass }} me-2" style="color: {{ $iconColor }}; font-size: 1.5rem;"></i>
                                             <strong style="font-size: 14px; font-weight: 500;">{{ $file->filename }}</strong>
                                             <small class="text-muted ms-2">({{ number_format($file->file_size / 1024, 2) }} KB)</small>
-                                        </div>
-                                        <div class="btn-group btn-group-sm">
-                                            <a href="{{ Storage::url($file->file_path) }}" target="_blank" class="btn btn-outline-primary">
-                                                <i class="fa-solid fa-eye"></i> Se
-                                            </a>
-                                            <a href="{{ Storage::url($file->file_path) }}" download class="btn btn-outline-primary">
-                                                <i class="fa-solid fa-download"></i> Download
-                                            </a>
-                                            <form action="{{ route('creator.resources.files.destroy', [$resource, $file]) }}" method="POST" class="d-inline"
-                                                  onsubmit="return confirm('Er du sikker på, at du vil slette denne fil?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
+                                        </a>
+                                        <form action="{{ route('creator.resources.files.destroy', [$resource, $file]) }}" method="POST" class="d-inline"
+                                              onsubmit="return confirm('Er du sikker på, at du vil slette denne fil?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-link text-danger p-0" style="font-size: 14px; text-decoration: none;">
+                                                <i class="fa-solid fa-trash me-1"></i> Slet
+                                            </button>
+                                        </form>
                                     </div>
                                 @endforeach
                             </div>
@@ -147,88 +167,76 @@
 
             <!-- Sidebar -->
             <div class="col-lg-4">
-                <!-- Resource Details -->
-                <div class="card mb-3">
+                <!-- Publiceret Status Card -->
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0" style="font-weight: 600;">Publiceret</h5>
+                    </div>
                     <div class="card-body">
-                        <h5 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px;">Downloads detaljer</h5>
-
-                        <!-- Status -->
-                        <div class="mb-3">
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Status</strong>
-                            @if($resource->is_published)
-                                <span class="badge bg-success">
-                                    <i class="fa-solid fa-circle-check"></i> Publiceret
-                                </span>
-                            @else
-                                <span class="badge bg-secondary">
-                                    <i class="fa-solid fa-file"></i> Kladde
-                                </span>
-                            @endif
-                        </div>
-
-                        <!-- Price -->
-                        <div class="mb-3">
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Pris</strong>
-                            @if($resource->is_free)
-                                <span style="color: #10b981; font-weight: 600;">
-                                    <i class="fa-solid fa-gift"></i> Gratis
-                                </span>
-                            @else
-                                <span style="font-weight: 600;">€{{ number_format($resource->price, 2) }}</span>
-                            @endif
-                        </div>
-
-                        <!-- Slug -->
-                        <div class="mb-3">
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">URL-slug</strong>
-                            <code class="small">{{ $resource->slug }}</code>
-                        </div>
-
-                        <!-- Files Count -->
-                        <div class="mb-3">
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Antal filer</strong>
-                            {{ $resource->files->count() }}
-                        </div>
-
-                        <!-- Downloads -->
-                        <div class="mb-3">
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Downloads</strong>
-                            0
-                        </div>
-
-                        <!-- Created/Updated -->
-                        <div class="mb-3">
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Oprettet</strong>
-                            {{ $resource->created_at->format('d/m/Y H:i') }}
-                        </div>
-
-                        <div>
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Sidst opdateret</strong>
-                            {{ $resource->updated_at->format('d/m/Y H:i') }}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div style="font-weight: 500; font-size: 15px; color: #333;">
+                                    <span id="publish-status-text">{{ $resource->is_published ? 'Materialet er publiceret' : 'Materialet er ikke publiceret' }}</span>
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    {{ $resource->is_published ? 'Synligt for brugere' : 'Kun synligt for dig' }}
+                                </div>
+                            </div>
+                            <div class="form-check form-switch" style="font-size: 1.5rem;">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       role="switch"
+                                       id="is_published"
+                                       style="cursor: pointer;"
+                                       {{ $resource->is_published ? 'checked' : '' }}
+                                       onchange="togglePublishStatus(this)">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Actions -->
-                <div class="card">
+                <!-- Price Card -->
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0" style="font-weight: 600;">Pris</h5>
+                    </div>
                     <div class="card-body">
-                        <h5 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px;">Handlinger</h5>
+                        <div class="mb-0">
+                            @if($resource->mailingLists->count() > 0)
+                                <span style="font-weight: 500; color: #333;">
+                                    For medlemmer af {{ $resource->mailingLists->pluck('name')->join(', ', ' og ') }}
+                                </span>
+                            @elseif($resource->is_free)
+                                <span style="font-weight: 500; color: #333;">Gratis</span>
+                            @else
+                                <span style="font-weight: 500; color: #333;">{{ number_format($resource->price, 2) }} Kr.</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Files Count Card -->
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0" style="font-weight: 600;">Antal filer</h5>
+                    </div>
+                    <div class="card-body">
+                        <div style="font-size: 32px; font-weight: 700; color: #333;">
+                            {{ $resource->files->count() }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0" style="font-weight: 600;">Handlinger</h5>
+                    </div>
+                    <div class="card-body">
                         <div class="d-grid gap-2">
-                            <a href="{{ route('creator.resources.edit', $resource) }}" class="btn btn-primary">
-                                <i class="fa-solid fa-pen"></i> Rediger download
-                            </a>
-
-                            <hr class="my-2">
-
-                            <form action="{{ route('creator.resources.destroy', $resource) }}" method="POST"
-                                  onsubmit="return confirm('Er du sikker på, at du vil slette dette download? Alle filer vil også blive slettet.');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-outline-danger w-100">
-                                    <i class="fa-solid fa-trash"></i> Slet download
-                                </button>
-                            </form>
+                            <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="fa-solid fa-trash"></i> Slet download
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -236,21 +244,59 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Bekræft sletning af download</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if($resource->files->count() > 0)
+                        <div class="alert alert-danger">
+                            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                            <strong>Advarsel!</strong> Dette download har <strong>{{ $resource->files->count() }} {{ $resource->files->count() === 1 ? 'fil' : 'filer' }}</strong>.
+                            Alle filer vil også blive slettet permanent.
+                        </div>
+                        <p class="mb-3">For at bekræfte sletningen, skal du skrive <strong>SLETMIG</strong> i feltet nedenfor:</p>
+                        <form id="deleteForm" action="{{ route('creator.resources.destroy', $resource) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <div class="mb-3">
+                                <input type="text"
+                                       class="form-control"
+                                       id="deleteConfirmation"
+                                       placeholder="Skriv SLETMIG"
+                                       autocomplete="off">
+                            </div>
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuller</button>
+                                <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                                    <i class="fa-solid fa-trash me-1"></i> Slet download
+                                </button>
+                            </div>
+                        </form>
+                    @else
+                        <p>Er du sikker på, at du vil slette dette download?</p>
+                        <p class="text-muted small mb-0">Denne handling kan ikke fortrydes.</p>
+                        <form action="{{ route('creator.resources.destroy', $resource) }}" method="POST" class="mt-3">
+                            @csrf
+                            @method('DELETE')
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuller</button>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa-solid fa-trash me-1"></i> Slet download
+                                </button>
+                            </div>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
     <style>
-        .card {
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-        }
-        .btn-primary {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-            font-size: 14px;
-            font-weight: 500;
-        }
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            border-color: var(--primary-hover);
-        }
         .card-header-tabs {
             margin-left: 0;
             margin-right: 0;
@@ -259,4 +305,73 @@
             padding-left: 1rem;
         }
     </style>
+
+    @push('scripts')
+    <script>
+        function togglePublishStatus(checkbox) {
+            const statusText = document.getElementById('publish-status-text');
+            const statusSubtext = statusText.parentElement.nextElementSibling;
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('_method', 'PATCH');
+            formData.append('title', '{{ $resource->title }}');
+            formData.append('description', '{{ addslashes($resource->description) }}');
+            formData.append('is_published', checkbox.checked ? '1' : '0');
+
+            // Submit via fetch
+            fetch('{{ route('creator.resources.update', $resource) }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Update UI
+                    if (checkbox.checked) {
+                        statusText.textContent = 'Materialet er publiceret';
+                        statusSubtext.textContent = 'Synligt for brugere';
+                    } else {
+                        statusText.textContent = 'Materialet er ikke publiceret';
+                        statusSubtext.textContent = 'Kun synligt for dig';
+                    }
+                } else {
+                    alert('Der opstod en fejl. Prøv igen.');
+                    // Revert checkbox
+                    checkbox.checked = !checkbox.checked;
+                }
+            })
+            .catch(error => {
+                alert('Der opstod en fejl. Prøv igen.');
+                // Revert checkbox
+                checkbox.checked = !checkbox.checked;
+            });
+        }
+
+        @if($resource->files->count() > 0)
+        // Delete confirmation logic for resources with files
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteConfirmationInput = document.getElementById('deleteConfirmation');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const deleteModal = document.getElementById('deleteModal');
+
+            if (deleteConfirmationInput && confirmDeleteBtn) {
+                deleteConfirmationInput.addEventListener('input', function() {
+                    if (this.value === 'SLETMIG') {
+                        confirmDeleteBtn.disabled = false;
+                    } else {
+                        confirmDeleteBtn.disabled = true;
+                    }
+                });
+
+                // Reset input when modal is closed
+                deleteModal.addEventListener('hidden.bs.modal', function() {
+                    deleteConfirmationInput.value = '';
+                    confirmDeleteBtn.disabled = true;
+                });
+            }
+        });
+        @endif
+    </script>
+    @endpush
 </x-app-layout>

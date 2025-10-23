@@ -6,12 +6,32 @@
     <div class="container-fluid">
         <!-- Page Header -->
         <div class="mb-4">
-            <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                <i class="fa-solid fa-users" style="color: var(--primary-color);"></i> Brugere
-            </h1>
-            <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
-                Administrer alle brugere på platformen
-            </p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
+                        <i class="fa-solid fa-users" style="color: var(--primary-color);"></i> Brugere
+                    </h1>
+                    <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
+                        Administrer alle brugere på platformen
+                    </p>
+                </div>
+                <!-- Filter Form -->
+                <form method="GET" action="{{ route('admin.users.index') }}" class="d-flex gap-2">
+                    <select name="mailing_list" class="form-select" style="width: 250px;" onchange="this.form.submit()">
+                        <option value="">Alle brugere</option>
+                        @foreach($mailingLists as $list)
+                            <option value="{{ $list->id }}" {{ request('mailing_list') == $list->id ? 'selected' : '' }}>
+                                {{ $list->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @if(request('mailing_list'))
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-times"></i> Ryd filter
+                        </a>
+                    @endif
+                </form>
+            </div>
         </div>
 
         <!-- Success Message -->

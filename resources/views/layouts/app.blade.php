@@ -132,6 +132,17 @@
                 color: white !important;
             }
 
+            .sidebar-menu .menu-count {
+                margin-left: auto;
+                font-size: 13px;
+                color: #999;
+                font-weight: 400;
+            }
+
+            .sidebar-menu a.active .menu-count {
+                color: rgba(255, 255, 255, 0.8);
+            }
+
             .sidebar-divider {
                 margin: 10px 0;
                 padding-top: 10px;
@@ -267,58 +278,26 @@
                     $effectiveRole = session('view_as', Auth::user()->role);
                 @endphp
 
-                @if($effectiveRole === 'admin' || $effectiveRole === 'creator')
-                    <li class="sidebar-label">BRUGERENS MENU</li>
-                @endif
-
-                <!-- Common Menu Items -->
+                <!-- USER MENU - Always shown -->
+                <li class="sidebar-label">BRUGER MENU</li>
                 <li>
                     <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="fa-solid fa-heart" style="color: var(--primary-color);"></i> Start
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('courses.index') }}" class="{{ request()->routeIs('courses.*') ? 'active' : '' }}">
+                    <a href="{{ route('courses.index') }}" class="{{ request()->routeIs('courses.index') || request()->routeIs('courses.show') || request()->routeIs('lessons.show') ? 'active' : '' }}">
                         <i class="fa-solid fa-circle-play" style="color: var(--primary-color);"></i> Forløb
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('resources.index') }}" class="{{ request()->routeIs('resources.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-photo-film" style="color: var(--primary-color);"></i> Downloads
+                    <a href="{{ route('resources.index') }}" class="{{ request()->routeIs('resources.index') || request()->routeIs('resources.show') ? 'active' : '' }}">
+                        <i class="fa-solid fa-photo-film" style="color: var(--primary-color);"></i> Materialer
                     </a>
                 </li>
 
-                @if($effectiveRole === 'admin')
-                    <!-- Admin-Only Section -->
-                    <li class="sidebar-divider"></li>
-                    <li class="sidebar-label">ADMINISTRATION</li>
-                    <li>
-                        <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                            <i class="fa-solid fa-gauge" style="color: #666;"></i> Overblik
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.courses.index') }}" class="{{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-circle-play" style="color: #666;"></i> Forløb
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.resources.index') }}" class="{{ request()->routeIs('admin.resources.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-photo-film" style="color: #666;"></i> Downloads
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.mailing-lists.index') }}" class="{{ request()->routeIs('admin.mailing-lists.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-envelope" style="color: #666;"></i> Mailing lister
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-users" style="color: #666;"></i> Brugere
-                        </a>
-                    </li>
-                @elseif($effectiveRole === 'creator')
-                    <!-- Creator-Only Section -->
+                @if($effectiveRole === 'creator' || $effectiveRole === 'admin')
+                    <!-- CREATOR MENU - Shown for creators and admins -->
                     <li class="sidebar-divider"></li>
                     <li class="sidebar-label">CREATOR MENU</li>
                     <li>
@@ -327,18 +306,59 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('creator.courses.index') }}" class="{{ request()->routeIs('creator.courses.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-circle-play" style="color: #666;"></i> Mine Forløb
+                        <a href="{{ route('creator.courses.index') }}" class="{{ request()->routeIs('creator.courses.*') || request()->routeIs('creator.lessons.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-circle-play" style="color: #666;"></i> Mine Forløb <span class="menu-count">({{ $coursesCount ?? 0 }})</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('creator.resources.index') }}" class="{{ request()->routeIs('creator.resources.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-photo-film" style="color: #666;"></i> Mine Downloads
+                            <i class="fa-solid fa-photo-film" style="color: #666;"></i> Mine Materialer <span class="menu-count">({{ $resourcesCount ?? 0 }})</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('creator.mailing-lists.index') }}" class="{{ request()->routeIs('creator.mailing-lists.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-envelope" style="color: #666;"></i> Mine lister
+                            <i class="fa-solid fa-envelope" style="color: #666;"></i> Mine Lister <span class="menu-count">({{ $mailingListsCount ?? 0 }})</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('creator.emails.index') }}" class="{{ request()->routeIs('creator.emails.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-paper-plane" style="color: #666;"></i> Mine Emails
+                        </a>
+                    </li>
+                @endif
+
+                @if($effectiveRole === 'admin')
+                    <!-- ADMIN MENU - Shown only for admins -->
+                    <li class="sidebar-divider"></li>
+                    <li class="sidebar-label">ADMIN MENU</li>
+                    <li>
+                        <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                            <i class="fa-solid fa-gauge" style="color: #666;"></i> Overblik
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.courses.index') }}" class="{{ request()->routeIs('admin.courses.*') || request()->routeIs('admin.courses.lessons.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-circle-play" style="color: #666;"></i> Alle Forløb
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.resources.index') }}" class="{{ request()->routeIs('admin.resources.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-photo-film" style="color: #666;"></i> Alle Materialer
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.mailing-lists.index') }}" class="{{ request()->routeIs('admin.mailing-lists.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-envelope" style="color: #666;"></i> Alle Lister
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-users" style="color: #666;"></i> Brugere
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.activity.index') }}" class="{{ request()->routeIs('admin.activity.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-clock-rotate-left" style="color: #666;"></i> Aktivitetslog
                         </a>
                     </li>
                 @endif
@@ -353,8 +373,8 @@
                     <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                         @csrf
                         <button type="submit" style="width: 100%; text-align: left; background: none; border: none; padding: 0; cursor: pointer;">
-                            <a style="display: flex; align-items: center; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; font-weight: 400;">
-                                <i class="fa-solid fa-right-from-bracket" style="width: 20px; margin-right: 10px; font-size: 14px; color: var(--primary-color);"></i> Log ud
+                            <a style="display: flex; align-items: center; padding: 12px 20px; color: #333; text-decoration: none; font-size: 15px; font-weight: 400;">
+                                <i class="fa-solid fa-right-from-bracket" style="width: 20px; margin-right: 10px; font-size: 15px; color: var(--primary-color);"></i> Log ud
                             </a>
                         </button>
                     </form>
@@ -395,17 +415,30 @@
                     @endif
                 </div>
                 <div class="d-flex align-items-center gap-3">
-                    @if(Auth::user()->role === 'admin')
+                    @if(Auth::user()->role === 'admin' || Auth::user()->role === 'creator')
                         <!-- View As Dropdown -->
                         <div class="view-as-menu dropdown">
+                            @php
+                                $viewAs = session('view_as', Auth::user()->role);
+                                $viewAsLabel = match($viewAs) {
+                                    'admin' => 'Administrator',
+                                    'creator' => 'Creator',
+                                    'member' => 'Medlem',
+                                    default => ucfirst($viewAs)
+                                };
+                            @endphp
                             <button class="dropdown-toggle" data-bs-toggle="dropdown" style="background: none; border: 1px solid #e0e0e0; padding: 6px 12px; cursor: pointer; font-size: 14px; color: #666; border-radius: 4px; display: flex; align-items: center; gap: 6px;">
                                 <i class="fa-solid fa-eye" style="font-size: 13px;"></i>
-                                <span>Se som: {{ ucfirst(session('view_as', Auth::user()->role)) }}</span>
+                                <span>Se som: {{ $viewAsLabel }}</span>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item {{ !session('view_as') || session('view_as') === 'admin' ? 'active' : '' }}" href="{{ route('view-as', 'admin') }}">Admin</a></li>
-                                <li><a class="dropdown-item {{ session('view_as') === 'creator' ? 'active' : '' }}" href="{{ route('view-as', 'creator') }}">Creator</a></li>
-                                <li><a class="dropdown-item {{ session('view_as') === 'member' ? 'active' : '' }}" href="{{ route('view-as', 'member') }}">Member</a></li>
+                                @if(Auth::user()->role === 'admin')
+                                    <li><a class="dropdown-item {{ !session('view_as') || session('view_as') === 'admin' ? 'active' : '' }}" href="{{ route('view-as', 'admin') }}">Administrator</a></li>
+                                @endif
+                                @if(Auth::user()->role === 'admin' || Auth::user()->role === 'creator')
+                                    <li><a class="dropdown-item {{ session('view_as') === 'creator' ? 'active' : '' }}" href="{{ route('view-as', 'creator') }}">Creator</a></li>
+                                @endif
+                                <li><a class="dropdown-item {{ session('view_as') === 'member' ? 'active' : '' }}" href="{{ route('view-as', 'member') }}">Medlem</a></li>
                             </ul>
                         </div>
                     @endif

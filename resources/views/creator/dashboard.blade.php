@@ -46,7 +46,7 @@
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-muted mb-1 small" style="font-weight: 300;">Mine Downloads</p>
+                        <p class="text-muted mb-1 small" style="font-weight: 300;">Mine Materialer</p>
                         <h2 class="mb-0" style="font-size: 28px; font-weight: 700;">{{ $stats['total_resources'] }}</h2>
                     </div>
                 </div>

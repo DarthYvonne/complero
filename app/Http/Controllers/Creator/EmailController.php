@@ -1,0 +1,89 @@
+<?php
+
+namespace App\Http\Controllers\Creator;
+
+use App\Http\Controllers\Controller;
+use App\Models\Email;
+use App\Models\MailingList;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+
+class EmailController extends Controller
+{
+    public function index()
+    {
+        $user = Auth::user();
+
+        // Get creator's mailing lists for the composer
+        $mailingLists = MailingList::where('creator_id', $user->id)
+            ->withCount('activeMembers')
+            ->get();
+
+        // Get creator's sent emails for the archive
+        $emails = Email::where('creator_id', $user->id)
+            ->with('mailingList')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('creator.emails.index', compact('mailingLists', 'emails'));
+    }
+
+    public function send(Request $request)
+    {
+        $validated = $request->validate([
+            'mailing_list_id' => 'nullable|exists:mailing_lists,id',
+            'subject' => 'required|string|max:255',
+            'body_html' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+
+        // Get recipients
+        $recipients = [];
+        $recipientData = [];
+        if ($request->mailing_list_id) {
+            $mailingList = MailingList::findOrFail($request->mailing_list_id);
+            $recipientData = $mailingList->activeMembers()->get()->map(function($member) {
+                return [
+                    'email' => $member->email,
+                    'name' => $member->name,
+                ];
+            })->toArray();
+            $recipients = array_column($recipientData, 'email');
+        }
+
+        // Save email to database
+        $email = Email::create([
+            'creator_id' => $user->id,
+            'mailing_list_id' => $request->mailing_list_id,
+            'subject' => $validated['subject'],
+            'body_html' => $validated['body_html'],
+            'recipients_count' => count($recipients),
+            'sent_at' => now(),
+        ]);
+
+        // Send emails using PHP Mail with placeholder replacement
+        foreach ($recipientData as $recipient) {
+            $personalizedBody = str_replace(
+                ['{{navn}}', '{{email}}'],
+                [$recipient['name'], $recipient['email']],
+                $validated['body_html']
+            );
+
+            $personalizedSubject = str_replace(
+                ['{{navn}}', '{{email}}'],
+                [$recipient['name'], $recipient['email']],
+                $validated['subject']
+            );
+
+            Mail::html($personalizedBody, function ($message) use ($recipient, $personalizedSubject) {
+                $message->to($recipient['email'])
+                    ->subject($personalizedSubject);
+            });
+        }
+
+        return redirect()->route('creator.emails.index')
+            ->with('success', 'Email sendt til ' . count($recipients) . ' modtagere');
+    }
+}

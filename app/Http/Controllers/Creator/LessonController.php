@@ -17,7 +17,7 @@ class LessonController extends Controller
      */
     public function create(Course $course)
     {
-        if ($course->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $course->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til dette forløb');
         }
 
@@ -29,7 +29,7 @@ class LessonController extends Controller
      */
     public function store(Request $request, Course $course)
     {
-        if ($course->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $course->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til dette forløb');
         }
 
@@ -78,7 +78,7 @@ class LessonController extends Controller
      */
     public function edit(Course $course, Lesson $lesson)
     {
-        if ($course->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $course->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til dette forløb');
         }
 
@@ -91,7 +91,7 @@ class LessonController extends Controller
      */
     public function update(Request $request, Course $course, Lesson $lesson)
     {
-        if ($course->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $course->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til dette forløb');
         }
 
@@ -147,7 +147,7 @@ class LessonController extends Controller
      */
     public function destroy(Course $course, Lesson $lesson)
     {
-        if ($course->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $course->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til dette forløb');
         }
 
@@ -173,7 +173,7 @@ class LessonController extends Controller
      */
     public function deleteFile(Course $course, Lesson $lesson, LessonFile $file)
     {
-        if ($course->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $course->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til dette forløb');
         }
 
@@ -188,7 +188,7 @@ class LessonController extends Controller
      */
     public function storeTab(Request $request, Course $course, Lesson $lesson)
     {
-        if ($course->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $course->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til dette forløb');
         }
 
@@ -211,7 +211,7 @@ class LessonController extends Controller
      */
     public function deleteTab(Course $course, Lesson $lesson, LessonTab $tab)
     {
-        if ($course->creator_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && $course->creator_id !== auth()->id()) {
             abort(403, 'Du har ikke adgang til dette forløb');
         }
 

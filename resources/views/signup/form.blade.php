@@ -75,12 +75,18 @@
                         @error('name')
                             <p style="color: #dc3545; font-size: 12px; margin-top: -8px; margin-bottom: 10px;">{{ $message }}</p>
                         @enderror
-                        <input type="email" name="email" placeholder="Din email" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;">
+                        <input type="email" name="email" placeholder="Din email" required style="width: 100%; padding: 10px; margin-bottom: {{ $mailingList->offer_membership ? '10px' : '15px' }}; border: 1px solid #ddd; border-radius: 4px;">
                         @error('email')
-                            <p style="color: #dc3545; font-size: 12px; margin-top: -13px; margin-bottom: 15px;">{{ $message }}</p>
+                            <p style="color: #dc3545; font-size: 12px; margin-top: -8px; margin-bottom: 10px;">{{ $message }}</p>
                         @enderror
-                        <button type="submit" style="width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 4px; font-weight: 500; cursor: pointer;">
-                            Tilmeld
+                        @if($mailingList->offer_membership)
+                            <input type="password" name="password" placeholder="Vælg et password" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;">
+                            @error('password')
+                                <p style="color: #dc3545; font-size: 12px; margin-top: -13px; margin-bottom: 15px;">{{ $message }}</p>
+                            @enderror
+                        @endif
+                        <button type="submit" style="width: 100%; padding: 12px; background: {{ $data['buttonColor'] ?? '#B9185E' }}; color: white; border: none; border-radius: 4px; font-weight: 500; cursor: pointer;">
+                            {{ $data['buttonText'] ?? 'Tilmeld' }}
                         </button>
                     </form>
                 </div>
@@ -97,12 +103,18 @@
                         @error('name')
                             <p style="color: #dc3545; font-size: 12px; margin-top: -8px; margin-bottom: 10px;">{{ $message }}</p>
                         @enderror
-                        <input type="email" name="email" placeholder="Email" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #e0e0e0; border-radius: 4px;">
+                        <input type="email" name="email" placeholder="Email" required style="width: 100%; padding: 10px; margin-bottom: {{ $mailingList->offer_membership ? '10px' : '15px' }}; border: 1px solid #e0e0e0; border-radius: 4px;">
                         @error('email')
-                            <p style="color: #dc3545; font-size: 12px; margin-top: -13px; margin-bottom: 15px;">{{ $message }}</p>
+                            <p style="color: #dc3545; font-size: 12px; margin-top: -8px; margin-bottom: 10px;">{{ $message }}</p>
                         @enderror
-                        <button type="submit" style="width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 4px; font-weight: 500; cursor: pointer;">
-                            Start nu
+                        @if($mailingList->offer_membership)
+                            <input type="password" name="password" placeholder="Vælg et password" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #e0e0e0; border-radius: 4px;">
+                            @error('password')
+                                <p style="color: #dc3545; font-size: 12px; margin-top: -13px; margin-bottom: 15px;">{{ $message }}</p>
+                            @enderror
+                        @endif
+                        <button type="submit" style="width: 100%; padding: 12px; background: {{ $data['buttonColor'] ?? '#B9185E' }}; color: white; border: none; border-radius: 4px; font-weight: 500; cursor: pointer;">
+                            {{ $data['buttonText'] ?? 'Start nu' }}
                         </button>
                     </form>
                 </div>
@@ -121,12 +133,18 @@
                         @error('name')
                             <p style="color: #dc3545; font-size: 12px; margin-top: -10px; margin-bottom: 12px;">{{ $message }}</p>
                         @enderror
-                        <input type="email" name="email" placeholder="Email" required style="width: 100%; padding: 12px; margin-bottom: 18px; border: 1px solid #e0e0e0; border-radius: 4px;">
+                        <input type="email" name="email" placeholder="Email" required style="width: 100%; padding: 12px; margin-bottom: {{ $mailingList->offer_membership ? '12px' : '18px' }}; border: 1px solid #e0e0e0; border-radius: 4px;">
                         @error('email')
-                            <p style="color: #dc3545; font-size: 12px; margin-top: -16px; margin-bottom: 18px;">{{ $message }}</p>
+                            <p style="color: #dc3545; font-size: 12px; margin-top: -10px; margin-bottom: 12px;">{{ $message }}</p>
                         @enderror
-                        <button type="submit" style="width: 100%; padding: 14px; background: var(--primary-color); color: white; border: none; border-radius: 4px; font-weight: 500; cursor: pointer; font-size: 15px;">
-                            Tilmeld
+                        @if($mailingList->offer_membership)
+                            <input type="password" name="password" placeholder="Vælg et password" style="width: 100%; padding: 12px; margin-bottom: 18px; border: 1px solid #e0e0e0; border-radius: 4px;">
+                            @error('password')
+                                <p style="color: #dc3545; font-size: 12px; margin-top: -16px; margin-bottom: 18px;">{{ $message }}</p>
+                            @enderror
+                        @endif
+                        <button type="submit" style="width: 100%; padding: 14px; background: {{ $data['buttonColor'] ?? '#B9185E' }}; color: white; border: none; border-radius: 4px; font-weight: 500; cursor: pointer; font-size: 15px;">
+                            {{ $data['buttonText'] ?? 'Tilmeld' }}
                         </button>
                     </form>
                 </div>

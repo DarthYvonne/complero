@@ -73,6 +73,11 @@ class Resource extends Model
         return $this->belongsTo(MailingList::class);
     }
 
+    public function mailingLists()
+    {
+        return $this->belongsToMany(MailingList::class);
+    }
+
     public function hasAccessBy(User $user)
     {
         return $this->accesses()->where('user_id', $user->id)->exists();
@@ -81,19 +86,21 @@ class Resource extends Model
     /**
      * Check if user has access to this resource
      * Access is granted if:
-     * - Resource has no mailing list (free for all)
-     * - User is a member of the resource's mailing list
+     * - Resource has no mailing lists (free for all)
+     * - User is a member of at least one of the resource's mailing lists
      */
     public function userHasAccess(User $user)
     {
-        // If no mailing list, resource is free for all
-        if (!$this->mailing_list_id) {
+        // If no mailing lists assigned, resource is free for all
+        if ($this->mailingLists->isEmpty()) {
             return true;
         }
 
-        // Check if user is a member of the resource's mailing list
+        // Check if user is a member of any of the resource's mailing lists
+        $resourceMailingListIds = $this->mailingLists->pluck('id');
+
         return $user->mailingLists()
-            ->where('mailing_list_id', $this->mailing_list_id)
+            ->whereIn('mailing_list_id', $resourceMailingListIds)
             ->wherePivot('status', 'active')
             ->exists();
     }

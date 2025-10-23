@@ -37,5 +37,8 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
         });
+
+        // Share menu counts with layout
+        view()->composer('layouts.app', \App\View\Composers\MenuComposer::class);
     }
 }

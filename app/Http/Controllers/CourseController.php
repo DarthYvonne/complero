@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Enrollment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
@@ -33,5 +35,37 @@ class CourseController extends Controller
         $course->load('tabs', 'lessons', 'creator', 'enrollments');
 
         return view('courses.show', compact('course'));
+    }
+
+    /**
+     * Enroll the user in a course.
+     */
+    public function enroll(Course $course)
+    {
+        $user = Auth::user();
+
+        // Check if user is already enrolled
+        $existingEnrollment = Enrollment::where('user_id', $user->id)
+            ->where('course_id', $course->id)
+            ->first();
+
+        if (!$existingEnrollment) {
+            // Create new enrollment
+            Enrollment::create([
+                'user_id' => $user->id,
+                'course_id' => $course->id,
+                'enrolled_at' => now(),
+            ]);
+        }
+
+        // Get the first lesson
+        $firstLesson = $course->lessons()->orderBy('order')->first();
+
+        if ($firstLesson) {
+            return redirect()->route('lessons.show', [$course, $firstLesson]);
+        }
+
+        // If no lessons, redirect back to course page
+        return redirect()->route('courses.show', $course)->with('error', 'Dette forløb har ingen lektioner endnu.');
     }
 }

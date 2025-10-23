@@ -18,11 +18,13 @@ class MailingList extends Model
         'is_active',
         'signup_form_template',
         'signup_form_data',
+        'offer_membership',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'signup_form_data' => 'array',
+        'offer_membership' => 'boolean',
     ];
 
     protected static function boot()
@@ -89,11 +91,11 @@ class MailingList extends Model
     }
 
     /**
-     * Get all resources available to this list
+     * Get all resources available to this list (legacy - single mailing list)
      */
     public function resources()
     {
-        return $this->hasMany(Resource::class);
+        return $this->belongsToMany(Resource::class);
     }
 
     /**

@@ -13,29 +13,30 @@
 @endphp
 
     <div class="container-fluid">
-        <div class="row g-4">
-            <!-- Main Content -->
-            <div class="col-lg-9">
-                <!-- Lesson Title -->
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h1 style="font-size: 28px; font-weight: 700; color: #333; margin-bottom: 0;">
-                                <i class="fa-solid fa-circle-play" style="color: var(--primary-color);"></i> {{ $course->title }}: <span style="font-weight: 100;">{{ $lesson->title }}</span>
-                            </h1>
-                        </div>
-                        @if($effectiveRole === 'admin' || $effectiveRole === 'creator')
-                            <div class="d-flex gap-2">
-                                <a href="{{ $effectiveRole === 'admin' ? route('admin.courses.lessons.create', $course) : route('creator.courses.lessons.create', $course) }}" class="btn btn-sm btn-primary">
-                                    <i class="fa-solid fa-circle-plus me-1"></i> Tilføj lektion
-                                </a>
-                                <a href="{{ $effectiveRole === 'admin' ? route('admin.courses.lessons.edit', [$course, $lesson]) : route('creator.courses.lessons.edit', [$course, $lesson]) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="fa-solid fa-pen me-1"></i> Rediger
-                                </a>
-                            </div>
-                        @endif
-                    </div>
+        <!-- Lesson Title -->
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 style="font-size: 28px; font-weight: 700; color: #333; margin-bottom: 0;">
+                        <i class="fa-solid fa-circle-play" style="color: var(--primary-color);"></i> {{ $course->title }}: <span style="font-weight: 100;">{{ $lesson->title }}</span>
+                    </h1>
                 </div>
+                @if($effectiveRole === 'admin' || $effectiveRole === 'creator')
+                    <div class="d-flex gap-2">
+                        <a href="{{ $effectiveRole === 'admin' ? route('admin.courses.lessons.edit', [$course, $lesson]) : route('creator.courses.lessons.edit', [$course, $lesson]) }}" class="btn btn-sm btn-primary">
+                            <i class="fa-solid fa-pen me-1"></i> Rediger
+                        </a>
+                        <a href="{{ $effectiveRole === 'admin' ? route('admin.courses.lessons.create', $course) : route('creator.courses.lessons.create', $course) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fa-solid fa-circle-plus me-1"></i> Tilføj lektion
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="row g-4 align-items-start">
+            <!-- Main Content -->
+            <div class="col-lg-8">
 
                 <!-- Video Player -->
                 @if($lesson->video_path)
@@ -175,12 +176,12 @@
             </div>
 
             <!-- Sidebar -->
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <!-- Course Lessons -->
                 <div class="card">
                     <div class="card-header bg-white border-bottom py-3">
                         <h6 class="mb-0" style="font-size: 16px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-list"></i> Lektioner
+                            Lektioner
                         </h6>
                     </div>
                     <div class="card-body p-0">
@@ -192,9 +193,9 @@
                                     <div class="d-flex align-items-start">
                                         <div class="me-2" style="min-width: 24px;">
                                             @if($l->id === $lesson->id)
-                                                <i class="fa-solid fa-circle-play" style="color: #fff;"></i>
+                                                <i class="fa-solid fa-tv" style="color: #fff;"></i>
                                             @else
-                                                <span style="font-size: 13px; font-weight: 300; color: #999;">{{ $index + 1 }}</span>
+                                                <i class="fa-solid fa-tv" style="color: #999;"></i>
                                             @endif
                                         </div>
                                         <div class="flex-grow-1">

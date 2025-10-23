@@ -6,6 +6,10 @@
     <strong style="color: #333; font-weight: 600;">{{ $mailingList->name }}</strong>
 @endsection
 
+@php
+    $effectiveRole = session('view_as', Auth::user()->role);
+@endphp
+
     <div class="container-fluid">
         <!-- Page Header -->
         <div class="mb-4">
@@ -67,7 +71,7 @@
 
         <div class="row g-4">
             <!-- Main Content -->
-            <div class="col-lg-8">
+            <div class="col-lg-7">
                 <!-- Members -->
                 <div class="card mb-4">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
@@ -124,13 +128,34 @@
                     </div>
                 </div>
 
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-5">
+                <!-- Status -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong style="font-size: 16px; font-weight: 600; color: #333;">Status</strong>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="statusToggle"
+                                       {{ $mailingList->is_active ? 'checked' : '' }}
+                                       onchange="toggleStatus(this)">
+                                <label class="form-check-label" for="statusToggle" style="font-weight: 500; color: #666;">
+                                    <span id="statusLabel">{{ $mailingList->is_active ? 'Aktiv' : 'Inaktiv' }}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Courses -->
-                <div class="card mb-4">
+                <div class="card mb-3">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                         <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-circle-play" style="color: var(--primary-color);"></i> Forløb @if($mailingList->courses->count() > 0)(<b>{{ $mailingList->courses->count() }}</b>)@endif
+                            <i class="fa-solid fa-circle-play" style="color: var(--primary-color);"></i> Forløb til medlemmer @if($mailingList->courses->count() > 0)(<b>{{ $mailingList->courses->count() }}</b>)@endif
                         </h5>
-                        @if($availableCourses->count() > 0)
+                        @if(($effectiveRole === 'admin' || $effectiveRole === 'creator') && $availableCourses->count() > 0)
                             <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#assignCoursesModal">
                                 <i class="fa-solid fa-plus me-1"></i> Tilbyd forløb
                             </button>
@@ -140,16 +165,14 @@
                         @if($mailingList->courses->count() > 0)
                             <div class="list-group list-group-flush">
                                 @foreach($mailingList->courses as $course)
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <a href="{{ route('creator.courses.show', $course) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="text-decoration: none; color: inherit;">
                                         <div>
                                             <strong style="font-weight: 500;">{{ $course->title }}</strong>
                                             <br>
-                                            <small class="text-muted">{{ Str::limit($course->description, 80) }}</small>
+                                            <small class="text-muted">{!! Str::limit(strip_tags($course->description), 80) !!}</small>
                                         </div>
-                                        <a href="{{ route('creator.courses.show', $course) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="fa-solid fa-eye"></i> Se
-                                        </a>
-                                    </div>
+                                        <i class="fa-solid fa-chevron-right" style="color: #999;"></i>
+                                    </a>
                                 @endforeach
                             </div>
                         @else
@@ -162,14 +185,14 @@
                 </div>
 
                 <!-- Resources -->
-                <div class="card">
+                <div class="card mb-3">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                         <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-photo-film" style="color: var(--primary-color);"></i> Downloads @if($mailingList->resources->count() > 0)(<b>{{ $mailingList->resources->count() }}</b>)@endif
+                            <i class="fa-solid fa-photo-film" style="color: var(--primary-color);"></i> Materialer til medlemmer @if($mailingList->resources->count() > 0)(<b>{{ $mailingList->resources->count() }}</b>)@endif
                         </h5>
-                        @if($availableResources->count() > 0)
+                        @if(($effectiveRole === 'admin' || $effectiveRole === 'creator') && $availableResources->count() > 0)
                             <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#assignResourcesModal">
-                                <i class="fa-solid fa-plus me-1"></i> Tilbyd download
+                                <i class="fa-solid fa-plus me-1"></i> Tilbyd materiale
                             </button>
                         @endif
                     </div>
@@ -177,85 +200,80 @@
                         @if($mailingList->resources->count() > 0)
                             <div class="list-group list-group-flush">
                                 @foreach($mailingList->resources as $resource)
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <a href="{{ route('creator.resources.show', $resource) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="text-decoration: none; color: inherit;">
                                         <div>
                                             <strong style="font-weight: 500;">{{ $resource->title }}</strong>
                                             <br>
-                                            <small class="text-muted">{{ Str::limit($resource->description, 80) }}</small>
+                                            <small class="text-muted">{!! Str::limit(strip_tags($resource->description), 80) !!}</small>
                                         </div>
-                                        <a href="{{ route('creator.resources.show', $resource) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="fa-solid fa-eye"></i> Se
-                                        </a>
-                                    </div>
+                                        <i class="fa-solid fa-chevron-right" style="color: #999;"></i>
+                                    </a>
                                 @endforeach
                             </div>
                         @else
                             <div class="text-center py-4">
                                 <i class="fa-solid fa-photo-film" style="font-size: 3rem; color: #d1d5db;"></i>
-                                <p class="mt-3 mb-0" style="font-weight: 300; color: #666;">Ingen downloads tildelt denne liste endnu</p>
+                                <p class="mt-3 mb-0" style="font-weight: 300; color: #666;">Ingen materialer tildelt denne liste endnu</p>
                             </div>
                         @endif
                     </div>
                 </div>
+
+                <!-- Delete Button -->
+                <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="fa-solid fa-trash"></i> Slet liste
+                </button>
             </div>
+        </div>
+    </div>
 
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <!-- List Details -->
-                <div class="card mb-3">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-info-circle" style="color: var(--primary-color);"></i> Liste detaljer
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Status -->
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <strong style="font-size: 16px; font-weight: 600; color: #333;">Status</strong>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="statusToggle"
-                                           {{ $mailingList->is_active ? 'checked' : '' }}
-                                           onchange="toggleStatus(this)">
-                                    <label class="form-check-label" for="statusToggle" style="font-weight: 500; color: #666;">
-                                        <span id="statusLabel">{{ $mailingList->is_active ? 'Aktiv' : 'Inaktiv' }}</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="my-3">
-
-                        <!-- Created/Updated -->
-                        <div class="mb-3">
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Oprettet</strong>
-                            <span style="font-weight: 300; color: #666;">{{ $mailingList->created_at->format('d/m/Y H:i') }}</span>
-                        </div>
-
-                        <div>
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Sidst opdateret</strong>
-                            <span style="font-weight: 300; color: #666;">{{ $mailingList->updated_at->format('d/m/Y H:i') }}</span>
-                        </div>
-                    </div>
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Bekræft sletning af mailingliste</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
-                <!-- Actions -->
-                <div class="card">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-bolt" style="color: var(--primary-color);"></i> Handlinger
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <form action="{{ route('creator.mailing-lists.destroy', $mailingList) }}" method="POST"
-                              onsubmit="return confirm('Er du sikker på, at du vil slette denne liste? Kurser og ressourcer vil blive gjort tilgængelige for alle.');">
+                <div class="modal-body">
+                    @if($mailingList->activeMembers->count() > 0)
+                        <div class="alert alert-danger">
+                            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                            <strong>Advarsel!</strong> Denne mailingliste har <strong>{{ $mailingList->activeMembers->count() }} {{ $mailingList->activeMembers->count() === 1 ? 'medlem' : 'medlemmer' }}</strong>.
+                            Alle medlemmer vil miste ALLE deres adgange til forløb og materialer.
+                        </div>
+                        <p class="mb-3">For at bekræfte sletningen, skal du skrive <strong>SLETMIG</strong> i feltet nedenfor:</p>
+                        <form id="deleteForm" action="{{ route('creator.mailing-lists.destroy', $mailingList) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-outline-danger w-100">
-                                <i class="fa-solid fa-trash"></i> Slet liste
-                            </button>
+                            <div class="mb-3">
+                                <input type="text"
+                                       class="form-control"
+                                       id="deleteConfirmation"
+                                       placeholder="Skriv SLETMIG"
+                                       autocomplete="off">
+                            </div>
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuller</button>
+                                <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                                    <i class="fa-solid fa-trash me-1"></i> Slet mailingliste
+                                </button>
+                            </div>
                         </form>
-                    </div>
+                    @else
+                        <p>Er du sikker på, at du vil slette denne mailingliste?</p>
+                        <p class="text-muted small mb-0">Denne handling kan ikke fortrydes.</p>
+                        <form action="{{ route('creator.mailing-lists.destroy', $mailingList) }}" method="POST" class="mt-3">
+                            @csrf
+                            @method('DELETE')
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuller</button>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa-solid fa-trash me-1"></i> Slet mailingliste
+                                </button>
+                            </div>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>
@@ -314,14 +332,14 @@
                 <div class="modal-header">
                     <h5 class="modal-title">
                         <i class="fa-solid fa-photo-film me-2" style="color: var(--primary-color);"></i>
-                        Tilbyd downloads til {{ $mailingList->name }}
+                        Tilbyd materialer til {{ $mailingList->name }}
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form action="{{ route('creator.mailing-lists.assign-resources', $mailingList) }}" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <p class="text-muted mb-3">Vælg hvilke downloads der skal være tilgængelige for medlemmer af denne liste.</p>
+                        <p class="text-muted mb-3">Vælg hvilke materialer der skal være tilgængelige for medlemmer af denne liste.</p>
 
                         @if($availableResources->count() > 0)
                             <div class="list-group">
@@ -338,7 +356,7 @@
                         @else
                             <div class="text-center py-4">
                                 <i class="fa-solid fa-photo-film" style="font-size: 3rem; color: #d1d5db;"></i>
-                                <p class="mt-3 mb-0" style="font-weight: 300; color: #666;">Ingen tilgængelige downloads</p>
+                                <p class="mt-3 mb-0" style="font-weight: 300; color: #666;">Ingen tilgængelige materialer</p>
                             </div>
                         @endif
                     </div>
@@ -354,6 +372,14 @@
     </div>
 
     <style>
+        .nav-tabs .nav-link {
+            background-color: transparent !important;
+        }
+
+        .nav-tabs .nav-link.active {
+            background-color: transparent !important;
+        }
+
         .card {
             border-radius: 8px;
             border: 1px solid #e0e0e0;
@@ -427,6 +453,26 @@
                 } else {
                     row.style.display = 'none';
                 }
+            });
+        }
+
+        // Delete confirmation handling
+        const deleteConfirmationInput = document.getElementById('deleteConfirmation');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const deleteModal = document.getElementById('deleteModal');
+
+        if (deleteConfirmationInput && confirmDeleteBtn) {
+            deleteConfirmationInput.addEventListener('input', function() {
+                if (this.value === 'SLETMIG') {
+                    confirmDeleteBtn.disabled = false;
+                } else {
+                    confirmDeleteBtn.disabled = true;
+                }
+            });
+
+            deleteModal.addEventListener('hidden.bs.modal', function() {
+                deleteConfirmationInput.value = '';
+                confirmDeleteBtn.disabled = true;
             });
         }
     </script>
