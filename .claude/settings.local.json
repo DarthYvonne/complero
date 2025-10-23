@@ -3,7 +3,14 @@
     "allow": [
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker --execute=\"echo json_encode(DB::select(''SELECT * FROM mailing_lists LIMIT 1''));\")",
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker --execute=\"echo json_encode(DB::select(''SELECT id, name, email, role FROM users''));\")",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker:*)"
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker:*)",
+      "Bash(composer require:*)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" \"C:\\Users\\Anders\\.config\\composer\\vendor\\bin\\composer\" require sendinblue/api-v3-sdk)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\composer.bat\" require sendinblue/api-v3-sdk)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\composer.bat\" remove sendinblue/api-v3-sdk)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\composer.bat\" require getbrevo/brevo-php)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_tracking_fields_to_emails_table --table=emails)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller BrevoWebhookController)"
     ],
     "deny": [],
     "ask": []

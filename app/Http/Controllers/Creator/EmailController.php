@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Creator;
 use App\Http\Controllers\Controller;
 use App\Models\Email;
 use App\Models\MailingList;
+use App\Services\BrevoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 
 class EmailController extends Controller
 {
@@ -29,7 +29,7 @@ class EmailController extends Controller
         return view('creator.emails.index', compact('mailingLists', 'emails'));
     }
 
-    public function send(Request $request)
+    public function send(Request $request, BrevoService $brevoService)
     {
         $validated = $request->validate([
             'mailing_list_id' => 'nullable|exists:mailing_lists,id',
@@ -63,7 +63,10 @@ class EmailController extends Controller
             'sent_at' => now(),
         ]);
 
-        // Send emails using PHP Mail with placeholder replacement
+        // Send emails using Brevo with placeholder replacement
+        $successCount = 0;
+        $errors = [];
+
         foreach ($recipientData as $recipient) {
             $personalizedBody = str_replace(
                 ['{{navn}}', '{{email}}'],
@@ -77,10 +80,28 @@ class EmailController extends Controller
                 $validated['subject']
             );
 
-            Mail::html($personalizedBody, function ($message) use ($recipient, $personalizedSubject) {
-                $message->to($recipient['email'])
-                    ->subject($personalizedSubject);
-            });
+            $result = $brevoService->sendEmail(
+                $recipient['email'],
+                $recipient['name'],
+                $personalizedSubject,
+                $personalizedBody
+            );
+
+            if ($result['success']) {
+                $successCount++;
+                // Store the first message ID for tracking
+                if (empty($email->brevo_message_id)) {
+                    $email->brevo_message_id = $result['message_id'];
+                    $email->save();
+                }
+            } else {
+                $errors[] = $recipient['email'];
+            }
+        }
+
+        if (count($errors) > 0) {
+            return redirect()->route('creator.emails.index')
+                ->with('warning', 'Email sendt til ' . $successCount . ' af ' . count($recipients) . ' modtagere. ' . count($errors) . ' fejlede.');
         }
 
         return redirect()->route('creator.emails.index')

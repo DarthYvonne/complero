@@ -45,7 +45,7 @@
             </div>
         @endif
 
-        <!-- Horizontal Tab Menu -->
+        <!-- Submenu Navigation -->
         <ul class="nav nav-tabs mb-4" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link active" href="{{ route('creator.mailing-lists.show', $mailingList) }}">
@@ -476,4 +476,25 @@
             });
         }
     </script>
+
+    <style>
+        .nav-tabs {
+            border-bottom: none;
+        }
+        .nav-tabs .nav-link {
+            color: #666;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: none;
+        }
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+    </style>
 </x-app-layout>

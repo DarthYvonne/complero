@@ -36,7 +36,7 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="archive-tab" data-bs-toggle="tab" data-bs-target="#archive" type="button" role="tab" aria-controls="archive" aria-selected="false">
-                    <i class="fa-solid fa-archive me-1"></i> Email Arkiv
+                    <i class="fa-solid fa-archive me-1"></i> Email Arkiv ({{ $emails->count() }})
                 </button>
             </li>
         </ul>
@@ -45,100 +45,76 @@
         <div class="tab-content" id="emailTabsContent">
             <!-- Composer Tab -->
             <div class="tab-pane fade show active" id="composer" role="tabpanel" aria-labelledby="composer-tab">
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header bg-white border-bottom">
-                                <h5 class="mb-0" style="font-weight: 600;">Ny Email</h5>
-                            </div>
-                            <div class="card-body">
-                                <form action="{{ route('creator.emails.send') }}" method="POST" id="emailForm">
-                                    @csrf
-
-                                    <!-- Mailing List -->
-                                    <div class="mb-3">
-                                        <label for="mailing_list_id" class="form-label">Send til liste</label>
-                                        <select name="mailing_list_id" id="mailing_list_id" class="form-select @error('mailing_list_id') is-invalid @enderror">
-                                            <option value="">Vælg en liste</option>
-                                            @foreach($mailingLists as $list)
-                                                <option value="{{ $list->id }}" {{ old('mailing_list_id') == $list->id ? 'selected' : '' }}>
-                                                    {{ $list->name }} ({{ $list->active_members_count ?? 0 }} medlemmer)
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('mailing_list_id')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    <!-- Subject -->
-                                    <div class="mb-3">
-                                        <label for="subject" class="form-label">Emne</label>
-                                        <input type="text"
-                                               name="subject"
-                                               id="subject"
-                                               class="form-control @error('subject') is-invalid @enderror"
-                                               placeholder="Indtast email emne"
-                                               value="{{ old('subject') }}"
-                                               required>
-                                        @error('subject')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    <!-- Body HTML -->
-                                    <div class="mb-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <label for="body_html" class="form-label mb-0">Besked</label>
-                                            <div class="dropdown">
-                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="placeholderDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fa-solid fa-code me-1"></i> Indsæt placeholder
-                                                </button>
-                                                <ul class="dropdown-menu" aria-labelledby="placeholderDropdown">
-                                                    <li><a class="dropdown-item placeholder-item" href="#" data-placeholder="@{{navn}}"><code>@{{navn}}</code> - Modtagerens navn</a></li>
-                                                    <li><a class="dropdown-item placeholder-item" href="#" data-placeholder="@{{email}}"><code>@{{email}}</code> - Modtagerens email</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <textarea name="body_html" id="body_html" class="form-control @error('body_html') is-invalid @enderror" style="display: none;">{{ old('body_html') }}</textarea>
-                                        <div id="editor" style="height: 400px;"></div>
-                                        @error('body_html')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    <!-- Submit Buttons -->
-                                    <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fa-solid fa-paper-plane me-1"></i> Send Email
-                                        </button>
-                                        <button type="reset" class="btn btn-outline-secondary" onclick="quill.setContents([]);">
-                                            Ryd
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0" style="font-weight: 600;">Ny Email</h5>
                     </div>
+                    <div class="card-body">
+                        <form action="{{ route('creator.emails.send') }}" method="POST" id="emailForm">
+                            @csrf
 
-                    <!-- Help Sidebar -->
-                    <div class="col-lg-4">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header bg-white border-bottom">
-                                <h5 class="mb-0" style="font-weight: 600;">
-                                    <i class="fa-solid fa-circle-info" style="color: var(--primary-color);"></i> Hjælp
-                                </h5>
+                            <!-- Mailing List -->
+                            <div class="mb-3">
+                                <label for="mailing_list_id" class="form-label">Send til liste</label>
+                                <select name="mailing_list_id" id="mailing_list_id" class="form-select @error('mailing_list_id') is-invalid @enderror">
+                                    <option value="">Vælg en liste</option>
+                                    @foreach($mailingLists as $list)
+                                        <option value="{{ $list->id }}" {{ old('mailing_list_id') == $list->id ? 'selected' : '' }}>
+                                            {{ $list->name }} ({{ $list->active_members_count ?? 0 }} medlemmer)
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('mailing_list_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
-                            <div class="card-body">
-                                <div style="font-size: 14px; font-weight: 300; color: #666;">
-                                    <p><strong>Send til liste:</strong> Vælg hvilken mailing liste emailen skal sendes til.</p>
-                                    <p><strong>Emne:</strong> Dette vises i modtagerens indbakke. Du kan bruge placeholders her også.</p>
-                                    <p><strong>Besked:</strong> Skriv din email med formatering. Du kan tilføje links, billeder og styling.</p>
-                                    <p><strong>Placeholders:</strong> Brug <code>@{{navn}}</code> eller <code>@{{email}}</code> til at personalisere emailen. Disse erstattes automatisk for hver modtager.</p>
-                                    <p class="mb-0"><strong>Tip:</strong> Emails sendes med PHP Mail og gemmes i arkivet.</p>
+
+                            <!-- Subject -->
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Emne</label>
+                                <input type="text"
+                                       name="subject"
+                                       id="subject"
+                                       class="form-control @error('subject') is-invalid @enderror"
+                                       placeholder="Indtast email emne"
+                                       value="{{ old('subject') }}"
+                                       required>
+                                @error('subject')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Body HTML -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label for="body_html" class="form-label mb-0">Besked</label>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="placeholderDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fa-solid fa-code me-1"></i> Indsæt placeholder
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="placeholderDropdown">
+                                            <li><a class="dropdown-item placeholder-item" href="#" data-placeholder="@{{navn}}"><code>@{{navn}}</code> - Modtagerens navn</a></li>
+                                            <li><a class="dropdown-item placeholder-item" href="#" data-placeholder="@{{email}}"><code>@{{email}}</code> - Modtagerens email</a></li>
+                                        </ul>
+                                    </div>
                                 </div>
+                                <textarea name="body_html" id="body_html" class="form-control @error('body_html') is-invalid @enderror" style="display: none;">{{ old('body_html') }}</textarea>
+                                <div id="editor" style="height: 400px;"></div>
+                                @error('body_html')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
                             </div>
-                        </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-paper-plane me-1"></i> Send Email
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary" onclick="quill.setContents([]);">
+                                    Ryd
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -163,6 +139,8 @@
                                             <th style="font-weight: 600; color: #333;">Emne</th>
                                             <th style="font-weight: 600; color: #333;">Liste</th>
                                             <th style="font-weight: 600; color: #333;">Modtagere</th>
+                                            <th style="font-weight: 600; color: #333;">Åbninger</th>
+                                            <th style="font-weight: 600; color: #333;">Klik</th>
                                             <th style="font-weight: 600; color: #333;">Sendt</th>
                                         </tr>
                                     </thead>
@@ -177,6 +155,22 @@
                                                 </td>
                                                 <td>
                                                     <span class="badge bg-primary">{{ $email->recipients_count }} personer</span>
+                                                </td>
+                                                <td>
+                                                    @if($email->unique_opens > 0)
+                                                        <span style="font-weight: 500; color: #333;">{{ $email->unique_opens }}</span>
+                                                        <span style="font-weight: 300; color: #999; font-size: 12px;">({{ $email->total_opens }} total)</span>
+                                                    @else
+                                                        <span style="font-weight: 300; color: #999;">-</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if($email->unique_clicks > 0)
+                                                        <span style="font-weight: 500; color: #333;">{{ $email->unique_clicks }}</span>
+                                                        <span style="font-weight: 300; color: #999; font-size: 12px;">({{ $email->total_clicks }} total)</span>
+                                                    @else
+                                                        <span style="font-weight: 300; color: #999;">-</span>
+                                                    @endif
                                                 </td>
                                                 <td style="font-weight: 300; color: #666;">
                                                     {{ $email->sent_at ? $email->sent_at->format('d/m/Y H:i') : 'Ikke sendt' }}

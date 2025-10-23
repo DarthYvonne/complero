@@ -13,10 +13,19 @@ class Email extends Model
         'body_html',
         'recipients_count',
         'sent_at',
+        'brevo_message_id',
+        'total_opens',
+        'unique_opens',
+        'total_clicks',
+        'unique_clicks',
+        'last_opened_at',
+        'last_clicked_at',
     ];
 
     protected $casts = [
         'sent_at' => 'datetime',
+        'last_opened_at' => 'datetime',
+        'last_clicked_at' => 'datetime',
     ];
 
     public function creator()

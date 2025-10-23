@@ -132,17 +132,6 @@
                 color: white !important;
             }
 
-            .sidebar-menu .menu-count {
-                margin-left: auto;
-                font-size: 13px;
-                color: #999;
-                font-weight: 400;
-            }
-
-            .sidebar-menu a.active .menu-count {
-                color: rgba(255, 255, 255, 0.8);
-            }
-
             .sidebar-divider {
                 margin: 10px 0;
                 padding-top: 10px;
@@ -307,17 +296,17 @@
                     </li>
                     <li>
                         <a href="{{ route('creator.courses.index') }}" class="{{ request()->routeIs('creator.courses.*') || request()->routeIs('creator.lessons.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-circle-play" style="color: #666;"></i> Mine Forløb <span class="menu-count">({{ $coursesCount ?? 0 }})</span>
+                            <i class="fa-solid fa-circle-play" style="color: #666;"></i> Mine Forløb (<b>{{ $coursesCount ?? 0 }}</b>)
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('creator.resources.index') }}" class="{{ request()->routeIs('creator.resources.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-photo-film" style="color: #666;"></i> Mine Materialer <span class="menu-count">({{ $resourcesCount ?? 0 }})</span>
+                            <i class="fa-solid fa-photo-film" style="color: #666;"></i> Mine Materialer (<b>{{ $resourcesCount ?? 0 }}</b>)
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('creator.mailing-lists.index') }}" class="{{ request()->routeIs('creator.mailing-lists.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-envelope" style="color: #666;"></i> Mine Lister <span class="menu-count">({{ $mailingListsCount ?? 0 }})</span>
+                            <i class="fa-solid fa-envelope" style="color: #666;"></i> Mine Lister (<b>{{ $mailingListsCount ?? 0 }}</b>)
                         </a>
                     </li>
                     <li>

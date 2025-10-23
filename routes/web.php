@@ -20,6 +20,9 @@ Route::get('/', function () {
 Route::get('/signup/{slug}', [\App\Http\Controllers\SignupController::class, 'show'])->name('signup.show');
 Route::post('/signup/{slug}', [\App\Http\Controllers\SignupController::class, 'store'])->name('signup.store');
 
+// Brevo webhook (must be publicly accessible)
+Route::post('/webhooks/brevo', [\App\Http\Controllers\BrevoWebhookController::class, 'handle'])->name('webhooks.brevo');
+
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

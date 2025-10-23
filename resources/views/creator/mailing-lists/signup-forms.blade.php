@@ -343,12 +343,24 @@
     </div>
 
     <style>
+        .nav-tabs {
+            border-bottom: none;
+        }
         .nav-tabs .nav-link {
+            color: #666;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
             background-color: transparent !important;
         }
-
         .nav-tabs .nav-link.active {
-            background-color: transparent !important;
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: none !important;
+        }
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
         }
 
         .card {
