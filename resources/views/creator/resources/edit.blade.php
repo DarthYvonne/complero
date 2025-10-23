@@ -75,6 +75,16 @@
                                     <div class="mb-2">
                                         <img src="{{ Storage::url($resource->image_url) }}" alt="{{ $resource->title }}" class="img-thumbnail" style="max-width: 300px;">
                                     </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               id="remove_image"
+                                               name="remove_image"
+                                               value="1">
+                                        <label class="form-check-label" for="remove_image">
+                                            Fjern billede
+                                        </label>
+                                    </div>
                                 </div>
                             @endif
 
@@ -225,7 +235,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px;">
-                            <i class="fa-solid fa-circle-info" style="color: #be185d;"></i> Downloadsinfo
+                            <i class="fa-solid fa-circle-info" style="color: var(--primary-color);"></i> Downloadsinfo
                         </h5>
                         <div style="font-size: 14px; font-weight: 300; color: #666;">
                             <div class="mb-3">
@@ -339,14 +349,14 @@
             border: 1px solid #e0e0e0;
         }
         .btn-primary {
-            background: #be185d;
-            border-color: #be185d;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             font-size: 14px;
             font-weight: 500;
         }
         .btn-primary:hover {
-            background: #9f1239;
-            border-color: #9f1239;
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
         }
         .form-label {
             font-weight: 500;

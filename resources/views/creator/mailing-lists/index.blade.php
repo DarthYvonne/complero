@@ -10,7 +10,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                        <i class="fa-solid fa-envelope" style="color: #be185d;"></i> Mailing lister
+                        <i class="fa-solid fa-envelope" style="color: var(--primary-color);"></i> Mailing lister
                     </h1>
                     <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
                         Administrer mailing lister og medlemmer
@@ -32,65 +32,32 @@
 
         <!-- Mailing Lists Table -->
         <div class="card">
-            <div class="card-body">
+            <div class="card-body" style="padding: 0;">
                 @if($mailingLists->count() > 0)
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th style="font-weight: 600; color: #333;">Navn</th>
-                                    <th style="font-weight: 600; color: #333;">Beskrivelse</th>
-                                    <th style="font-weight: 600; color: #333;">Medlemmer</th>
-                                    <th style="font-weight: 600; color: #333;">Kurser</th>
-                                    <th style="font-weight: 600; color: #333;">Ressourcer</th>
-                                    <th style="font-weight: 600; color: #333;">Status</th>
-                                    <th style="font-weight: 600; color: #333;">Handlinger</th>
+                                    <th style="font-weight: 600; color: #333; text-align: left;">Navn</th>
+                                    <th style="font-weight: 600; color: #333; text-align: left;">Medlemmer</th>
+                                    <th style="font-weight: 600; color: #333; text-align: left;">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($mailingLists as $list)
-                                    <tr>
-                                        <td>
-                                            <strong style="font-weight: 500;">{{ $list->name }}</strong>
-                                            <br>
-                                            <small class="text-muted">{{ $list->slug }}</small>
+                                    <tr style="cursor: pointer;" onclick="window.location='{{ route('creator.mailing-lists.show', $list) }}'">
+                                        <td style="font-weight: 500; color: #333; text-align: left;">
+                                            {{ $list->name }}
                                         </td>
-                                        <td style="font-weight: 300; color: #666;">
-                                            {{ Str::limit($list->description, 50) }}
+                                        <td style="font-weight: 300; color: #666; text-align: left;">
+                                            {{ $list->members_count }}
                                         </td>
-                                        <td>
-                                            <span class="badge bg-info">{{ $list->members_count }} medlemmer</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-primary">{{ $list->courses_count }} kurser</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-success">{{ $list->resources_count }} ressourcer</span>
-                                        </td>
-                                        <td>
+                                        <td style="font-weight: 300; color: #666; text-align: left;">
                                             @if($list->is_active)
-                                                <span class="badge bg-success">Aktiv</span>
+                                                Aktiv
                                             @else
-                                                <span class="badge bg-secondary">Inaktiv</span>
+                                                Inaktiv
                                             @endif
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm" role="group">
-                                                <a href="{{ route('creator.mailing-lists.show', $list) }}" class="btn btn-outline-primary">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </a>
-                                                <a href="{{ route('creator.mailing-lists.edit', $list) }}" class="btn btn-outline-primary">
-                                                    <i class="fa-solid fa-pen"></i>
-                                                </a>
-                                                <form action="{{ route('creator.mailing-lists.destroy', $list) }}" method="POST" class="d-inline"
-                                                      onsubmit="return confirm('Er du sikker på, at du vil slette denne liste?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-outline-danger">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -117,17 +84,24 @@
             border: 1px solid #e0e0e0;
         }
         .btn-primary {
-            background: #be185d;
-            border-color: #be185d;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             font-size: 14px;
             font-weight: 500;
         }
         .btn-primary:hover {
-            background: #9f1239;
-            border-color: #9f1239;
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
         }
         .table {
-            font-size: 14px;
+            font-size: 16px;
+        }
+        .table th,
+        .table td {
+            padding: 12px 16px;
+        }
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
         }
     </style>
 </x-app-layout>

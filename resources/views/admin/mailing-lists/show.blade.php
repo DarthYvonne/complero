@@ -51,8 +51,7 @@
                 <div class="card mb-4">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                         <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-users" style="color: #be185d;"></i> Medlemmer
-                            <span class="badge bg-secondary ms-2">{{ $mailingList->activeMembers->count() }}</span>
+                            <i class="fa-solid fa-users" style="color: var(--primary-color);"></i> Medlemmer @if($mailingList->activeMembers->count() > 0)(<b>{{ $mailingList->activeMembers->count() }}</b>)@endif
                         </h5>
                     </div>
                     <div class="card-body">
@@ -103,8 +102,7 @@
                 <div class="card mb-4">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                         <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-graduation-cap" style="color: #be185d;"></i> Kurser
-                            <span class="badge bg-secondary ms-2">{{ $mailingList->courses->count() }}</span>
+                            <i class="fa-solid fa-circle-play" style="color: var(--primary-color);"></i> Forløb @if($mailingList->courses->count() > 0)(<b>{{ $mailingList->courses->count() }}</b>)@endif
                         </h5>
                     </div>
                     <div class="card-body">
@@ -125,8 +123,8 @@
                             </div>
                         @else
                             <div class="text-center py-4">
-                                <i class="fa-solid fa-graduation-cap" style="font-size: 3rem; color: #d1d5db;"></i>
-                                <p class="mt-3 mb-0" style="font-weight: 300; color: #666;">Ingen kurser tildelt denne liste endnu</p>
+                                <i class="fa-solid fa-circle-play" style="font-size: 3rem; color: #d1d5db;"></i>
+                                <p class="mt-3 mb-0" style="font-weight: 300; color: #666;">Ingen forløb tildelt denne liste endnu</p>
                             </div>
                         @endif
                     </div>
@@ -136,8 +134,7 @@
                 <div class="card">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                         <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                            <i class="fa-solid fa-file-lines" style="color: #be185d;"></i> Ressourcer
-                            <span class="badge bg-secondary ms-2">{{ $mailingList->resources->count() }}</span>
+                            <i class="fa-solid fa-photo-film" style="color: var(--primary-color);"></i> Downloads @if($mailingList->resources->count() > 0)(<b>{{ $mailingList->resources->count() }}</b>)@endif
                         </h5>
                     </div>
                     <div class="card-body">
@@ -158,8 +155,8 @@
                             </div>
                         @else
                             <div class="text-center py-4">
-                                <i class="fa-solid fa-file-lines" style="font-size: 3rem; color: #d1d5db;"></i>
-                                <p class="mt-3 mb-0" style="font-weight: 300; color: #666;">Ingen ressourcer tildelt denne liste endnu</p>
+                                <i class="fa-solid fa-photo-film" style="font-size: 3rem; color: #d1d5db;"></i>
+                                <p class="mt-3 mb-0" style="font-weight: 300; color: #666;">Ingen downloads tildelt denne liste endnu</p>
                             </div>
                         @endif
                     </div>
@@ -239,14 +236,14 @@
             border: 1px solid #e0e0e0;
         }
         .btn-primary {
-            background: #be185d;
-            border-color: #be185d;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             font-size: 14px;
             font-weight: 500;
         }
         .btn-primary:hover {
-            background: #9f1239;
-            border-color: #9f1239;
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
         }
         .table {
             font-size: 14px;

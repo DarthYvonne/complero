@@ -10,7 +10,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                        <i class="fa-solid fa-envelope" style="color: #be185d;"></i> Mailing lister
+                        <i class="fa-solid fa-envelope" style="color: var(--primary-color);"></i> Mailing lister
                     </h1>
                     <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
                         Administrer mailing lister og medlemmer
@@ -41,8 +41,8 @@
                                     <th style="font-weight: 600; color: #333;">Navn</th>
                                     <th style="font-weight: 600; color: #333;">Beskrivelse</th>
                                     <th style="font-weight: 600; color: #333;">Medlemmer</th>
-                                    <th style="font-weight: 600; color: #333;">Kurser</th>
-                                    <th style="font-weight: 600; color: #333;">Ressourcer</th>
+                                    <th style="font-weight: 600; color: #333;">Forløb</th>
+                                    <th style="font-weight: 600; color: #333;">Downloads</th>
                                     <th style="font-weight: 600; color: #333;">Status</th>
                                     <th style="font-weight: 600; color: #333;">Handlinger</th>
                                 </tr>
@@ -62,10 +62,10 @@
                                             <span class="badge bg-info">{{ $list->members_count }} medlemmer</span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-primary">{{ $list->courses_count }} kurser</span>
+                                            <span class="badge bg-primary">{{ $list->courses_count }} forløb</span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-success">{{ $list->resources_count }} ressourcer</span>
+                                            <span class="badge bg-success">{{ $list->resources_count }} downloads</span>
                                         </td>
                                         <td>
                                             @if($list->is_active)
@@ -117,14 +117,14 @@
             border: 1px solid #e0e0e0;
         }
         .btn-primary {
-            background: #be185d;
-            border-color: #be185d;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             font-size: 14px;
             font-weight: 500;
         }
         .btn-primary:hover {
-            background: #9f1239;
-            border-color: #9f1239;
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
         }
         .table {
             font-size: 14px;

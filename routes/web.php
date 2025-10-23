@@ -19,6 +19,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Public signup forms
+Route::get('/signup/{slug}', [\App\Http\Controllers\SignupController::class, 'show'])->name('signup.show');
+Route::post('/signup/{slug}', [\App\Http\Controllers\SignupController::class, 'store'])->name('signup.store');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
@@ -74,8 +78,19 @@ Route::middleware(['auth', 'creator-or-admin'])->prefix('creator')->name('creato
 
     // Mailing List Management (scoped to creator's own lists)
     Route::resource('mailing-lists', CreatorMailingListController::class);
+    Route::get('/mailing-lists/{mailing_list}/signup-forms', [CreatorMailingListController::class, 'signupForms'])->name('mailing-lists.signup-forms');
+    Route::get('/mailing-lists/{mailing_list}/qr-code', [CreatorMailingListController::class, 'qrCode'])->name('mailing-lists.qr-code');
+    Route::get('/mailing-lists/{mailing_list}/import', [CreatorMailingListController::class, 'import'])->name('mailing-lists.import');
+    Route::get('/mailing-lists/download-template', [CreatorMailingListController::class, 'downloadTemplate'])->name('mailing-lists.download-template');
+    Route::post('/mailing-lists/{mailing_list}/parse-import', [CreatorMailingListController::class, 'parseImport'])->name('mailing-lists.parse-import');
+    Route::post('/mailing-lists/{mailing_list}/process-import', [CreatorMailingListController::class, 'processImport'])->name('mailing-lists.process-import');
     Route::post('/mailing-lists/{mailing_list}/members', [CreatorMailingListController::class, 'addMember'])->name('mailing-lists.members.add');
     Route::delete('/mailing-lists/{mailing_list}/members/{user}', [CreatorMailingListController::class, 'removeMember'])->name('mailing-lists.members.remove');
+    Route::post('/mailing-lists/{mailing_list}/signup-form/template', [CreatorMailingListController::class, 'updateSignupFormTemplate'])->name('mailing-lists.signup-form.template');
+    Route::post('/mailing-lists/{mailing_list}/signup-form/data', [CreatorMailingListController::class, 'updateSignupFormData'])->name('mailing-lists.signup-form.data');
+    Route::post('/mailing-lists/{mailing_list}/signup-form/upload-image', [CreatorMailingListController::class, 'uploadSignupFormImage'])->name('mailing-lists.signup-form.upload-image');
+    Route::post('/mailing-lists/{mailing_list}/assign-courses', [CreatorMailingListController::class, 'assignCourses'])->name('mailing-lists.assign-courses');
+    Route::post('/mailing-lists/{mailing_list}/assign-resources', [CreatorMailingListController::class, 'assignResources'])->name('mailing-lists.assign-resources');
 });
 
 // Admin Routes

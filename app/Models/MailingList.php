@@ -16,10 +16,13 @@ class MailingList extends Model
         'slug',
         'description',
         'is_active',
+        'signup_form_template',
+        'signup_form_data',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'signup_form_data' => 'array',
     ];
 
     protected static function boot()
@@ -28,9 +31,26 @@ class MailingList extends Model
 
         static::creating(function ($list) {
             if (empty($list->slug)) {
-                $list->slug = Str::slug($list->name);
+                $list->slug = static::generateUniqueSlug($list->name);
             }
         });
+    }
+
+    /**
+     * Generate a unique slug for the mailing list
+     */
+    protected static function generateUniqueSlug($name)
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (static::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 
     /**
@@ -48,7 +68,8 @@ class MailingList extends Model
     {
         return $this->belongsToMany(User::class, 'list_memberships')
             ->withPivot('subscribed_at', 'unsubscribed_at', 'status')
-            ->withTimestamps();
+            ->withTimestamps()
+            ->using(ListMembership::class);
     }
 
     /**

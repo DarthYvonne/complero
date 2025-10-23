@@ -12,15 +12,20 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                        Forløb: <span style="font-weight: 100;">{{ $course->title }}</span>
+                        <i class="fa-solid fa-circle-play" style="color: var(--primary-color);"></i> {{ $course->title }}
                     </h1>
-                    <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
-                        <i class="fa-solid fa-user"></i> {{ $course->creator->name }}
-                        <span style="margin: 0 8px;">•</span>
-                        <i class="fa-solid fa-calendar"></i> {{ $course->created_at->format('d/m/Y') }}
+                    <p style="font-size: 16px; font-weight: 300; color: #999; margin: 0;">
+                        Af: {{ $course->creator->name }}
                         @if($course->lessons->count() > 0)
                             <span style="margin: 0 8px;">•</span>
-                            <i class="fa-solid fa-circle-play"></i> {{ $course->lessons->count() }} {{ $course->lessons->count() === 1 ? 'lektion' : 'lektioner' }}
+                            {{ $course->lessons->count() }} {{ $course->lessons->count() === 1 ? 'lektion' : 'lektioner' }}
+                        @endif
+                        <span style="margin: 0 8px;">•</span>
+                        Pris:
+                        @if($course->is_free)
+                            <span style="color: #10b981; font-weight: 500;">Gratis for dig</span>
+                        @else
+                            <span style="font-weight: 500;">€{{ number_format($course->price, 2) }}</span>
                         @endif
                     </p>
                 </div>
@@ -36,11 +41,9 @@
             <!-- Main Content -->
             <div class="col-lg-8">
                 <!-- Course Image -->
-                @if($course->image_url)
-                    <div class="card mb-4">
-                        <img src="{{ Storage::url($course->image_url) }}" class="card-img-top" alt="{{ $course->title }}" style="max-height: 400px; object-fit: cover;">
-                    </div>
-                @endif
+                <div class="card mb-4">
+                    <img src="{{ $course->image }}" class="card-img-top" alt="{{ $course->title }}" style="max-height: 400px; object-fit: cover;">
+                </div>
 
                 <!-- Description / Tabs -->
                 <div class="card mb-4">
@@ -79,42 +82,46 @@
                     @else
                         <!-- No tabs, just show description -->
                         <div class="card-body">
-                            <h5 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px;">
-                                <i class="fa-solid fa-align-left" style="color: #2563eb;"></i> Om dette forløb
-                            </h5>
                             <div style="font-size: 14px; font-weight: 300; color: #666;">{!! $course->description !!}</div>
                         </div>
                     @endif
                 </div>
 
-                <!-- Lessons Section -->
+                <!-- Enroll Button -->
+                <button class="btn btn-primary btn-lg w-100">
+                    <i class="fa-solid fa-rocket me-2"></i> Tag forløbet nu
+                </button>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Course Lessons -->
                 @if($course->lessons->count() > 0)
                     <div class="card">
-                        <div class="card-header bg-white border-0 py-3">
-                            <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                                <i class="fa-solid fa-circle-play" style="color: #2563eb;"></i> Lektioner
-                                <span class="badge bg-secondary ms-2">{{ $course->lessons->count() }}</span>
-                            </h5>
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0" style="font-size: 16px; font-weight: 600; color: #333;">
+                                <i class="fa-solid fa-list"></i> Lektioner
+                            </h6>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-0">
                             <div class="list-group list-group-flush">
-                                @foreach($course->lessons->sortBy('order') as $lesson)
-                                    <a href="{{ route('lessons.show', [$course, $lesson]) }}" class="list-group-item list-group-item-action lesson-item" style="text-decoration: none; transition: background-color 0.2s;">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex align-items-center mb-1">
-                                                    <i class="fa-solid fa-circle-play me-2" style="color: #2563eb;"></i>
-                                                    <strong style="font-size: 16px; font-weight: 600; color: #333;">{{ $lesson->title }}</strong>
-                                                    @if($lesson->duration_minutes)
-                                                        <span class="badge bg-light text-dark ms-2" style="font-weight: 300;">{{ $lesson->duration_minutes }} min</span>
-                                                    @endif
-                                                </div>
-                                                @if($lesson->description)
-                                                    <p class="mb-0 ms-4" style="font-size: 14px; font-weight: 300; color: #666;">{{ $lesson->description }}</p>
-                                                @endif
+                                @foreach($course->lessons->sortBy('order') as $index => $lesson)
+                                    <a href="{{ route('lessons.show', [$course, $lesson]) }}"
+                                       class="list-group-item list-group-item-action"
+                                       style="border-left: none; border-right: none;">
+                                        <div class="d-flex align-items-start">
+                                            <div class="me-2" style="min-width: 24px;">
+                                                <span style="font-size: 13px; font-weight: 300; color: #999;">{{ $index + 1 }}</span>
                                             </div>
-                                            <div class="ms-3">
-                                                <i class="fa-solid fa-chevron-right" style="color: #999;"></i>
+                                            <div class="flex-grow-1">
+                                                <div style="font-size: 14px; font-weight: 400; color: #333;">
+                                                    {{ $lesson->title }}
+                                                </div>
+                                                @if($lesson->duration_minutes)
+                                                    <small style="font-size: 12px; font-weight: 300; color: #999;">
+                                                        {{ $lesson->duration_minutes }} min
+                                                    </small>
+                                                @endif
                                             </div>
                                         </div>
                                     </a>
@@ -123,50 +130,6 @@
                         </div>
                     </div>
                 @endif
-            </div>
-
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <!-- Course Info -->
-                <div class="card">
-                    <div class="card-body">
-                        <h5 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px;">
-                            <i class="fa-solid fa-circle-info" style="color: #2563eb;"></i> Forløb information
-                        </h5>
-
-                        <!-- Price -->
-                        <div class="mb-3">
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Pris</strong>
-                            @if($course->is_free)
-                                <span style="color: #10b981; font-weight: 600; font-size: 20px;">
-                                    <i class="fa-solid fa-gift"></i> Gratis
-                                </span>
-                            @else
-                                <span style="font-weight: 600; font-size: 20px;">€{{ number_format($course->price, 2) }}</span>
-                            @endif
-                        </div>
-
-                        <!-- Lessons Count -->
-                        <div class="mb-3">
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Antal lektioner</strong>
-                            <span style="font-size: 14px; font-weight: 300; color: #666;">{{ $course->lessons->count() }}</span>
-                        </div>
-
-                        <!-- Total Duration -->
-                        @if($course->lessons->sum('duration_minutes') > 0)
-                            <div class="mb-3">
-                                <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Samlet varighed</strong>
-                                <span style="font-size: 14px; font-weight: 300; color: #666;">{{ $course->lessons->sum('duration_minutes') }} minutter</span>
-                            </div>
-                        @endif
-
-                        <!-- Enrollments -->
-                        <div>
-                            <strong class="d-block small mb-1" style="color: #999; font-weight: 500;">Deltagere</strong>
-                            <span style="font-size: 14px; font-weight: 300; color: #666;">{{ $course->enrollments->count() }}</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -177,15 +140,15 @@
             border: 1px solid #e0e0e0;
         }
         .btn-primary {
-            background: #be185d;
-            border-color: #be185d;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             font-size: 14px;
             font-weight: 500;
             border-radius: 6px;
         }
         .btn-primary:hover {
-            background: #9f1239;
-            border-color: #9f1239;
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
         }
         .btn-outline-secondary {
             font-size: 14px;

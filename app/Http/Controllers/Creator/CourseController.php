@@ -40,6 +40,7 @@ class CourseController extends Controller
             'description' => ['required', 'string'],
             'mailing_list_id' => ['nullable', 'exists:mailing_lists,id'],
             'price' => ['nullable', 'numeric', 'min:0'],
+            'primary_color' => ['nullable', 'string', 'max:7'],
             'is_free' => ['boolean'],
             'is_published' => ['boolean'],
             'image' => ['nullable', 'image', 'max:2048'],
@@ -110,9 +111,11 @@ class CourseController extends Controller
             'description' => ['required', 'string'],
             'mailing_list_id' => ['nullable', 'exists:mailing_lists,id'],
             'price' => ['nullable', 'numeric', 'min:0'],
+            'primary_color' => ['nullable', 'string', 'max:7'],
             'is_free' => ['boolean'],
             'is_published' => ['boolean'],
             'image' => ['nullable', 'image', 'max:2048'],
+            'remove_image' => ['boolean'],
         ]);
 
         // Ensure the mailing list belongs to this creator if specified
@@ -126,6 +129,12 @@ class CourseController extends Controller
         $validated['is_free'] = $request->has('is_free');
         $validated['is_published'] = $request->has('is_published');
 
+        // Handle image removal
+        if ($request->has('remove_image') && $request->remove_image) {
+            $validated['image_url'] = null;
+        }
+
+        // Handle new image upload
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('courses', 'public');
             $validated['image_url'] = $path;

@@ -25,6 +25,37 @@
         <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
         <style>
+            :root {
+                @php
+                    // Detect course color from context
+                    $primaryColor = '#be185d'; // Default magenta
+                    $textColor = '#ffffff'; // Default white text
+
+                    if (isset($course) && $course->primary_color) {
+                        $primaryColor = $course->primary_color;
+                        // Yellow needs black text
+                        if ($primaryColor === '#F2CC21') {
+                            $textColor = '#000000';
+                        }
+                    } elseif (isset($lesson) && isset($lesson->course) && $lesson->course->primary_color) {
+                        $primaryColor = $lesson->course->primary_color;
+                        if ($primaryColor === '#F2CC21') {
+                            $textColor = '#000000';
+                        }
+                    }
+
+                    // Calculate hover color (darker version)
+                    $rgb = sscanf($primaryColor, "#%02x%02x%02x");
+                    $r = max(0, $rgb[0] - 30);
+                    $g = max(0, $rgb[1] - 30);
+                    $b = max(0, $rgb[2] - 30);
+                    $hoverColor = sprintf("#%02x%02x%02x", $r, $g, $b);
+                @endphp
+                --primary-color: {{ $primaryColor }};
+                --primary-hover: {{ $hoverColor }};
+                --primary-text: {{ $textColor }};
+            }
+
             body {
                 font-family: 'Inter', sans-serif;
                 background-color: #f8f9fa;
@@ -43,12 +74,16 @@
                 border-right: 1px solid #e0e0e0;
                 padding: 0;
                 overflow-y: auto;
+                z-index: 1000;
             }
 
             .sidebar-logo {
                 padding: 20px;
                 border-bottom: 1px solid #e0e0e0;
                 background: white;
+                height: 70px;
+                display: flex;
+                align-items: center;
             }
 
             .sidebar-logo img {
@@ -82,8 +117,8 @@
             }
 
             .sidebar-menu a.active {
-                background-color: #be185d;
-                color: white;
+                background-color: var(--primary-color);
+                color: var(--primary-text);
                 font-weight: 500;
             }
 
@@ -126,6 +161,35 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                height: 70px;
+            }
+
+            .mobile-header {
+                display: none;
+            }
+
+            .hamburger {
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #333;
+                cursor: pointer;
+                padding: 10px;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+
+            .sidebar.active {
+                transform: translateX(0) !important;
             }
 
             .user-menu {
@@ -157,9 +221,29 @@
             @media (max-width: 768px) {
                 .sidebar {
                     transform: translateX(-220px);
+                    transition: transform 0.3s ease;
                 }
                 .main-content {
                     margin-left: 0;
+                }
+                .top-bar {
+                    display: none;
+                }
+                .mobile-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 15px 20px;
+                    background: white;
+                    border-bottom: 1px solid #e0e0e0;
+                    height: 70px;
+                }
+                .mobile-header img {
+                    height: 30px;
+                    width: auto;
+                }
+                .sidebar-overlay.active {
+                    display: block;
                 }
             }
         </style>
@@ -167,8 +251,11 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body>
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
         <!-- Sidebar -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-logo">
                 <a href="{{ route('dashboard') }}" style="display: block;">
                     <img src="{{ asset('graphics/logo.png') }}" alt="Complicero">
@@ -176,26 +263,30 @@
             </div>
 
             <ul class="sidebar-menu">
+                @php
+                    $effectiveRole = session('view_as', Auth::user()->role);
+                @endphp
+
+                @if($effectiveRole === 'admin' || $effectiveRole === 'creator')
+                    <li class="sidebar-label">BRUGERENS MENU</li>
+                @endif
+
                 <!-- Common Menu Items -->
                 <li>
                     <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                        <i class="fa-solid fa-heart" style="color: #be185d;"></i> Start
+                        <i class="fa-solid fa-heart" style="color: var(--primary-color);"></i> Start
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('courses.index') }}" class="{{ request()->routeIs('courses.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-circle-play" style="color: #be185d;"></i> Forløb
+                        <i class="fa-solid fa-circle-play" style="color: var(--primary-color);"></i> Forløb
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('resources.index') }}" class="{{ request()->routeIs('resources.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-photo-film" style="color: #be185d;"></i> Downloads
+                        <i class="fa-solid fa-photo-film" style="color: var(--primary-color);"></i> Downloads
                     </a>
                 </li>
-
-                @php
-                    $effectiveRole = session('view_as', Auth::user()->role);
-                @endphp
 
                 @if($effectiveRole === 'admin')
                     <!-- Admin-Only Section -->
@@ -255,7 +346,7 @@
                 <li class="sidebar-divider"></li>
                 <li>
                     <a href="{{ route('profile.edit') }}">
-                        <i class="fa-solid fa-user" style="color: #be185d;"></i> Min profil
+                        <i class="fa-solid fa-user" style="color: var(--primary-color);"></i> Min profil
                     </a>
                 </li>
                 <li>
@@ -263,7 +354,7 @@
                         @csrf
                         <button type="submit" style="width: 100%; text-align: left; background: none; border: none; padding: 0; cursor: pointer;">
                             <a style="display: flex; align-items: center; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; font-weight: 400;">
-                                <i class="fa-solid fa-right-from-bracket" style="width: 20px; margin-right: 10px; font-size: 14px; color: #be185d;"></i> Log ud
+                                <i class="fa-solid fa-right-from-bracket" style="width: 20px; margin-right: 10px; font-size: 14px; color: var(--primary-color);"></i> Log ud
                             </a>
                         </button>
                     </form>
@@ -273,6 +364,17 @@
 
         <!-- Main Content -->
         <div class="main-content">
+            <!-- Mobile Header -->
+            <div class="mobile-header">
+                <a href="{{ route('dashboard') }}">
+                    <img src="{{ asset('graphics/logo.png') }}" alt="Complicero">
+                </a>
+                <button class="hamburger" id="hamburgerBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Desktop Top Bar -->
             <div class="top-bar">
                 <div class="breadcrumb-area" style="font-size: 15px; color: #999; font-weight: 300;">
                     @php
@@ -338,6 +440,27 @@
 
         <!-- Quill Rich Text Editor -->
         <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+        <!-- Mobile Menu Toggle -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const hamburgerBtn = document.getElementById('hamburgerBtn');
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+
+                if (hamburgerBtn) {
+                    hamburgerBtn.addEventListener('click', function() {
+                        sidebar.classList.toggle('active');
+                        overlay.classList.toggle('active');
+                    });
+
+                    overlay.addEventListener('click', function() {
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                    });
+                }
+            });
+        </script>
 
         @stack('scripts')
     </body>

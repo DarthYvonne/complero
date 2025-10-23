@@ -126,6 +126,7 @@ class ResourceController extends Controller
             'is_free' => ['nullable', 'boolean'],
             'is_published' => ['nullable', 'boolean'],
             'files.*' => ['nullable', 'file', 'max:10240'],
+            'remove_image' => ['boolean'],
         ]);
 
         // Ensure the mailing list belongs to this creator if specified
@@ -144,6 +145,15 @@ class ResourceController extends Controller
             'is_published' => $request->has('is_published'),
         ]);
 
+        // Handle image removal
+        if ($request->has('remove_image') && $request->remove_image) {
+            if ($resource->image_url) {
+                Storage::disk('public')->delete($resource->image_url);
+            }
+            $resource->update(['image_url' => null]);
+        }
+
+        // Handle new image upload
         if ($request->hasFile('image')) {
             if ($resource->image_url) {
                 Storage::disk('public')->delete($resource->image_url);

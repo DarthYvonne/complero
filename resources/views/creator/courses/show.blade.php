@@ -100,8 +100,7 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
                         <h5 class="mb-0">
-                            <i class="fa-solid fa-circle-play"></i> Lektioner
-                            <span class="badge bg-secondary ms-2">{{ $course->lessons->count() }}</span>
+                            <i class="fa-solid fa-circle-play"></i> Lektioner @if($course->lessons->count() > 0)(<b>{{ $course->lessons->count() }}</b>)@endif
                         </h5>
                         <a href="{{ route('creator.courses.lessons.create', $course) }}" class="btn btn-sm btn-primary">
                             <i class="fa-solid fa-circle-plus me-1"></i> Tilføj lektion

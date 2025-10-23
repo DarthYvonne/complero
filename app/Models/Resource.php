@@ -97,4 +97,23 @@ class Resource extends Model
             ->wherePivot('status', 'active')
             ->exists();
     }
+
+    /**
+     * Get the placeholder image (use magenta as default for resources)
+     */
+    public function getPlaceholderImageAttribute()
+    {
+        return asset('graphics/placeholder-magenta.jpg');
+    }
+
+    /**
+     * Get the image URL or placeholder
+     */
+    public function getImageAttribute()
+    {
+        if ($this->image_url) {
+            return \Storage::url($this->image_url);
+        }
+        return $this->placeholder_image;
+    }
 }

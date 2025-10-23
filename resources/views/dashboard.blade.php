@@ -12,7 +12,7 @@
         <!-- Page Header -->
         <div class="mb-4">
             <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                <i class="fa-solid fa-heart" style="color: #be185d;"></i> {{ $organizationName }}
+                <i class="fa-solid fa-heart" style="color: var(--primary-color);"></i> {{ $organizationName }}
             </h1>
             <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
                 Velkommen tilbage, {{ Auth::user()->name }}
@@ -23,7 +23,7 @@
         <div class="mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 style="font-size: 20px; font-weight: 600; color: #333; margin: 0;">Fortsæt læring</h2>
-                <a href="#" class="text-decoration-none" style="color: #be185d; font-size: 14px; font-weight: 400;">Se alle</a>
+                <a href="#" class="text-decoration-none" style="color: var(--primary-color); font-size: 14px; font-weight: 400;">Se alle</a>
             </div>
 
             <!-- Placeholder for courses in progress - FULL WIDTH -->
@@ -54,7 +54,7 @@
         }
 
         .btn-primary {
-            background: #be185d;
+            background: var(--primary-color);
             border: none;
             border-radius: 6px;
             padding: 0.5rem 1.5rem;
@@ -63,7 +63,7 @@
         }
 
         .btn-primary:hover {
-            background: #9f1239;
+            background: var(--primary-hover);
         }
     </style>
 </x-app-layout>

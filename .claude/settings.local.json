@@ -13,7 +13,11 @@
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/ResourceController)",
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/MailingListController)",
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/LessonController)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan config:clear)"
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan config:clear)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_signup_form_settings_to_mailing_lists_table --table=mailing_lists)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan view:clear)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_primary_color_to_courses_table --table=courses)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

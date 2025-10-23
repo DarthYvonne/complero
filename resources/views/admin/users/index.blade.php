@@ -7,7 +7,7 @@
         <!-- Page Header -->
         <div class="mb-4">
             <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                <i class="fa-solid fa-users" style="color: #be185d;"></i> Brugere
+                <i class="fa-solid fa-users" style="color: var(--primary-color);"></i> Brugere
             </h1>
             <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
                 Administrer alle brugere på platformen
@@ -61,7 +61,7 @@
                                         @elseif($user->role === 'creator')
                                             <span class="badge bg-success">Skaber</span>
                                         @else
-                                            <span class="badge" style="background-color: #be185d;">Medlem</span>
+                                            <span class="badge" style="background-color: var(--primary-color);">Medlem</span>
                                         @endif
                                     </td>
                                     <td style="padding: 12px; font-size: 13px; color: #999; font-weight: 300;">{{ $user->created_at->diffForHumans() }}</td>
@@ -123,12 +123,12 @@
             font-weight: 500;
         }
         .btn-outline-primary {
-            color: #be185d;
-            border-color: #be185d;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
         }
         .btn-outline-primary:hover {
-            background: #be185d;
-            border-color: #be185d;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             color: white;
         }
         .table tbody tr {

@@ -20,21 +20,19 @@
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h1 style="font-size: 28px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                                {{ $course->title }}
+                            <h1 style="font-size: 28px; font-weight: 700; color: #333; margin-bottom: 0;">
+                                <i class="fa-solid fa-circle-play" style="color: var(--primary-color);"></i> {{ $course->title }}: <span style="font-weight: 100;">{{ $lesson->title }}</span>
                             </h1>
-                            <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
-                                <i class="fa-solid fa-circle-play"></i> {{ $lesson->title }}
-                                @if($lesson->duration_minutes)
-                                    <span style="margin: 0 8px;">•</span>
-                                    <i class="fa-solid fa-clock"></i> {{ $lesson->duration_minutes }} minutter
-                                @endif
-                            </p>
                         </div>
-                        @if($effectiveRole === 'admin')
-                            <a href="{{ route('admin.courses.lessons.edit', [$course, $lesson]) }}" class="btn btn-sm btn-outline-primary">
-                                <i class="fa-solid fa-pen me-1"></i> Rediger lektion
-                            </a>
+                        @if($effectiveRole === 'admin' || $effectiveRole === 'creator')
+                            <div class="d-flex gap-2">
+                                <a href="{{ $effectiveRole === 'admin' ? route('admin.courses.lessons.create', $course) : route('creator.courses.lessons.create', $course) }}" class="btn btn-sm btn-primary">
+                                    <i class="fa-solid fa-circle-plus me-1"></i> Tilføj lektion
+                                </a>
+                                <a href="{{ $effectiveRole === 'admin' ? route('admin.courses.lessons.edit', [$course, $lesson]) : route('creator.courses.lessons.edit', [$course, $lesson]) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fa-solid fa-pen me-1"></i> Rediger
+                                </a>
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -59,7 +57,7 @@
                             <ul class="nav nav-tabs card-header-tabs" id="lessonTabs" role="tablist" style="border-bottom: none; margin-bottom: 0;">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="intro-tab" data-bs-toggle="tab" data-bs-target="#intro" type="button" role="tab" aria-controls="intro" aria-selected="true">
-                                        Intro
+                                        Introduktion
                                     </button>
                                 </li>
                                 @foreach($lesson->tabs as $index => $tab)
@@ -155,19 +153,19 @@
                             <div>
                                 @if($prevLesson)
                                     <a href="{{ route('lessons.show', [$course, $prevLesson]) }}" class="btn btn-outline-secondary">
-                                        <i class="fa-solid fa-chevron-left me-1"></i> Forrige lektion
+                                        <i class="fa-solid fa-chevron-left me-1"></i> {{ $prevLesson->title }}
+                                    </a>
+                                @else
+                                    <a href="{{ route('courses.show', $course) }}" class="btn btn-outline-secondary">
+                                        <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til forløbet
                                     </a>
                                 @endif
                             </div>
 
-                            <a href="{{ route('courses.show', $course) }}" class="btn btn-outline-secondary">
-                                <i class="fa-solid fa-list me-1"></i> Tilbage til forløb
-                            </a>
-
                             <div>
                                 @if($nextLesson)
                                     <a href="{{ route('lessons.show', [$course, $nextLesson]) }}" class="btn btn-primary">
-                                        Næste lektion <i class="fa-solid fa-chevron-right ms-1"></i>
+                                        Fortsæt til {{ $nextLesson->title }} <i class="fa-solid fa-chevron-right ms-1"></i>
                                     </a>
                                 @endif
                             </div>
@@ -225,15 +223,15 @@
             border: 1px solid #e0e0e0;
         }
         .btn-primary {
-            background: #be185d;
-            border-color: #be185d;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             font-size: 14px;
             font-weight: 500;
             border-radius: 6px;
         }
         .btn-primary:hover {
-            background: #9f1239;
-            border-color: #9f1239;
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
         }
         .btn-outline-secondary {
             font-size: 14px;
@@ -251,8 +249,8 @@
             border-bottom: none;
         }
         .list-group-item.active {
-            background-color: #be185d;
-            border-color: #be185d;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
         }
         .list-group-item-action:hover:not(.active) {
             background-color: #f9fafb;

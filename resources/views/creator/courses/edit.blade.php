@@ -78,6 +78,16 @@
                                              class="img-thumbnail"
                                              style="max-height: 200px;">
                                     </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               id="remove_image"
+                                               name="remove_image"
+                                               value="1">
+                                        <label class="form-check-label" for="remove_image">
+                                            Fjern billede
+                                        </label>
+                                    </div>
                                 </div>
                             @endif
 
@@ -116,6 +126,38 @@
                                 @enderror
                                 <div class="form-text">Sæt til 0 for gratis kurser</div>
                             </div>
+
+                            <!-- Primary Color -->
+                            <div class="mb-3">
+                                <label for="primary_color" class="form-label">Primær farve</label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <select class="form-select @error('primary_color') is-invalid @enderror"
+                                            id="primary_color"
+                                            name="primary_color"
+                                            style="flex: 1;">
+                                        <option value="#be185d" {{ old('primary_color', $course->primary_color) == '#be185d' ? 'selected' : '' }}>Magenta (standard)</option>
+                                        <option value="#F2CC21" {{ old('primary_color', $course->primary_color) == '#F2CC21' ? 'selected' : '' }}>Gul</option>
+                                        <option value="#2B5A18" {{ old('primary_color', $course->primary_color) == '#2B5A18' ? 'selected' : '' }}>Grøn</option>
+                                        <option value="#306D7F" {{ old('primary_color', $course->primary_color) == '#306D7F' ? 'selected' : '' }}>Blå</option>
+                                    </select>
+                                    <div id="color-preview" style="width: 50px; height: 38px; border-radius: 6px; border: 1px solid #ddd; background-color: {{ old('primary_color', $course->primary_color) }};"></div>
+                                </div>
+                                @error('primary_color')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text">Vælg den primære farve for dette forløb</div>
+                            </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const colorSelect = document.getElementById('primary_color');
+                                    const colorPreview = document.getElementById('color-preview');
+
+                                    colorSelect.addEventListener('change', function() {
+                                        colorPreview.style.backgroundColor = this.value;
+                                    });
+                                });
+                            </script>
 
                             <!-- Mailing List -->
                             <div class="mb-3">

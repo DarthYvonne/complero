@@ -16,7 +16,7 @@
         <!-- Page Header -->
         <div class="mb-4">
             <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                <i class="fa-solid fa-gauge" style="color: #be185d;"></i> {{ $organizationName }}
+                <i class="fa-solid fa-gauge" style="color: var(--primary-color);"></i> {{ $organizationName }}
             </h1>
             <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
                 Administrer din platform
@@ -129,23 +129,23 @@
         }
 
         .btn-primary {
-            background: #be185d;
-            border-color: #be185d;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
         }
 
         .btn-primary:hover {
-            background: #9f1239;
-            border-color: #9f1239;
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
         }
 
         .btn-outline-primary {
-            color: #be185d;
-            border-color: #be185d;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
         }
 
         .btn-outline-primary:hover {
-            background: #be185d;
-            border-color: #be185d;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             color: white;
         }
 

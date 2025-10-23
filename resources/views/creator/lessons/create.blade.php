@@ -1,9 +1,9 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('admin.courses.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Forløb</a>
+    <a href="{{ route('creator.courses.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Forløb</a>
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('admin.courses.show', $course) }}" style="color: #999; text-decoration: none; transition: color 0.2s;">{{ $course->title }}</a>
+    <a href="{{ route('creator.courses.show', $course) }}" style="color: #999; text-decoration: none; transition: color 0.2s;">{{ $course->title }}</a>
     <span style="margin: 0 8px;">/</span>
     <strong style="color: #333; font-weight: 600;">Tilføj lektion</strong>
 @endsection
@@ -20,7 +20,7 @@
                         Tilføj en ny lektion til {{ $course->title }}
                     </p>
                 </div>
-                <a href="{{ route('admin.courses.show', $course) }}" class="btn btn-outline-secondary">
+                <a href="{{ route('creator.courses.show', $course) }}" class="btn btn-outline-secondary">
                     <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til forløb
                 </a>
             </div>
@@ -31,7 +31,7 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{ route('admin.courses.lessons.store', $course) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('creator.courses.lessons.store', $course) }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
                             <!-- Title -->
@@ -109,7 +109,7 @@
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fa-solid fa-circle-check me-1"></i> Opret lektion
                                 </button>
-                                <a href="{{ route('admin.courses.show', $course) }}" class="btn btn-outline-secondary">
+                                <a href="{{ route('creator.courses.show', $course) }}" class="btn btn-outline-secondary">
                                     Annuller
                                 </a>
                             </div>

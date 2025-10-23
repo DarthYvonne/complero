@@ -1,9 +1,9 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('admin.courses.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Forløb</a>
+    <a href="{{ route('creator.courses.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Forløb</a>
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('admin.courses.show', $course) }}" style="color: #999; text-decoration: none; transition: color 0.2s;">{{ $course->title }}</a>
+    <a href="{{ route('creator.courses.show', $course) }}" style="color: #999; text-decoration: none; transition: color 0.2s;">{{ $course->title }}</a>
     <span style="margin: 0 8px;">/</span>
     <span style="color: #999;">{{ $lesson->title }}</span>
     <span style="margin: 0 8px;">/</span>
@@ -15,14 +15,11 @@
         <div class="mb-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                        Rediger lektion
+                    <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 0;">
+                        <i class="fa-solid fa-circle-play" style="color: var(--primary-color);"></i> {{ $course->title }}: <span style="font-weight: 100;">{{ $lesson->title }}</span>
                     </h1>
-                    <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
-                        {{ $lesson->title }}
-                    </p>
                 </div>
-                <a href="{{ route('admin.courses.show', $course) }}" class="btn btn-outline-secondary">
+                <a href="{{ route('creator.courses.show', $course) }}" class="btn btn-outline-secondary">
                     <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til forløb
                 </a>
             </div>
@@ -33,7 +30,7 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{ route('admin.courses.lessons.update', [$course, $lesson]) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('creator.courses.lessons.update', [$course, $lesson]) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PATCH')
 
@@ -143,7 +140,7 @@
                                                     {{ $file->filename }}
                                                     <small class="text-muted">({{ number_format($file->file_size / 1024, 2) }} KB)</small>
                                                 </div>
-                                                <form action="{{ route('admin.courses.lessons.files.destroy', [$course, $lesson, $file]) }}" method="POST" class="d-inline"
+                                                <form action="{{ route('creator.courses.lessons.files.destroy', [$course, $lesson, $file]) }}" method="POST" class="d-inline"
                                                       onsubmit="return confirm('Er du sikker på, at du vil slette denne fil?');">
                                                     @csrf
                                                     @method('DELETE')
@@ -176,7 +173,7 @@
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fa-solid fa-circle-check me-1"></i> Gem ændringer
                                 </button>
-                                <a href="{{ route('admin.courses.show', $course) }}" class="btn btn-outline-secondary">
+                                <a href="{{ route('creator.courses.show', $course) }}" class="btn btn-outline-secondary">
                                     Annuller
                                 </a>
                             </div>
@@ -202,7 +199,7 @@
                                                 <strong>{{ $tab->title }}</strong>
                                                 <div class="small text-muted mt-1">{{ Str::limit(strip_tags($tab->content), 100) }}</div>
                                             </div>
-                                            <form action="{{ route('admin.courses.lessons.tabs.destroy', [$course, $lesson, $tab]) }}" method="POST" class="d-inline"
+                                            <form action="{{ route('creator.courses.lessons.tabs.destroy', [$course, $lesson, $tab]) }}" method="POST" class="d-inline"
                                                   onsubmit="return confirm('Er du sikker på, at du vil slette denne tab?');">
                                                 @csrf
                                                 @method('DELETE')
@@ -219,7 +216,7 @@
                         <!-- Add New Tab Form -->
                         <div>
                             <h6 class="mb-3">Tilføj ny tab</h6>
-                            <form action="{{ route('admin.courses.lessons.tabs.store', [$course, $lesson]) }}" method="POST">
+                            <form action="{{ route('creator.courses.lessons.tabs.store', [$course, $lesson]) }}" method="POST">
                                 @csrf
 
                                 <!-- Tab Title -->

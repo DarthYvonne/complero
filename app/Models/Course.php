@@ -18,6 +18,7 @@ class Course extends Model
         'description',
         'image_url',
         'price',
+        'primary_color',
         'is_free',
         'is_published',
         'stripe_price_id',
@@ -96,5 +97,32 @@ class Course extends Model
             ->where('mailing_list_id', $this->mailing_list_id)
             ->wherePivot('status', 'active')
             ->exists();
+    }
+
+    /**
+     * Get the placeholder image based on the course's primary color
+     */
+    public function getPlaceholderImageAttribute()
+    {
+        $colorMap = [
+            '#be185d' => 'placeholder-magenta.jpg',
+            '#F2CC21' => 'placeholder-yellow.jpg',
+            '#2B5A18' => 'placeholder-green.jpg',
+            '#306D7F' => 'placeholder-blue.jpg',
+        ];
+
+        $placeholder = $colorMap[$this->primary_color] ?? 'placeholder-magenta.jpg';
+        return asset('graphics/' . $placeholder);
+    }
+
+    /**
+     * Get the image URL or placeholder
+     */
+    public function getImageAttribute()
+    {
+        if ($this->image_url) {
+            return \Storage::url($this->image_url);
+        }
+        return $this->placeholder_image;
     }
 }

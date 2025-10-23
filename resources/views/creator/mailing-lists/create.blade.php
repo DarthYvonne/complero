@@ -1,11 +1,9 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('admin.mailing-lists.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Mailing lister</a>
+    <a href="{{ route('creator.mailing-lists.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Mailing lister</a>
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('admin.mailing-lists.show', $mailingList) }}" style="color: #999; text-decoration: none; transition: color 0.2s;">{{ $mailingList->name }}</a>
-    <span style="margin: 0 8px;">/</span>
-    <strong style="color: #333; font-weight: 600;">Rediger</strong>
+    <strong style="color: #333; font-weight: 600;">Opret liste</strong>
 @endsection
 
     <div class="container-fluid">
@@ -14,14 +12,14 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                        <i class="fa-solid fa-pen" style="color: var(--primary-color);"></i> Rediger mailing liste
+                        <i class="fa-solid fa-circle-plus" style="color: var(--primary-color);"></i> Opret mailing liste
                     </h1>
                     <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
-                        {{ $mailingList->name }}
+                        Opret en ny mailing liste for medlemmer
                     </p>
                 </div>
-                <a href="{{ route('admin.mailing-lists.show', $mailingList) }}" class="btn btn-outline-secondary">
-                    <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til liste
+                <a href="{{ route('creator.mailing-lists.index') }}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til lister
                 </a>
             </div>
         </div>
@@ -31,9 +29,8 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{ route('admin.mailing-lists.update', $mailingList) }}" method="POST">
+                        <form action="{{ route('creator.mailing-lists.store') }}" method="POST">
                             @csrf
-                            @method('PATCH')
 
                             <!-- Name -->
                             <div class="mb-3">
@@ -42,7 +39,7 @@
                                        class="form-control @error('name') is-invalid @enderror"
                                        id="name"
                                        name="name"
-                                       value="{{ old('name', $mailingList->name) }}"
+                                       value="{{ old('name') }}"
                                        required>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -55,7 +52,7 @@
                                 <textarea class="form-control @error('description') is-invalid @enderror"
                                           id="description"
                                           name="description"
-                                          rows="4">{{ old('description', $mailingList->description) }}</textarea>
+                                          rows="4">{{ old('description') }}</textarea>
                                 @error('description')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -69,7 +66,7 @@
                                            id="is_active"
                                            name="is_active"
                                            value="1"
-                                           {{ old('is_active', $mailingList->is_active) ? 'checked' : '' }}>
+                                           {{ old('is_active', true) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="is_active">
                                         Listen er aktiv
                                     </label>
@@ -79,9 +76,9 @@
                             <!-- Submit Buttons -->
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fa-solid fa-circle-check me-1"></i> Gem ændringer
+                                    <i class="fa-solid fa-circle-check me-1"></i> Opret liste
                                 </button>
-                                <a href="{{ route('admin.mailing-lists.show', $mailingList) }}" class="btn btn-outline-secondary">
+                                <a href="{{ route('creator.mailing-lists.index') }}" class="btn btn-outline-secondary">
                                     Annuller
                                 </a>
                             </div>
@@ -90,43 +87,17 @@
                 </div>
             </div>
 
-            <!-- Info Sidebar -->
+            <!-- Help Sidebar -->
             <div class="col-lg-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px;">
-                            <i class="fa-solid fa-circle-info" style="color: var(--primary-color);"></i> Listeinfo
+                            <i class="fa-solid fa-circle-info" style="color: var(--primary-color);"></i> Hjælp
                         </h5>
                         <div style="font-size: 14px; font-weight: 300; color: #666;">
-                            <div class="mb-3">
-                                <strong class="d-block mb-1">Oprettet</strong>
-                                {{ $mailingList->created_at->format('d/m/Y H:i') }}
-                            </div>
-
-                            <div class="mb-3">
-                                <strong class="d-block mb-1">Sidst opdateret</strong>
-                                {{ $mailingList->updated_at->format('d/m/Y H:i') }}
-                            </div>
-
-                            <div class="mb-3">
-                                <strong class="d-block mb-1">Slug</strong>
-                                <code>{{ $mailingList->slug }}</code>
-                            </div>
-
-                            <div class="mb-3">
-                                <strong class="d-block mb-1">Medlemmer</strong>
-                                {{ $mailingList->members()->wherePivot('status', 'active')->count() }}
-                            </div>
-
-                            <div class="mb-3">
-                                <strong class="d-block mb-1">Kurser</strong>
-                                {{ $mailingList->courses()->count() }}
-                            </div>
-
-                            <div>
-                                <strong class="d-block mb-1">Ressourcer</strong>
-                                {{ $mailingList->resources()->count() }}
-                            </div>
+                            <p><strong>Navn:</strong> Vælg et klart navn for din mailing liste.</p>
+                            <p><strong>Beskrivelse:</strong> Forklar hvad denne liste bruges til.</p>
+                            <p><strong>Status:</strong> Deaktivér listen for midlertidigt at stoppe nyt indhold fra at blive tilgængeligt.</p>
                         </div>
                     </div>
                 </div>

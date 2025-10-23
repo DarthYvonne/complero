@@ -32,54 +32,40 @@
         <!-- Courses Grid -->
         <div class="row g-3">
             @forelse($courses as $course)
+                @php
+                    $courseColor = $course->primary_color ?? '#be185d';
+                @endphp
                 <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 clickable-card" data-href="{{ route('creator.courses.show', $course) }}" style="cursor: pointer;">
-                        @if($course->image_url)
-                            <img src="{{ Storage::url($course->image_url) }}" class="card-img-top" alt="{{ $course->title }}" style="height: 200px; object-fit: cover;">
-                        @else
-                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                <i class="fa-solid fa-image text-muted" style="font-size: 3rem;"></i>
-                            </div>
-                        @endif
+                    <div class="card clickable-card" data-href="{{ route('creator.courses.show', $course) }}" style="cursor: pointer;">
+                        <img src="{{ $course->image }}" class="card-img-top" alt="{{ $course->title }}" style="height: 200px; object-fit: cover;">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0">{{ $course->title }}</h5>
+                                <h5 class="card-title mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
+                                    <i class="fa-solid fa-circle-play" style="color: {{ $courseColor }};"></i> {{ $course->title }}
+                                </h5>
                                 @if($course->is_published)
                                     <span class="badge bg-success">Publiceret</span>
                                 @else
                                     <span class="badge bg-secondary">Kladde</span>
                                 @endif
                             </div>
-                            <p class="card-text text-muted small">{{ Str::limit($course->description, 100) }}</p>
+                            <div class="card-text" style="font-size: 14px; font-weight: 300; color: #666; margin-bottom: 15px;">
+                                {!! Str::limit(strip_tags($course->description), 200) !!}
+                                @if(strlen(strip_tags($course->description)) > 200)
+                                    <a href="{{ route('creator.courses.show', $course) }}" style="color: {{ $courseColor }}; text-decoration: underline;">læs resten</a>
+                                @endif
+                            </div>
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted small">
-                                    <i class="fa-solid fa-user"></i> {{ $course->creator->name }}
+                                <span style="font-size: 13px; font-weight: 300; color: #999;">
+                                    <span style="color: {{ $courseColor }}; font-weight: 600;">Af:</span> {{ $course->creator->organization_name ?: $course->creator->name }}
                                 </span>
-                                <span class="fw-bold">
+                                <span style="font-size: 16px; font-weight: 600; color: #333;">
                                     @if($course->is_free)
-                                        Gratis
+                                        Gratis for medlemmer
                                     @else
                                         €{{ number_format($course->price, 2) }}
                                     @endif
                                 </span>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-white border-top-0">
-                            <div class="btn-group w-100" role="group">
-                                <a href="{{ route('creator.courses.show', $course) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="fa-solid fa-eye"></i> Se
-                                </a>
-                                <a href="{{ route('creator.courses.edit', $course) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="fa-solid fa-pen"></i> Rediger
-                                </a>
-                                <form action="{{ route('creator.courses.destroy', $course) }}" method="POST" class="d-inline"
-                                      onsubmit="return confirm('Er du sikker på, at du vil slette dette forløb?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="fa-solid fa-trash"></i> Slet
-                                    </button>
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -118,15 +104,15 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .btn-primary {
-            background: #be185d;
-            border-color: #be185d;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             font-size: 14px;
             font-weight: 500;
             border-radius: 6px;
         }
         .btn-primary:hover {
-            background: #9f1239;
-            border-color: #9f1239;
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
         }
     </style>
 

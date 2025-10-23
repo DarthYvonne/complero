@@ -3,7 +3,7 @@
         <!-- Page Header -->
         <div class="mb-4">
             <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                <i class="fa-solid fa-gear" style="color: #be185d;"></i> Indstillinger
+                <i class="fa-solid fa-gear" style="color: var(--primary-color);"></i> Indstillinger
             </h1>
             <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
                 Administrer organisationsindstillinger
@@ -80,14 +80,14 @@
             border: 1px solid #e0e0e0;
         }
         .btn-primary {
-            background: #be185d;
-            border-color: #be185d;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             font-size: 14px;
             font-weight: 500;
         }
         .btn-primary:hover {
-            background: #9f1239;
-            border-color: #9f1239;
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
         }
         .form-label {
             font-weight: 500;

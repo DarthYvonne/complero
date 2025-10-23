@@ -1,9 +1,9 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('admin.mailing-lists.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Mailing lister</a>
+    <a href="{{ route('creator.mailing-lists.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Mailing lister</a>
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('admin.mailing-lists.show', $mailingList) }}" style="color: #999; text-decoration: none; transition: color 0.2s;">{{ $mailingList->name }}</a>
+    <a href="{{ route('creator.mailing-lists.show', $mailingList) }}" style="color: #999; text-decoration: none; transition: color 0.2s;">{{ $mailingList->name }}</a>
     <span style="margin: 0 8px;">/</span>
     <strong style="color: #333; font-weight: 600;">Rediger</strong>
 @endsection
@@ -20,7 +20,7 @@
                         {{ $mailingList->name }}
                     </p>
                 </div>
-                <a href="{{ route('admin.mailing-lists.show', $mailingList) }}" class="btn btn-outline-secondary">
+                <a href="{{ route('creator.mailing-lists.show', $mailingList) }}" class="btn btn-outline-secondary">
                     <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til liste
                 </a>
             </div>
@@ -31,7 +31,7 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{ route('admin.mailing-lists.update', $mailingList) }}" method="POST">
+                        <form action="{{ route('creator.mailing-lists.update', $mailingList) }}" method="POST">
                             @csrf
                             @method('PATCH')
 
@@ -81,7 +81,7 @@
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fa-solid fa-circle-check me-1"></i> Gem ændringer
                                 </button>
-                                <a href="{{ route('admin.mailing-lists.show', $mailingList) }}" class="btn btn-outline-secondary">
+                                <a href="{{ route('creator.mailing-lists.show', $mailingList) }}" class="btn btn-outline-secondary">
                                     Annuller
                                 </a>
                             </div>
