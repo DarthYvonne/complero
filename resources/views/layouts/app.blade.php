@@ -69,7 +69,7 @@
                 top: 0;
                 left: 0;
                 height: 100vh;
-                width: 220px;
+                width: 240px;
                 background-color: #f5f5f7;
                 border-right: 1px solid #e0e0e0;
                 padding: 0;
@@ -84,6 +84,7 @@
                 height: 70px;
                 display: flex;
                 align-items: center;
+                justify-content: center;
             }
 
             .sidebar-logo img {
@@ -132,6 +133,25 @@
                 color: white !important;
             }
 
+            .sidebar-menu .menu-badge {
+                display: inline-block;
+                background: var(--primary-color);
+                color: white;
+                font-size: 12px;
+                font-weight: 600;
+                padding: 3px 7px;
+                border-radius: 10px;
+                line-height: 1;
+                margin-left: 6px;
+                min-width: 22px;
+                text-align: center;
+            }
+
+            .sidebar-menu a.active .menu-badge {
+                background: rgba(255, 255, 255, 0.25);
+                color: white;
+            }
+
             .sidebar-divider {
                 margin: 10px 0;
                 padding-top: 10px;
@@ -149,7 +169,7 @@
 
             /* Main content */
             .main-content {
-                margin-left: 220px;
+                margin-left: 240px;
                 min-height: 100vh;
                 padding: 0;
             }
@@ -296,17 +316,17 @@
                     </li>
                     <li>
                         <a href="{{ route('creator.courses.index') }}" class="{{ request()->routeIs('creator.courses.*') || request()->routeIs('creator.lessons.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-circle-play" style="color: #666;"></i> Mine Forløb (<b>{{ $coursesCount ?? 0 }}</b>)
+                            <i class="fa-solid fa-circle-play" style="color: #666;"></i> Mine Forløb <span class="menu-badge">{{ $coursesCount ?? 0 }}</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('creator.resources.index') }}" class="{{ request()->routeIs('creator.resources.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-photo-film" style="color: #666;"></i> Mine Materialer (<b>{{ $resourcesCount ?? 0 }}</b>)
+                            <i class="fa-solid fa-photo-film" style="color: #666;"></i> Mine Materialer <span class="menu-badge">{{ $resourcesCount ?? 0 }}</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('creator.mailing-lists.index') }}" class="{{ request()->routeIs('creator.mailing-lists.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-envelope" style="color: #666;"></i> Mine Lister (<b>{{ $mailingListsCount ?? 0 }}</b>)
+                            <i class="fa-solid fa-envelope" style="color: #666;"></i> Mine Lister <span class="menu-badge">{{ $mailingListsCount ?? 0 }}</span>
                         </a>
                     </li>
                     <li>

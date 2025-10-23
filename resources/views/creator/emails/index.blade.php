@@ -146,7 +146,18 @@
                                     </thead>
                                     <tbody>
                                         @foreach($emails as $email)
-                                            <tr>
+                                            <tr style="cursor: pointer;"
+                                                onclick="showEmailModal(
+                                                    '{{ addslashes($email->subject) }}',
+                                                    {!! json_encode($email->body_html) !!},
+                                                    '{{ $email->mailingList ? $email->mailingList->name : 'Ingen liste' }}',
+                                                    {{ $email->recipients_count }},
+                                                    {{ $email->unique_opens }},
+                                                    {{ $email->total_opens }},
+                                                    {{ $email->unique_clicks }},
+                                                    {{ $email->total_clicks }},
+                                                    '{{ $email->sent_at ? $email->sent_at->format('d/m/Y H:i') : 'Ikke sendt' }}'
+                                                )">
                                                 <td>
                                                     <strong style="font-weight: 500;">{{ $email->subject }}</strong>
                                                 </td>
@@ -188,6 +199,80 @@
                             </div>
                         @endif
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Details Modal -->
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Email Detaljer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Email Info -->
+                    <div class="mb-3">
+                        <h6 style="font-weight: 600; color: #333;">Emne</h6>
+                        <p id="modalSubject" style="font-weight: 400;"></p>
+                    </div>
+
+                    <!-- Stats Row -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body p-3">
+                                    <div style="font-size: 12px; color: #999; text-transform: uppercase; font-weight: 600;">Modtagere</div>
+                                    <div style="font-size: 24px; font-weight: 600; color: #333;" id="modalRecipients"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body p-3">
+                                    <div style="font-size: 12px; color: #999; text-transform: uppercase; font-weight: 600;">Åbninger</div>
+                                    <div style="font-size: 24px; font-weight: 600; color: #333;">
+                                        <span id="modalUniqueOpens"></span>
+                                        <span style="font-size: 14px; color: #999; font-weight: 400;" id="modalTotalOpens"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body p-3">
+                                    <div style="font-size: 12px; color: #999; text-transform: uppercase; font-weight: 600;">Klik</div>
+                                    <div style="font-size: 24px; font-weight: 600; color: #333;">
+                                        <span id="modalUniqueClicks"></span>
+                                        <span style="font-size: 14px; color: #999; font-weight: 400;" id="modalTotalClicks"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body p-3">
+                                    <div style="font-size: 12px; color: #999; text-transform: uppercase; font-weight: 600;">Sendt</div>
+                                    <div style="font-size: 14px; font-weight: 500; color: #333;" id="modalSentAt"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Content -->
+                    <div class="mb-3">
+                        <h6 style="font-weight: 600; color: #333;">Email Indhold</h6>
+                        <div id="modalBody" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; background: #f9f9f9;"></div>
+                    </div>
+
+                    <div class="mb-0">
+                        <p style="font-size: 13px; color: #666;"><strong>Liste:</strong> <span id="modalList"></span></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
                 </div>
             </div>
         </div>
@@ -253,6 +338,38 @@
                 quill.focus();
             });
         });
+
+        // Function to show email modal
+        function showEmailModal(subject, body, list, recipients, uniqueOpens, totalOpens, uniqueClicks, totalClicks, sentAt) {
+            // Populate modal fields
+            document.getElementById('modalSubject').textContent = subject;
+            document.getElementById('modalBody').innerHTML = body;
+            document.getElementById('modalList').textContent = list;
+            document.getElementById('modalRecipients').textContent = recipients;
+            document.getElementById('modalSentAt').textContent = sentAt;
+
+            // Opens
+            if (uniqueOpens > 0) {
+                document.getElementById('modalUniqueOpens').textContent = uniqueOpens;
+                document.getElementById('modalTotalOpens').textContent = ' (' + totalOpens + ')';
+            } else {
+                document.getElementById('modalUniqueOpens').textContent = '-';
+                document.getElementById('modalTotalOpens').textContent = '';
+            }
+
+            // Clicks
+            if (uniqueClicks > 0) {
+                document.getElementById('modalUniqueClicks').textContent = uniqueClicks;
+                document.getElementById('modalTotalClicks').textContent = ' (' + totalClicks + ')';
+            } else {
+                document.getElementById('modalUniqueClicks').textContent = '-';
+                document.getElementById('modalTotalClicks').textContent = '';
+            }
+
+            // Show modal
+            var modal = new bootstrap.Modal(document.getElementById('emailModal'));
+            modal.show();
+        }
     </script>
     @endpush
 
