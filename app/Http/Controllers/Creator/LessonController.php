@@ -33,39 +33,77 @@ class LessonController extends Controller
             abort(403, 'Du har ikke adgang til dette forløb');
         }
 
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'content' => ['nullable', 'string'],
-            'duration_minutes' => ['nullable', 'integer', 'min:1'],
-            'video' => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:512000'], // 500MB max
-            'files.*' => ['nullable', 'file', 'max:10240'], // 10MB max per file
-        ]);
-
-        $lesson = $course->lessons()->create([
-            'title' => $validated['title'],
-            'content' => $validated['content'] ?? null,
-            'duration_minutes' => $validated['duration_minutes'] ?? null,
-        ]);
-
-        // Handle video upload
-        if ($request->hasFile('video')) {
-            $video = $request->file('video');
-            $path = $video->store('', 'videos');
-            $lesson->update(['video_path' => $path]);
+        try {
+            $validated = $request->validate([
+                'title' => ['required', 'string', 'max:255'],
+                'content' => ['nullable', 'string'],
+                'duration_minutes' => ['nullable', 'integer', 'min:1'],
+                'video' => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:512000'], // 500MB max
+                'files.*' => ['nullable', 'file', 'max:10240'], // 10MB max per file
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Validering fejlede',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
         }
 
-        // Handle file attachments
-        if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
-                $path = $file->store('lesson-files', 'public');
+        try {
+            $lesson = $course->lessons()->create([
+                'title' => $validated['title'],
+                'content' => $validated['content'] ?? null,
+                'duration_minutes' => $validated['duration_minutes'] ?? null,
+            ]);
 
-                $lesson->files()->create([
-                    'filename' => $file->getClientOriginalName(),
-                    'file_path' => $path,
-                    'file_size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType(),
-                ]);
+            // Handle video upload
+            if ($request->hasFile('video')) {
+                $video = $request->file('video');
+                $path = $video->store('', 'videos');
+
+                if (!$path) {
+                    throw new \Exception('Video kunne ikke gemmes. Tjek diskplads og rettigheder.');
+                }
+
+                $lesson->update(['video_path' => $path]);
             }
+
+            // Handle file attachments
+            if ($request->hasFile('files')) {
+                foreach ($request->file('files') as $file) {
+                    $path = $file->store('lesson-files', 'public');
+
+                    $lesson->files()->create([
+                        'filename' => $file->getClientOriginalName(),
+                        'file_path' => $path,
+                        'file_size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType(),
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Lesson creation error: ' . $e->getMessage());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Fejl under upload: ' . $e->getMessage(),
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['video' => 'Fejl under upload: ' . $e->getMessage()]);
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Lektion oprettet succesfuldt',
+                'redirect' => route('creator.courses.show', $course)
+            ]);
         }
 
         return redirect()

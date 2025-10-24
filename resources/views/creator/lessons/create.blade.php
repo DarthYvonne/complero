@@ -161,10 +161,40 @@
                                     <div>
                                         <i class="fa-solid fa-video me-2"></i>
                                         <span id="video-filename"></span>
+                                        <small class="text-muted ms-2">(<span id="video-filesize"></span>)</small>
                                     </div>
                                     <button type="button" class="btn btn-sm btn-danger" onclick="clearVideoUpload()">
                                         <i class="fa-solid fa-times"></i>
                                     </button>
+                                </div>
+                            </div>
+
+                            <!-- Upload Progress Bar -->
+                            <div id="upload-progress" class="mt-3" style="display: none;">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span><i class="fa-solid fa-upload me-2"></i>Uploader video...</span>
+                                            <span id="upload-percentage">0%</span>
+                                        </div>
+                                        <div class="progress" style="height: 25px;">
+                                            <div id="upload-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated"
+                                                 role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                0%
+                                            </div>
+                                        </div>
+                                        <small class="text-muted mt-2 d-block">
+                                            <span id="upload-speed"></span> • <span id="upload-time-remaining"></span>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Upload Error Display -->
+                            <div id="upload-error" class="mt-3" style="display: none;">
+                                <div class="alert alert-danger">
+                                    <h6 class="alert-heading"><i class="fa-solid fa-exclamation-triangle me-2"></i>Upload fejlede</h6>
+                                    <p class="mb-0" id="upload-error-message"></p>
                                 </div>
                             </div>
                         </div>
@@ -314,6 +344,13 @@
             const form = document.querySelector('form');
             form.addEventListener('submit', function(e) {
                 document.querySelector('#content').value = quill.root.innerHTML;
+
+                // Check if there's a video file being uploaded
+                const videoInput = document.getElementById('video');
+                if (videoInput && videoInput.files && videoInput.files[0]) {
+                    e.preventDefault(); // Prevent normal form submission
+                    uploadFormWithProgress(form);
+                }
             });
 
             // Also sync on text change
@@ -322,18 +359,198 @@
             });
         });
 
-        // Preview video
+        // Preview video with size validation
         function previewVideo(input) {
             if (input.files && input.files[0]) {
-                document.getElementById('video-filename').textContent = input.files[0].name;
+                const file = input.files[0];
+                const maxSize = 500 * 1024 * 1024; // 500MB in bytes
+
+                // Hide previous errors
+                document.getElementById('upload-error').style.display = 'none';
+
+                // Validate file size
+                if (file.size > maxSize) {
+                    document.getElementById('upload-error-message').innerHTML =
+                        `Filen er for stor (${formatFileSize(file.size)}). Maksimal størrelse er 500MB.`;
+                    document.getElementById('upload-error').style.display = 'block';
+                    input.value = ''; // Clear the input
+                    return;
+                }
+
+                document.getElementById('video-filename').textContent = file.name;
+                document.getElementById('video-filesize').textContent = formatFileSize(file.size);
                 document.getElementById('video-preview').style.display = 'block';
             }
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
         }
 
         // Clear video upload
         function clearVideoUpload() {
             document.getElementById('video').value = '';
             document.getElementById('video-preview').style.display = 'none';
+        }
+
+        // Upload form with progress tracking
+        function uploadFormWithProgress(form) {
+            const formData = new FormData(form);
+            const videoInput = document.getElementById('video');
+
+            // Show progress bar
+            document.getElementById('upload-progress').style.display = 'block';
+            document.getElementById('upload-error').style.display = 'none';
+            document.getElementById('video-preview').style.display = 'none';
+
+            // Disable submit button to prevent double submission
+            const submitButtons = form.querySelectorAll('button[type="submit"]');
+            submitButtons.forEach(btn => btn.disabled = true);
+
+            const xhr = new XMLHttpRequest();
+            let startTime = Date.now();
+            let lastLoaded = 0;
+
+            // Track upload progress
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = Math.round((e.loaded / e.total) * 100);
+                    const progressBar = document.getElementById('upload-progress-bar');
+                    const percentText = document.getElementById('upload-percentage');
+
+                    progressBar.style.width = percentComplete + '%';
+                    progressBar.textContent = percentComplete + '%';
+                    progressBar.setAttribute('aria-valuenow', percentComplete);
+                    percentText.textContent = percentComplete + '%';
+
+                    // Calculate upload speed
+                    const elapsedTime = (Date.now() - startTime) / 1000; // seconds
+                    const uploadSpeed = e.loaded / elapsedTime; // bytes per second
+                    const speedText = formatFileSize(uploadSpeed) + '/s';
+                    document.getElementById('upload-speed').textContent = speedText;
+
+                    // Calculate time remaining
+                    const bytesRemaining = e.total - e.loaded;
+                    const secondsRemaining = Math.round(bytesRemaining / uploadSpeed);
+                    const timeText = formatTime(secondsRemaining);
+                    document.getElementById('upload-time-remaining').textContent = 'Ca. ' + timeText + ' tilbage';
+                }
+            });
+
+            // Handle completion
+            xhr.addEventListener('load', function() {
+                if (xhr.status === 200 || xhr.status === 302) {
+                    // Success! Redirect or reload
+                    const progressBar = document.getElementById('upload-progress-bar');
+                    progressBar.classList.remove('progress-bar-animated');
+                    progressBar.classList.add('bg-success');
+                    progressBar.textContent = 'Færdig!';
+
+                    setTimeout(function() {
+                        // Check if response has redirect
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.redirect) {
+                                window.location.href = response.redirect;
+                            } else {
+                                window.location.reload();
+                            }
+                        } catch (e) {
+                            // Not JSON, likely a redirect - reload the page
+                            window.location.reload();
+                        }
+                    }, 500);
+                } else {
+                    // Error occurred
+                    handleUploadError(xhr);
+                    submitButtons.forEach(btn => btn.disabled = false);
+                }
+            });
+
+            // Handle errors
+            xhr.addEventListener('error', function() {
+                handleUploadError(xhr, 'Netværksfejl. Tjek din internetforbindelse og prøv igen.');
+                submitButtons.forEach(btn => btn.disabled = false);
+            });
+
+            xhr.addEventListener('abort', function() {
+                handleUploadError(xhr, 'Upload blev afbrudt.');
+                submitButtons.forEach(btn => btn.disabled = false);
+            });
+
+            xhr.addEventListener('timeout', function() {
+                handleUploadError(xhr, 'Upload timeout. Filen er muligvis for stor eller din forbindelse er for langsom.');
+                submitButtons.forEach(btn => btn.disabled = false);
+            });
+
+            // Send the request
+            xhr.open('POST', form.action);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.timeout = 600000; // 10 minutes timeout
+            xhr.send(formData);
+        }
+
+        // Handle upload errors
+        function handleUploadError(xhr, defaultMessage = null) {
+            document.getElementById('upload-progress').style.display = 'none';
+
+            let errorMessage = defaultMessage || 'Der opstod en ukendt fejl under upload.';
+
+            if (xhr.responseText) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.errors) {
+                        // Laravel validation errors
+                        errorMessage = '<ul class="mb-0">';
+                        for (const field in response.errors) {
+                            response.errors[field].forEach(err => {
+                                errorMessage += `<li>${err}</li>`;
+                            });
+                        }
+                        errorMessage += '</ul>';
+                    } else if (response.message) {
+                        errorMessage = response.message;
+                    }
+                } catch (e) {
+                    // Not JSON, try to extract error from HTML
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(xhr.responseText, 'text/html');
+                    const errorTitle = doc.querySelector('title');
+                    if (errorTitle) {
+                        errorMessage = errorTitle.textContent;
+                    }
+                }
+            }
+
+            // Add server status information
+            if (xhr.status) {
+                errorMessage += `<br><small class="text-muted">HTTP Status: ${xhr.status}</small>`;
+            }
+
+            document.getElementById('upload-error-message').innerHTML = errorMessage;
+            document.getElementById('upload-error').style.display = 'block';
+
+            // Scroll to error
+            document.getElementById('upload-error').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Format time in seconds to readable format
+        function formatTime(seconds) {
+            if (seconds < 60) {
+                return seconds + ' sekunder';
+            } else if (seconds < 3600) {
+                const minutes = Math.floor(seconds / 60);
+                return minutes + ' minut' + (minutes > 1 ? 'ter' : '');
+            } else {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                return hours + ' time' + (hours > 1 ? 'r' : '') + (minutes > 0 ? ' og ' + minutes + ' minut' + (minutes > 1 ? 'ter' : '') : '');
+            }
         }
 
         // Preview files
