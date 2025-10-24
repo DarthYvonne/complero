@@ -95,46 +95,84 @@ class LessonController extends Controller
             abort(403, 'Du har ikke adgang til dette forløb');
         }
 
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'content' => ['nullable', 'string'],
-            'duration_minutes' => ['nullable', 'integer', 'min:1'],
-            'order' => ['nullable', 'integer', 'min:1'],
-            'video' => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:512000'],
-            'files.*' => ['nullable', 'file', 'max:10240'],
-        ]);
-
-        $lesson->update([
-            'title' => $validated['title'],
-            'content' => $validated['content'] ?? null,
-            'duration_minutes' => $validated['duration_minutes'] ?? null,
-            'order' => $validated['order'] ?? $lesson->order,
-        ]);
-
-        // Handle video upload (replace existing)
-        if ($request->hasFile('video')) {
-            // Delete old video if exists
-            if ($lesson->video_path) {
-                Storage::disk('videos')->delete($lesson->video_path);
+        try {
+            $validated = $request->validate([
+                'title' => ['required', 'string', 'max:255'],
+                'content' => ['nullable', 'string'],
+                'duration_minutes' => ['nullable', 'integer', 'min:1'],
+                'order' => ['nullable', 'integer', 'min:1'],
+                'video' => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:512000'],
+                'files.*' => ['nullable', 'file', 'max:10240'],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Validering fejlede',
+                    'errors' => $e->errors()
+                ], 422);
             }
-
-            $video = $request->file('video');
-            $path = $video->store('', 'videos');
-            $lesson->update(['video_path' => $path]);
+            throw $e;
         }
 
-        // Handle new file attachments
-        if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
-                $path = $file->store('lesson-files', 'public');
+        try {
+            $lesson->update([
+                'title' => $validated['title'],
+                'content' => $validated['content'] ?? null,
+                'duration_minutes' => $validated['duration_minutes'] ?? null,
+                'order' => $validated['order'] ?? $lesson->order,
+            ]);
 
-                $lesson->files()->create([
-                    'filename' => $file->getClientOriginalName(),
-                    'file_path' => $path,
-                    'file_size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType(),
-                ]);
+            // Handle video upload (replace existing)
+            if ($request->hasFile('video')) {
+                // Delete old video if exists
+                if ($lesson->video_path) {
+                    Storage::disk('videos')->delete($lesson->video_path);
+                }
+
+                $video = $request->file('video');
+                $path = $video->store('', 'videos');
+
+                if (!$path) {
+                    throw new \Exception('Video kunne ikke gemmes. Tjek diskplads og rettigheder.');
+                }
+
+                $lesson->update(['video_path' => $path]);
             }
+
+            // Handle new file attachments
+            if ($request->hasFile('files')) {
+                foreach ($request->file('files') as $file) {
+                    $path = $file->store('lesson-files', 'public');
+
+                    $lesson->files()->create([
+                        'filename' => $file->getClientOriginalName(),
+                        'file_path' => $path,
+                        'file_size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType(),
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Lesson update error: ' . $e->getMessage());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Fejl under upload: ' . $e->getMessage(),
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['video' => 'Fejl under upload: ' . $e->getMessage()]);
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Lektion opdateret succesfuldt',
+                'redirect' => route('creator.courses.show', $course)
+            ]);
         }
 
         return redirect()
