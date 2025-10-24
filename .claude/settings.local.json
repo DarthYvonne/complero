@@ -10,7 +10,9 @@
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\composer.bat\" remove sendinblue/api-v3-sdk)",
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\composer.bat\" require getbrevo/brevo-php)",
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_tracking_fields_to_emails_table --table=emails)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller BrevoWebhookController)"
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller BrevoWebhookController)",
+      "Read(//c/**)",
+      "Read(//c//**)"
     ],
     "deny": [],
     "ask": []

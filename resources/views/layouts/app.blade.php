@@ -139,12 +139,13 @@
                 color: white;
                 font-size: 12px;
                 font-weight: 600;
-                padding: 3px 7px;
-                border-radius: 10px;
+                padding: 4px 8px;
+                border-radius: 12px;
                 line-height: 1;
                 margin-left: 6px;
-                min-width: 22px;
+                min-width: 24px;
                 text-align: center;
+                box-sizing: border-box;
             }
 
             .sidebar-menu a.active .menu-badge {
