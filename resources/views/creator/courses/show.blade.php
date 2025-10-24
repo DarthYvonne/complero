@@ -176,11 +176,11 @@
                         @if($course->lessons->count() > 0)
                             <div class="list-group list-group-flush">
                                 @foreach($course->lessons->sortBy('order') as $lesson)
-                                    @if($effectiveRole === 'admin' || $effectiveRole === 'creator')
-                                        <a href="{{ route('creator.courses.lessons.edit', [$course, $lesson]) }}"
-                                           class="list-group-item list-group-item-action"
-                                           style="border-left: none; border-right: none; padding: 12px 16px;">
-                                            <div class="d-flex align-items-start">
+                                    <a href="{{ route('lessons.show', [$course, $lesson]) }}"
+                                       class="list-group-item list-group-item-action"
+                                       style="border-left: none; border-right: none; padding: 12px 16px;">
+                                        <div class="d-flex align-items-start justify-content-between">
+                                            <div class="d-flex align-items-start flex-grow-1">
                                                 <div class="me-2" style="min-width: 24px;">
                                                     <i class="fa-solid fa-tv" style="color: #999;"></i>
                                                 </div>
@@ -195,27 +195,15 @@
                                                     @endif
                                                 </div>
                                             </div>
-                                        </a>
-                                    @else
-                                        <div class="list-group-item"
-                                           style="border-left: none; border-right: none; padding: 12px 16px;">
-                                            <div class="d-flex align-items-start">
-                                                <div class="me-2" style="min-width: 24px;">
-                                                    <i class="fa-solid fa-tv" style="color: #999;"></i>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <div style="font-size: 14px; font-weight: 400; color: #333;">
-                                                        {{ $lesson->title }}
-                                                    </div>
-                                                    @if($lesson->duration_minutes)
-                                                        <small style="font-size: 12px; font-weight: 300; color: #999;">
-                                                            {{ $lesson->duration_minutes }} min
-                                                        </small>
-                                                    @endif
-                                                </div>
-                                            </div>
+                                            @if($effectiveRole === 'admin' || $effectiveRole === 'creator')
+                                                <a href="{{ route('creator.courses.lessons.edit', [$course, $lesson]) }}"
+                                                   class="btn btn-sm btn-outline-primary ms-2"
+                                                   onclick="event.stopPropagation();">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </a>
+                                            @endif
                                         </div>
-                                    @endif
+                                    </a>
                                 @endforeach
                             </div>
                         @else

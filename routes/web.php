@@ -57,6 +57,7 @@ Route::middleware(['auth', 'creator-or-admin'])->prefix('creator')->name('creato
     Route::get('/courses/{course}/lessons/{lesson}/edit', [CreatorLessonController::class, 'edit'])->name('courses.lessons.edit');
     Route::patch('/courses/{course}/lessons/{lesson}', [CreatorLessonController::class, 'update'])->name('courses.lessons.update');
     Route::delete('/courses/{course}/lessons/{lesson}', [CreatorLessonController::class, 'destroy'])->name('courses.lessons.destroy');
+    Route::delete('/courses/{course}/lessons/{lesson}/video', [CreatorLessonController::class, 'deleteVideo'])->name('courses.lessons.video.destroy');
     Route::delete('/courses/{course}/lessons/{lesson}/files/{file}', [CreatorLessonController::class, 'deleteFile'])->name('courses.lessons.files.destroy');
 
     // Course Tab Management
@@ -132,6 +133,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/courses/{course}/lessons/{lesson}/edit', [CreatorLessonController::class, 'edit'])->name('courses.lessons.edit');
     Route::patch('/courses/{course}/lessons/{lesson}', [CreatorLessonController::class, 'update'])->name('courses.lessons.update');
     Route::delete('/courses/{course}/lessons/{lesson}', [CreatorLessonController::class, 'destroy'])->name('courses.lessons.destroy');
+    Route::delete('/courses/{course}/lessons/{lesson}/video', [CreatorLessonController::class, 'deleteVideo'])->name('courses.lessons.video.destroy');
     Route::delete('/courses/{course}/lessons/{lesson}/files/{file}', [CreatorLessonController::class, 'deleteFile'])->name('courses.lessons.files.destroy');
 
     // Lesson Tabs

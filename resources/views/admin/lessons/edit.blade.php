@@ -97,23 +97,24 @@
                             @if($lesson->video_path)
                                 <div class="mb-3">
                                     <label class="form-label">Nuværende video</label>
-                                    <div class="alert alert-info mb-2">
-                                        <i class="fa-solid fa-video me-2"></i>
-                                        Video uploadet
-                                        <a href="{{ $lesson->getVideoUrl() }}" target="_blank" class="alert-link">Se video</a>
+                                    <div class="alert alert-success d-flex justify-content-between align-items-center mb-0">
+                                        <div>
+                                            <i class="fa-solid fa-video me-2"></i>
+                                            <strong>{{ basename($lesson->video_path) }}</strong>
+                                            <a href="{{ $lesson->getVideoUrl() }}" target="_blank" class="alert-link ms-3">
+                                                <i class="fa-solid fa-play"></i> Se video
+                                            </a>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteVideoModal">
+                                            <i class="fa-solid fa-trash"></i> Slet
+                                        </button>
                                     </div>
                                 </div>
                             @endif
 
                             <!-- Video Upload -->
-                            <div class="mb-3">
-                                <label for="video" class="form-label">
-                                    @if($lesson->video_path)
-                                        Nyt video (valgfrit)
-                                    @else
-                                        Video (MP4, MOV, AVI, WebM)
-                                    @endif
-                                </label>
+                            <div class="mb-3" style="display: {{ $lesson->video_path ? 'none' : 'block' }}">
+                                <label for="video" class="form-label">Video (MP4, MOV, AVI, WebM)</label>
                                 <input type="file"
                                        class="form-control @error('video') is-invalid @enderror"
                                        id="video"
@@ -122,13 +123,7 @@
                                 @error('video')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                                <div class="form-text" style="font-weight: 300;">
-                                    @if($lesson->video_path)
-                                        Upload kun hvis du vil erstatte den nuværende video. Maksimal filstørrelse: 500MB
-                                    @else
-                                        Maksimal filstørrelse: 500MB
-                                    @endif
-                                </div>
+                                <div class="form-text" style="font-weight: 300;">Maksimal filstørrelse: 500MB</div>
                             </div>
 
                             <!-- Current Files -->
@@ -378,4 +373,30 @@
         });
     </script>
     @endpush
+
+    <!-- Delete Video Modal -->
+    <div class="modal fade" id="deleteVideoModal" tabindex="-1" aria-labelledby="deleteVideoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteVideoModalLabel">Slet video</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Er du sikker på, at du vil slette denne video?</p>
+                    <p class="text-danger small mb-0"><i class="fa-solid fa-exclamation-triangle me-1"></i> Denne handling kan ikke fortrydes.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuller</button>
+                    <form action="{{ route('admin.courses.lessons.video.destroy', [$course, $lesson]) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fa-solid fa-trash me-1"></i> Slet video
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </x-app-layout>

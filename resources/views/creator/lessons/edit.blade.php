@@ -210,23 +210,24 @@
                         <div class="card-body">
                             <!-- Current Video -->
                             @if($lesson->video_path)
-                                <div class="mb-3">
-                                    <div class="alert alert-info d-flex justify-content-between align-items-center mb-0">
+                                <div class="mb-3" id="current-video-display">
+                                    <div class="alert alert-success d-flex justify-content-between align-items-center mb-0">
                                         <div>
                                             <i class="fa-solid fa-video me-2"></i>
-                                            Video uploadet
-                                            <a href="{{ $lesson->getVideoUrl() }}" target="_blank" class="alert-link ms-2">Se video</a>
+                                            <strong>{{ basename($lesson->video_path) }}</strong>
+                                            <a href="{{ $lesson->getVideoUrl() }}" target="_blank" class="alert-link ms-3">
+                                                <i class="fa-solid fa-play"></i> Se video
+                                            </a>
                                         </div>
-                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeVideo()">
-                                            <i class="fa-solid fa-trash"></i>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteVideoModal">
+                                            <i class="fa-solid fa-trash"></i> Slet
                                         </button>
                                     </div>
-                                    <input type="hidden" id="remove_video" name="remove_video" value="0">
                                 </div>
                             @endif
 
                             <!-- Video Upload Drop Zone -->
-                            <div class="upload-zone" onclick="document.getElementById('video').click()">
+                            <div class="upload-zone" id="video-upload-zone" onclick="document.getElementById('video').click()" style="display: {{ $lesson->video_path ? 'none' : 'block' }}">
                                 <input type="file"
                                        class="d-none @error('video') is-invalid @enderror"
                                        id="video"
@@ -565,14 +566,6 @@
             document.getElementById('video-preview').style.display = 'none';
         }
 
-        // Remove current video
-        function removeVideo() {
-            if (confirm('Er du sikker på, at du vil fjerne denne video?')) {
-                document.getElementById('remove_video').value = '1';
-                document.querySelector('form').submit();
-            }
-        }
-
         // Preview files
         function previewFiles(input) {
             if (input.files && input.files.length > 0) {
@@ -823,4 +816,30 @@
         }
     </script>
     @endpush
+
+    <!-- Delete Video Modal -->
+    <div class="modal fade" id="deleteVideoModal" tabindex="-1" aria-labelledby="deleteVideoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteVideoModalLabel">Slet video</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Er du sikker på, at du vil slette denne video?</p>
+                    <p class="text-danger small mb-0"><i class="fa-solid fa-exclamation-triangle me-1"></i> Denne handling kan ikke fortrydes.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuller</button>
+                    <form action="{{ route('creator.courses.lessons.video.destroy', [$course, $lesson]) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fa-solid fa-trash me-1"></i> Slet video
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </x-app-layout>

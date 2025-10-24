@@ -12,7 +12,8 @@
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_tracking_fields_to_emails_table --table=emails)",
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller BrevoWebhookController)",
       "Read(//c/**)",
-      "Read(//c//**)"
+      "Read(//c//**)",
+      "Bash(powershell -Command \"(Get-Content ''resources\\views\\admin\\lessons\\edit.blade.php'' | Measure-Object -Line).Lines\")"
     ],
     "deny": [],
     "ask": []

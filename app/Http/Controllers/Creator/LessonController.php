@@ -209,12 +209,12 @@ class LessonController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Lektion opdateret succesfuldt',
-                'redirect' => route('creator.courses.show', $course)
+                'redirect' => route('lessons.show', [$course, $lesson])
             ]);
         }
 
         return redirect()
-            ->route('creator.courses.show', $course)
+            ->route('lessons.show', [$course, $lesson])
             ->with('success', 'Lektion opdateret succesfuldt');
     }
 
@@ -242,6 +242,26 @@ class LessonController extends Controller
         return redirect()
             ->route('creator.courses.show', $course)
             ->with('success', 'Lektion slettet succesfuldt');
+    }
+
+    /**
+     * Delete the video from a lesson.
+     */
+    public function deleteVideo(Course $course, Lesson $lesson)
+    {
+        if (auth()->user()->role !== 'admin' && $course->creator_id !== auth()->id()) {
+            abort(403, 'Du har ikke adgang til dette forløb');
+        }
+
+        // Delete video file if exists
+        if ($lesson->video_path) {
+            Storage::disk('videos')->delete($lesson->video_path);
+            $lesson->update(['video_path' => null]);
+        }
+
+        return redirect()
+            ->route('creator.courses.lessons.edit', [$course, $lesson])
+            ->with('success', 'Video slettet succesfuldt');
     }
 
     /**
