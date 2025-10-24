@@ -13,7 +13,9 @@
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller BrevoWebhookController)",
       "Read(//c/**)",
       "Read(//c//**)",
-      "Bash(powershell -Command \"(Get-Content ''resources\\views\\admin\\lessons\\edit.blade.php'' | Measure-Object -Line).Lines\")"
+      "Bash(powershell -Command \"(Get-Content ''resources\\views\\admin\\lessons\\edit.blade.php'' | Measure-Object -Line).Lines\")",
+      "Bash(powershell -Command \"(Get-Content ''resources\\views\\creator\\resources\\create.blade.php'' | Measure-Object -Line).Lines\")",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_video_path_to_resources_table --table=resources)"
     ],
     "deny": [],
     "ask": []

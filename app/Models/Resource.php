@@ -17,6 +17,7 @@ class Resource extends Model
         'slug',
         'description',
         'image_url',
+        'video_path',
         'price',
         'is_free',
         'is_published',
@@ -122,5 +123,22 @@ class Resource extends Model
             return \Storage::url($this->image_url);
         }
         return $this->placeholder_image;
+    }
+
+    /**
+     * Get the full URL for the video file.
+     */
+    public function getVideoUrl()
+    {
+        if (!$this->video_path) {
+            return null;
+        }
+
+        $url = \Illuminate\Support\Facades\Storage::disk('videos')->url($this->video_path);
+
+        // Always force HTTPS - we're always on HTTPS in production
+        $url = str_replace('http://', 'https://', $url);
+
+        return $url;
     }
 }

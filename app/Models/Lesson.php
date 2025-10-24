@@ -84,6 +84,11 @@ class Lesson extends Model
             return null;
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('videos')->url($this->video_path);
+        $url = \Illuminate\Support\Facades\Storage::disk('videos')->url($this->video_path);
+
+        // Always force HTTPS - we're always on HTTPS in production
+        $url = str_replace('http://', 'https://', $url);
+
+        return $url;
     }
 }

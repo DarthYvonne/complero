@@ -52,55 +52,101 @@ class ResourceController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'mailing_list_id' => ['nullable', 'exists:mailing_lists,id'],
-            'image' => ['nullable', 'image', 'max:2048'],
-            'price' => ['nullable', 'numeric', 'min:0'],
-            'is_free' => ['nullable', 'boolean'],
-            'is_published' => ['nullable', 'boolean'],
-            'files.*' => ['nullable', 'file', 'max:10240'],
-        ]);
-
-        // Ensure the mailing list belongs to this creator if specified (unless admin)
-        if ($validated['mailing_list_id'] ?? null) {
-            $query = MailingList::where('id', $validated['mailing_list_id']);
-
-            if (auth()->user()->role !== 'admin') {
-                $query->where('creator_id', auth()->id());
+        try {
+            $validated = $request->validate([
+                'title' => ['required', 'string', 'max:255'],
+                'description' => ['required', 'string'],
+                'mailing_list_id' => ['nullable', 'exists:mailing_lists,id'],
+                'video' => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:512000'], // 500MB max
+                'image' => ['nullable', 'image', 'max:2048'],
+                'price' => ['nullable', 'numeric', 'min:0'],
+                'is_free' => ['nullable', 'boolean'],
+                'is_published' => ['nullable', 'boolean'],
+                'files.*' => ['nullable', 'file', 'max:10240'],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Validering fejlede',
+                    'errors' => $e->errors()
+                ], 422);
             }
-
-            $mailingList = $query->firstOrFail();
+            throw $e;
         }
 
-        $resource = Resource::create([
-            'creator_id' => auth()->id(),
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'mailing_list_id' => $request->input('mailing_list_id') ?: null,
-            'price' => $validated['price'] ?? 0,
-            'is_free' => $request->has('is_free'),
-            'is_published' => $request->has('is_published'),
-        ]);
+        try {
+            // Ensure the mailing list belongs to this creator if specified (unless admin)
+            if ($validated['mailing_list_id'] ?? null) {
+                $query = MailingList::where('id', $validated['mailing_list_id']);
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $path = $image->store('resources', 'public');
-            $resource->update(['image_url' => $path]);
+                if (auth()->user()->role !== 'admin') {
+                    $query->where('creator_id', auth()->id());
+                }
+
+                $mailingList = $query->firstOrFail();
+            }
+
+            $resource = Resource::create([
+                'creator_id' => auth()->id(),
+                'title' => $validated['title'],
+                'description' => $validated['description'],
+                'mailing_list_id' => $request->input('mailing_list_id') ?: null,
+                'price' => $validated['price'] ?? 0,
+                'is_free' => $request->has('is_free'),
+                'is_published' => $request->has('is_published'),
+            ]);
+
+            // Handle video upload
+            if ($request->hasFile('video')) {
+                $video = $request->file('video');
+                $path = $video->store('', 'videos');
+
+                if (!$path) {
+                    throw new \Exception('Video kunne ikke gemmes. Tjek diskplads og rettigheder.');
+                }
+
+                $resource->update(['video_path' => $path]);
+            }
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $path = $image->store('resources', 'public');
+                $resource->update(['image_url' => $path]);
+            }
+
+            if ($request->hasFile('files')) {
+                foreach ($request->file('files') as $file) {
+                    $path = $file->store('resource-files', 'public');
+
+                    $resource->files()->create([
+                        'filename' => $file->getClientOriginalName(),
+                        'file_path' => $path,
+                        'file_size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType(),
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Resource creation error: ' . $e->getMessage());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Fejl under upload: ' . $e->getMessage(),
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['video' => 'Fejl under upload: ' . $e->getMessage()]);
         }
 
-        if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
-                $path = $file->store('resource-files', 'public');
-
-                $resource->files()->create([
-                    'filename' => $file->getClientOriginalName(),
-                    'file_path' => $path,
-                    'file_size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType(),
-                ]);
-            }
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Ressource oprettet succesfuldt',
+                'redirect' => route('creator.resources.show', $resource)
+            ]);
         }
 
         return redirect()
