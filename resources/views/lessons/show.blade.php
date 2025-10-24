@@ -43,7 +43,7 @@
                     <div class="card mb-4">
                         <div class="card-body p-0">
                             <video controls style="width: 100%; max-height: 600px; background: #000;">
-                                <source src="{{ Storage::url($lesson->video_path) }}" type="video/mp4">
+                                <source src="{{ $lesson->getVideoUrl() }}" type="video/mp4">
                                 Din browser understøtter ikke videoafspilning.
                             </video>
                         </div>

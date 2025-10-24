@@ -50,7 +50,7 @@ class LessonController extends Controller
         // Handle video upload
         if ($request->hasFile('video')) {
             $video = $request->file('video');
-            $path = $video->store('videos', 'public');
+            $path = $video->store('', 'videos');
             $lesson->update(['video_path' => $path]);
         }
 
@@ -115,11 +115,11 @@ class LessonController extends Controller
         if ($request->hasFile('video')) {
             // Delete old video if exists
             if ($lesson->video_path) {
-                Storage::disk('public')->delete($lesson->video_path);
+                Storage::disk('videos')->delete($lesson->video_path);
             }
 
             $video = $request->file('video');
-            $path = $video->store('videos', 'public');
+            $path = $video->store('', 'videos');
             $lesson->update(['video_path' => $path]);
         }
 
@@ -153,7 +153,7 @@ class LessonController extends Controller
 
         // Delete video file if exists
         if ($lesson->video_path) {
-            Storage::disk('public')->delete($lesson->video_path);
+            Storage::disk('videos')->delete($lesson->video_path);
         }
 
         // Delete all lesson files

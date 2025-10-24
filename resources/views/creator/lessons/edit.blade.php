@@ -215,7 +215,7 @@
                                         <div>
                                             <i class="fa-solid fa-video me-2"></i>
                                             Video uploadet
-                                            <a href="{{ Storage::url($lesson->video_path) }}" target="_blank" class="alert-link ms-2">Se video</a>
+                                            <a href="{{ $lesson->getVideoUrl() }}" target="_blank" class="alert-link ms-2">Se video</a>
                                         </div>
                                         <button type="button" class="btn btn-sm btn-danger" onclick="removeVideo()">
                                             <i class="fa-solid fa-trash"></i>

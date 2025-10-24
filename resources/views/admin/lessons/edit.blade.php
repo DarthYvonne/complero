@@ -100,7 +100,7 @@
                                     <div class="alert alert-info mb-2">
                                         <i class="fa-solid fa-video me-2"></i>
                                         Video uploadet
-                                        <a href="{{ Storage::url($lesson->video_path) }}" target="_blank" class="alert-link">Se video</a>
+                                        <a href="{{ $lesson->getVideoUrl() }}" target="_blank" class="alert-link">Se video</a>
                                     </div>
                                 </div>
                             @endif

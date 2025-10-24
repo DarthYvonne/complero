@@ -74,4 +74,16 @@ class Lesson extends Model
     {
         return $this->completions()->where('user_id', $user->id)->exists();
     }
+
+    /**
+     * Get the full URL for the video file.
+     */
+    public function getVideoUrl()
+    {
+        if (!$this->video_path) {
+            return null;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('videos')->url($this->video_path);
+    }
 }
