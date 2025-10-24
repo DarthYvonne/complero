@@ -41,9 +41,23 @@
                 <!-- Video Player -->
                 @if($lesson->video_path)
                     <div class="card mb-4">
-                        <div class="card-body p-0">
-                            <video controls style="width: 100%; max-height: 600px; background: #000;">
-                                <source src="{{ $lesson->getVideoUrl() }}" type="video/mp4">
+                        <div class="card-body p-0" style="position: relative; padding-top: 56.25%; /* 16:9 Aspect Ratio */">
+                            <video id="lesson-video"
+                                   controls
+                                   controlsList="nodownload"
+                                   style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000;"
+                                   preload="metadata">
+                                @php
+                                    $extension = strtolower(pathinfo($lesson->video_path, PATHINFO_EXTENSION));
+                                    $mimeTypes = [
+                                        'mp4' => 'video/mp4',
+                                        'webm' => 'video/webm',
+                                        'mov' => 'video/quicktime',
+                                        'avi' => 'video/x-msvideo',
+                                    ];
+                                    $mimeType = $mimeTypes[$extension] ?? 'video/mp4';
+                                @endphp
+                                <source src="{{ $lesson->getVideoUrl() }}" type="{{ $mimeType }}">
                                 Din browser understøtter ikke videoafspilning.
                             </video>
                         </div>
@@ -264,4 +278,26 @@
             padding-left: 1rem;
         }
     </style>
+
+    @if($lesson->video_path)
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('lesson-video');
+
+            if (video) {
+                video.addEventListener('error', function(e) {
+                    console.error('Video error:', e);
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'alert alert-danger m-3';
+                    errorDiv.innerHTML = '<i class="fa-solid fa-exclamation-triangle me-2"></i><strong>Video kunne ikke indlæses.</strong> Kontakt venligst support hvis problemet fortsætter.';
+                    video.parentElement.appendChild(errorDiv);
+                });
+
+                video.addEventListener('loadeddata', function() {
+                    console.log('Video loaded successfully');
+                });
+            }
+        });
+    </script>
+    @endif
 </x-app-layout>
