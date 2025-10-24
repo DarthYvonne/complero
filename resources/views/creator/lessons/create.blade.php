@@ -343,13 +343,20 @@
             // Sync Quill content to hidden textarea on form submission
             const form = document.querySelector('form');
             form.addEventListener('submit', function(e) {
+                console.log('Form submit triggered');
                 document.querySelector('#content').value = quill.root.innerHTML;
 
                 // Check if there's a video file being uploaded
                 const videoInput = document.getElementById('video');
+                console.log('Video input:', videoInput);
+                console.log('Video files:', videoInput ? videoInput.files : 'no input');
+
                 if (videoInput && videoInput.files && videoInput.files[0]) {
+                    console.log('Video file detected, starting AJAX upload');
                     e.preventDefault(); // Prevent normal form submission
                     uploadFormWithProgress(form);
+                } else {
+                    console.log('No video file, allowing normal form submission');
                 }
             });
 
@@ -400,10 +407,13 @@
 
         // Upload form with progress tracking
         function uploadFormWithProgress(form) {
+            console.log('uploadFormWithProgress called');
             const formData = new FormData(form);
             const videoInput = document.getElementById('video');
+            console.log('Form data created, video input:', videoInput);
 
             // Show progress bar
+            console.log('Showing progress bar');
             document.getElementById('upload-progress').style.display = 'block';
             document.getElementById('upload-error').style.display = 'none';
             document.getElementById('video-preview').style.display = 'none';
@@ -420,6 +430,7 @@
             xhr.upload.addEventListener('progress', function(e) {
                 if (e.lengthComputable) {
                     const percentComplete = Math.round((e.loaded / e.total) * 100);
+                    console.log('Upload progress:', percentComplete + '%');
                     const progressBar = document.getElementById('upload-progress-bar');
                     const percentText = document.getElementById('upload-percentage');
 
@@ -444,8 +455,11 @@
 
             // Handle completion
             xhr.addEventListener('load', function() {
+                console.log('XHR load event fired, status:', xhr.status);
+                console.log('Response:', xhr.responseText.substring(0, 200));
                 if (xhr.status === 200 || xhr.status === 302) {
                     // Success! Redirect or reload
+                    console.log('Upload successful!');
                     const progressBar = document.getElementById('upload-progress-bar');
                     progressBar.classList.remove('progress-bar-animated');
                     progressBar.classList.add('bg-success');
@@ -489,10 +503,12 @@
             });
 
             // Send the request
+            console.log('Sending XHR request to:', form.action);
             xhr.open('POST', form.action);
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.timeout = 600000; // 10 minutes timeout
             xhr.send(formData);
+            console.log('XHR request sent');
         }
 
         // Handle upload errors
