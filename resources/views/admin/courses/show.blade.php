@@ -113,7 +113,7 @@
                                 @foreach($course->lessons->sortBy('order') as $lesson)
                                     <div class="list-group-item d-flex justify-content-between align-items-center">
                                         <div class="flex-grow-1">
-                                            <a href="{{ route('lessons.show', [$course, $lesson]) }}" style="text-decoration: none; color: inherit;" target="_blank">
+                                            <a href="{{ route('admin.courses.lessons.edit', [$course, $lesson]) }}" style="text-decoration: none; color: inherit;">
                                                 <i class="fa-solid fa-circle-play text-primary me-2"></i>
                                                 <strong>{{ $lesson->title }}</strong>
                                                 @if($lesson->duration_minutes)
