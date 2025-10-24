@@ -51,13 +51,23 @@
                                     <p class="text-muted small mb-3">
                                         {{ $course->lessons->count() }} {{ $course->lessons->count() === 1 ? 'lektion' : 'lektioner' }}
                                     </p>
-                                    <a href="{{ $enrollment->lastAccessedLesson ? route('lessons.show', [$course, $enrollment->lastAccessedLesson]) : route('lessons.show', [$course, $course->lessons->first()]) }}"
-                                       class="btn w-100"
-                                       style="background: {{ $courseColor }}; border-color: {{ $courseColor }}; color: #ffffff;"
-                                       onmouseover="this.style.background='{{ $hoverColor }}'; this.style.borderColor='{{ $hoverColor }}';"
-                                       onmouseout="this.style.background='{{ $courseColor }}'; this.style.borderColor='{{ $courseColor }}';">
-                                        <i class="fa-solid fa-play me-1"></i> Fortsæt
-                                    </a>
+                                    @php
+                                        $targetLesson = $enrollment->lastAccessedLesson ?? $course->lessons->first();
+                                    @endphp
+                                    @if($targetLesson)
+                                        <a href="{{ route('lessons.show', [$course, $targetLesson]) }}"
+                                           class="btn w-100"
+                                           style="background: {{ $courseColor }}; border-color: {{ $courseColor }}; color: #ffffff;"
+                                           onmouseover="this.style.background='{{ $hoverColor }}'; this.style.borderColor='{{ $hoverColor }}';"
+                                           onmouseout="this.style.background='{{ $courseColor }}'; this.style.borderColor='{{ $courseColor }}';">
+                                            <i class="fa-solid fa-play me-1"></i> Fortsæt
+                                        </a>
+                                    @else
+                                        <button class="btn w-100" disabled
+                                                style="background: #e0e0e0; border-color: #e0e0e0; color: #999;">
+                                            <i class="fa-solid fa-circle-info me-1"></i> Ingen lektioner endnu
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
