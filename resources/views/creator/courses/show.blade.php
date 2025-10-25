@@ -48,7 +48,7 @@
                 <!-- Course Image -->
                 @if($course->image_url)
                     <div class="card border-0 shadow-sm mb-4">
-                        <img src="{{ Storage::url($course->image_url) }}" class="card-img-top" alt="{{ $course->title }}" style="max-height: 400px; object-fit: cover;">
+                        <img src="{{ $course->image }}" class="card-img-top" alt="{{ $course->title }}" style="max-height: 400px; object-fit: cover;">
                     </div>
                 @endif
 

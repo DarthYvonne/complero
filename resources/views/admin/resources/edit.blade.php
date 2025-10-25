@@ -73,7 +73,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Nuværende billede</label>
                                     <div class="mb-2">
-                                        <img src="{{ Storage::url($resource->image_url) }}" alt="{{ $resource->title }}" class="img-thumbnail" style="max-width: 300px;">
+                                        <img src="{{ $resource->image }}" alt="{{ $resource->title }}" class="img-thumbnail" style="max-width: 300px;">
                                     </div>
                                 </div>
                             @endif

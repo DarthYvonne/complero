@@ -85,7 +85,7 @@
                                             data-bs-target="#intro-tab"
                                             type="button"
                                             role="tab">
-                                        Introduktion
+                                        <span id="intro-tab-title-display">Introduktion</span>
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
@@ -104,7 +104,17 @@
                             <div class="tab-content" id="lessonTabsContent">
                                 <!-- Introduktion Tab -->
                                 <div class="tab-pane fade show active" id="intro-tab" role="tabpanel">
+                                    <div class="mb-3">
+                                        <label for="intro_title" class="form-label">Tab titel</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="intro_title"
+                                               name="intro_title"
+                                               value="Introduktion"
+                                               placeholder="Introduktion">
+                                    </div>
                                     <div class="mb-0">
+                                        <label for="content" class="form-label">Tab indhold</label>
                                         <div id="content-editor" style="min-height: 250px; background: white;"></div>
                                         <textarea class="form-control @error('content') is-invalid @enderror"
                                                   id="content"
@@ -116,12 +126,23 @@
                                     </div>
                                 </div>
 
-                                <!-- Add New Tab (Note: tabs can only be added after lesson creation) -->
+                                <!-- Add New Tab -->
                                 <div class="tab-pane fade" id="add-new-tab" role="tabpanel">
-                                    <div class="alert alert-info">
-                                        <i class="fa-solid fa-circle-info me-2"></i>
-                                        Du kan tilføje ekstra tabs efter du har oprettet lektionen.
+                                    <div class="mb-3">
+                                        <label for="new_tab_title" class="form-label">Tab titel <span class="text-danger">*</span></label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="new_tab_title"
+                                               placeholder="F.eks. Ressourcer eller Noter">
                                     </div>
+                                    <div class="mb-3">
+                                        <label for="new_tab_content" class="form-label">Tab indhold <span class="text-danger">*</span></label>
+                                        <div id="tab-content-editor" style="min-height: 200px; background: white;"></div>
+                                        <textarea id="new_tab_content" style="display: none;"></textarea>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="addNewTab()">
+                                        <i class="fa-solid fa-save me-1"></i> Gem tab
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -316,6 +337,10 @@
 
     @push('scripts')
     <script>
+        let tabQuill; // Quill editor for new tab content
+        let tabs = []; // Store tabs created before lesson is saved
+        let tabCounter = 0; // Counter for unique tab IDs
+
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Quill editor for content
             const quill = new Quill('#content-editor', {
@@ -334,6 +359,28 @@
                 placeholder: 'Beskriv lektionens indhold...'
             });
 
+            // Initialize Quill editor for new tab content
+            tabQuill = new Quill('#tab-content-editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        ['link'],
+                        ['clean']
+                    ]
+                },
+                placeholder: 'Skriv tab indhold...'
+            });
+
+            // Sync tab content to hidden textarea
+            tabQuill.on('text-change', function() {
+                document.querySelector('#new_tab_content').value = tabQuill.root.innerHTML;
+            });
+
             // Load existing content if any
             const existingContent = document.querySelector('#content').value;
             if (existingContent) {
@@ -345,6 +392,21 @@
             form.addEventListener('submit', function(e) {
                 console.log('Form submit triggered');
                 document.querySelector('#content').value = quill.root.innerHTML;
+
+                // Add tabs data to form
+                tabs.forEach((tab, index) => {
+                    const titleInput = document.createElement('input');
+                    titleInput.type = 'hidden';
+                    titleInput.name = `tabs[${index}][title]`;
+                    titleInput.value = tab.title;
+                    form.appendChild(titleInput);
+
+                    const contentInput = document.createElement('input');
+                    contentInput.type = 'hidden';
+                    contentInput.name = `tabs[${index}][content]`;
+                    contentInput.value = tab.content;
+                    form.appendChild(contentInput);
+                });
 
                 // Check if there's a video file being uploaded
                 const videoInput = document.getElementById('video');
@@ -364,7 +426,112 @@
             quill.on('text-change', function() {
                 document.querySelector('#content').value = quill.root.innerHTML;
             });
+
+            // Update intro tab title dynamically
+            document.getElementById('intro_title').addEventListener('input', function(e) {
+                const titleDisplay = document.getElementById('intro-tab-title-display');
+                titleDisplay.textContent = e.target.value || 'Introduktion';
+            });
         });
+
+        // Add new tab function
+        function addNewTab() {
+            const title = document.getElementById('new_tab_title').value.trim();
+            const content = tabQuill.root.innerHTML;
+
+            if (!title) {
+                alert('Indtast en tab titel');
+                return;
+            }
+
+            if (!content || content === '<p><br></p>') {
+                alert('Indtast tab indhold');
+                return;
+            }
+
+            // Generate unique ID
+            const tabId = 'new-tab-' + (++tabCounter);
+
+            // Store tab data
+            tabs.push({
+                id: tabId,
+                title: title,
+                content: content
+            });
+
+            // Add tab to navigation (before the + button)
+            const navList = document.getElementById('lessonTabsNav');
+            const addButton = document.getElementById('add-new-tab-nav').parentElement;
+
+            const newNavItem = document.createElement('li');
+            newNavItem.className = 'nav-item';
+            newNavItem.setAttribute('role', 'presentation');
+            newNavItem.innerHTML = `
+                <button class="nav-link"
+                        id="${tabId}-nav"
+                        data-bs-toggle="tab"
+                        data-bs-target="#${tabId}"
+                        type="button"
+                        role="tab">
+                    ${title}
+                </button>
+            `;
+            navList.insertBefore(newNavItem, addButton);
+
+            // Add tab content pane
+            const tabContent = document.getElementById('lessonTabsContent');
+            const newTabPane = document.createElement('div');
+            newTabPane.className = 'tab-pane fade';
+            newTabPane.id = tabId;
+            newTabPane.setAttribute('role', 'tabpanel');
+            newTabPane.innerHTML = `
+                <div class="mb-3">
+                    <label class="form-label">Tab titel</label>
+                    <input type="text" class="form-control" value="${title}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tab indhold</label>
+                    <div class="border rounded p-3" style="background: #f8f9fa;">
+                        ${content}
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeTab('${tabId}')">
+                    <i class="fa-solid fa-trash me-1"></i> Slet tab
+                </button>
+            `;
+            tabContent.appendChild(newTabPane);
+
+            // Clear form
+            document.getElementById('new_tab_title').value = '';
+            tabQuill.setContents([]);
+
+            // Switch to the newly created tab
+            const newTabButton = document.getElementById(tabId + '-nav');
+            const bsTab = new bootstrap.Tab(newTabButton);
+            bsTab.show();
+        }
+
+        // Remove tab function
+        function removeTab(tabId) {
+            if (!confirm('Er du sikker på at du vil slette denne tab?')) {
+                return;
+            }
+
+            // Remove from tabs array
+            tabs = tabs.filter(tab => tab.id !== tabId);
+
+            // Remove nav item
+            const navItem = document.getElementById(tabId + '-nav').parentElement;
+            navItem.remove();
+
+            // Remove tab pane
+            const tabPane = document.getElementById(tabId);
+            tabPane.remove();
+
+            // Switch to intro tab
+            const introTab = new bootstrap.Tab(document.getElementById('intro-tab-nav'));
+            introTab.show();
+        }
 
         // Preview video with size validation
         function previewVideo(input) {

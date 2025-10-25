@@ -15,7 +15,19 @@
       "Read(//c//**)",
       "Bash(powershell -Command \"(Get-Content ''resources\\views\\admin\\lessons\\edit.blade.php'' | Measure-Object -Line).Lines\")",
       "Bash(powershell -Command \"(Get-Content ''resources\\views\\creator\\resources\\create.blade.php'' | Measure-Object -Line).Lines\")",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_video_path_to_resources_table --table=resources)"
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_video_path_to_resources_table --table=resources)",
+      "Bash(powershell -Command \"Test-Path ''public\\storage''\")",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan storage:link)",
+      "Bash(powershell -Command:*)",
+      "Bash(cmd /c mklink /J publicfiles storageapppublicfiles)",
+      "Bash(cmd /c \"mklink /J public\\files C:\\Users\\Anders\\Dropbox\\__saas\\complero\\storage\\app\\public\\files\")",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan storage:link --force)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_short_description_to_courses_table --table=courses)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_intro_title_to_lessons_table --table=lessons)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker --execute=\"echo json_encode(DB::select(''SELECT id, title, video_path FROM lessons WHERE video_path IS NOT NULL LIMIT 3''));\")",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker --execute=\"echo json_encode(DB::select(''SELECT id, title, video_path FROM resources WHERE video_path IS NOT NULL LIMIT 3''));\")"
     ],
     "deny": [],
     "ask": []

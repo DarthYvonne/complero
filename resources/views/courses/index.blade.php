@@ -34,8 +34,11 @@
                                 <i class="fa-solid fa-circle-play" style="color: {{ $courseColor }};"></i> {{ $course->title }}
                             </h5>
                             <div class="card-text" style="font-size: 14px; font-weight: 300; color: #666; margin-bottom: 15px;">
-                                {!! Str::limit(strip_tags($course->description), 200) !!}
-                                @if(strlen(strip_tags($course->description)) > 200)
+                                @php
+                                    $displayText = $course->short_description ?: strip_tags($course->description);
+                                @endphp
+                                {!! Str::limit($displayText, 200) !!}
+                                @if(strlen($displayText) > 200)
                                     <a href="{{ route('courses.show', $course) }}" style="color: {{ $courseColor }}; text-decoration: underline;">læs resten</a>
                                 @endif
                             </div>

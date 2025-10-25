@@ -105,7 +105,7 @@
                                             data-bs-target="#intro-tab"
                                             type="button"
                                             role="tab">
-                                        Introduktion
+                                        <span id="intro-tab-title-display">{{ $lesson->intro_title ?: 'Introduktion' }}</span>
                                     </button>
                                 </li>
                                 @foreach($lesson->tabs as $index => $tab)
@@ -136,7 +136,17 @@
                             <div class="tab-content" id="lessonTabsContent">
                                 <!-- Introduktion Tab -->
                                 <div class="tab-pane fade show active" id="intro-tab" role="tabpanel">
+                                    <div class="mb-3">
+                                        <label for="intro_title" class="form-label">Tab titel</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="intro_title"
+                                               name="intro_title"
+                                               value="{{ old('intro_title', $lesson->intro_title ?? 'Introduktion') }}"
+                                               placeholder="Introduktion">
+                                    </div>
                                     <div class="mb-0">
+                                        <label for="content" class="form-label">Tab indhold</label>
                                         <div id="content-editor" style="min-height: 250px; background: white;"></div>
                                         <textarea class="form-control @error('content') is-invalid @enderror"
                                                   id="content"
@@ -189,7 +199,7 @@
                                         <textarea id="new_tab_content" style="display: none;"></textarea>
                                     </div>
                                     <button type="button" class="btn btn-primary" onclick="submitTabForm()">
-                                        <i class="fa-solid fa-plus me-1"></i> Tilføj tab
+                                        <i class="fa-solid fa-save me-1"></i> Gem tab
                                     </button>
                                 </div>
                             </div>
@@ -472,6 +482,12 @@
             // Also sync on text change
             quill.on('text-change', function() {
                 document.querySelector('#content').value = quill.root.innerHTML;
+            });
+
+            // Update intro tab title dynamically
+            document.getElementById('intro_title').addEventListener('input', function(e) {
+                const titleDisplay = document.getElementById('intro-tab-title-display');
+                titleDisplay.textContent = e.target.value || 'Introduktion';
             });
 
             // Initialize Quill editor for new tab content

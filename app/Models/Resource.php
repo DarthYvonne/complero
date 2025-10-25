@@ -120,7 +120,7 @@ class Resource extends Model
     public function getImageAttribute()
     {
         if ($this->image_url) {
-            return \Storage::url($this->image_url);
+            return \Storage::disk('files')->url($this->image_url);
         }
         return $this->placeholder_image;
     }
@@ -134,7 +134,13 @@ class Resource extends Model
             return null;
         }
 
-        $url = \Illuminate\Support\Facades\Storage::disk('videos')->url($this->video_path);
+        // Remove 'videos/' prefix if it exists (legacy paths)
+        $path = $this->video_path;
+        if (strpos($path, 'videos/') === 0) {
+            $path = substr($path, 7); // Remove 'videos/' (7 characters)
+        }
+
+        $url = \Illuminate\Support\Facades\Storage::disk('videos')->url($path);
 
         // Always force HTTPS - we're always on HTTPS in production
         $url = str_replace('http://', 'https://', $url);

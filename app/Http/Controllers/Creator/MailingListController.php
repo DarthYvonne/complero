@@ -407,7 +407,7 @@ class MailingListController extends Controller
         }
 
         $validated = $request->validate([
-            'template' => ['required', 'in:simple,modern,split'],
+            'template' => ['required', 'in:simple,modern,split,raw'],
         ]);
 
         $mailingList->update([
@@ -427,7 +427,7 @@ class MailingListController extends Controller
         }
 
         $validated = $request->validate([
-            'template' => ['required', 'in:simple,modern,split'],
+            'template' => ['required', 'in:simple,modern,split,raw'],
             'image' => ['nullable', 'string'],
             'header' => ['nullable', 'string', 'max:255'],
             'body' => ['nullable', 'string', 'max:500'],
@@ -467,11 +467,11 @@ class MailingListController extends Controller
             'image' => ['required', 'image', 'max:2048'], // 2MB max
         ]);
 
-        $path = $request->file('image')->store('signup-forms', 'public');
+        $path = $request->file('image')->store('signup-forms', 'files');
 
         return response()->json([
             'success' => true,
-            'url' => asset('storage/' . $path),
+            'url' => asset('files/' . $path),
         ]);
     }
 

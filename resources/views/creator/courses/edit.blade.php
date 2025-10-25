@@ -221,7 +221,7 @@
                             @if($course->image_url)
                                 <div class="mb-3">
                                     <div class="position-relative d-inline-block">
-                                        <img src="{{ Storage::url($course->image_url) }}"
+                                        <img src="{{ $course->image }}"
                                              alt="{{ $course->title }}"
                                              class="img-thumbnail"
                                              style="max-height: 200px; max-width: 100%;">

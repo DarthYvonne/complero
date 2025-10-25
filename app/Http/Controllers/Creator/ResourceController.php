@@ -110,13 +110,13 @@ class ResourceController extends Controller
 
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
-                $path = $image->store('resources', 'public');
+                $path = $image->store('resources', 'files');
                 $resource->update(['image_url' => $path]);
             }
 
             if ($request->hasFile('files')) {
                 foreach ($request->file('files') as $file) {
-                    $path = $file->store('resource-files', 'public');
+                    $path = $file->store('resource-files', 'files');
 
                     $resource->files()->create([
                         'filename' => $file->getClientOriginalName(),
@@ -236,7 +236,7 @@ class ResourceController extends Controller
         // Handle image removal
         if ($request->has('remove_image') && $request->remove_image) {
             if ($resource->image_url) {
-                Storage::disk('public')->delete($resource->image_url);
+                Storage::disk('files')->delete($resource->image_url);
             }
             $resource->update(['image_url' => null]);
         }
@@ -244,17 +244,17 @@ class ResourceController extends Controller
         // Handle new image upload
         if ($request->hasFile('image')) {
             if ($resource->image_url) {
-                Storage::disk('public')->delete($resource->image_url);
+                Storage::disk('files')->delete($resource->image_url);
             }
 
             $image = $request->file('image');
-            $path = $image->store('resources', 'public');
+            $path = $image->store('resources', 'files');
             $resource->update(['image_url' => $path]);
         }
 
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
-                $path = $file->store('resource-files', 'public');
+                $path = $file->store('resource-files', 'files');
 
                 $resource->files()->create([
                     'filename' => $file->getClientOriginalName(),
@@ -277,11 +277,11 @@ class ResourceController extends Controller
         }
 
         if ($resource->image_url) {
-            Storage::disk('public')->delete($resource->image_url);
+            Storage::disk('files')->delete($resource->image_url);
         }
 
         foreach ($resource->files as $file) {
-            Storage::disk('public')->delete($file->file_path);
+            Storage::disk('files')->delete($file->file_path);
         }
 
         $resource->delete();
@@ -297,7 +297,7 @@ class ResourceController extends Controller
             abort(403);
         }
 
-        Storage::disk('public')->delete($file->file_path);
+        Storage::disk('files')->delete($file->file_path);
         $file->delete();
 
         return back()->with('success', 'Fil slettet succesfuldt');

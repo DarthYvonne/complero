@@ -16,6 +16,7 @@ class Course extends Model
         'title',
         'slug',
         'description',
+        'short_description',
         'intro_title',
         'image_url',
         'price',
@@ -122,7 +123,7 @@ class Course extends Model
     public function getImageAttribute()
     {
         if ($this->image_url) {
-            return \Storage::url($this->image_url);
+            return \Storage::disk('files')->url($this->image_url);
         }
         return $this->placeholder_image;
     }

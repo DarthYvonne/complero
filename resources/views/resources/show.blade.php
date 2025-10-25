@@ -31,7 +31,7 @@
                 <!-- Resource Image -->
                 @if($resource->image_url)
                     <div class="card mb-4">
-                        <img src="{{ Storage::url($resource->image_url) }}" class="card-img-top" alt="{{ $resource->title }}" style="max-height: 400px; object-fit: cover;">
+                        <img src="{{ $resource->image }}" class="card-img-top" alt="{{ $resource->title }}" style="max-height: 400px; object-fit: cover;">
                     </div>
                 @endif
 
@@ -116,7 +116,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <a href="{{ Storage::url($file->file_path) }}" download style="text-decoration: none; white-space: nowrap;">
+                                        <a href="{{ Storage::disk('files')->url($file->file_path) }}" download style="text-decoration: none; white-space: nowrap;">
                                             <i class="fa-solid fa-cloud-arrow-down" style="color: var(--primary-color); font-size: 1.1rem; margin-right: 6px;"></i>
                                             <span style="color: var(--primary-color); font-weight: 500; font-size: 14px;">Hent</span>
                                         </a>

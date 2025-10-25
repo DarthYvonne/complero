@@ -58,7 +58,7 @@
                 <!-- Resource Image -->
                 @if($resource->image_url)
                     <div class="card mb-4">
-                        <img src="{{ Storage::url($resource->image_url) }}" class="card-img-top" alt="{{ $resource->title }}" style="max-height: 400px; object-fit: cover;">
+                        <img src="{{ $resource->image }}" class="card-img-top" alt="{{ $resource->title }}" style="max-height: 400px; object-fit: cover;">
                     </div>
                 @endif
 
@@ -138,7 +138,7 @@
                                         };
                                     @endphp
                                     <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        <a href="{{ Storage::url($file->file_path) }}" target="_blank" class="text-decoration-none flex-grow-1" style="color: inherit;">
+                                        <a href="{{ Storage::disk('files')->url($file->file_path) }}" target="_blank" class="text-decoration-none flex-grow-1" style="color: inherit;">
                                             <i class="fa-solid {{ $iconClass }} me-2" style="color: {{ $iconColor }}; font-size: 1.5rem;"></i>
                                             <strong style="font-size: 14px; font-weight: 500;">{{ $file->filename }}</strong>
                                             <small class="text-muted ms-2">({{ number_format($file->file_size / 1024, 2) }} KB)</small>

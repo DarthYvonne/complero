@@ -55,6 +55,7 @@ class CourseController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'short_description' => ['nullable', 'string'],
             'intro_title' => ['nullable', 'string', 'max:255'],
             'mailing_list_id' => ['nullable', 'exists:mailing_lists,id'],
             'price' => ['nullable', 'numeric', 'min:0'],
@@ -82,7 +83,7 @@ class CourseController extends Controller
         $validated['is_published'] = $request->has('is_published');
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('courses', 'public');
+            $path = $request->file('image')->store('courses', 'files');
             $validated['image_url'] = $path;
         }
 
@@ -144,6 +145,7 @@ class CourseController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'short_description' => ['nullable', 'string'],
             'intro_title' => ['nullable', 'string', 'max:255'],
             'mailing_list_id' => ['nullable', 'exists:mailing_lists,id'],
             'price' => ['nullable', 'numeric', 'min:0'],
@@ -176,7 +178,7 @@ class CourseController extends Controller
 
         // Handle new image upload
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('courses', 'public');
+            $path = $request->file('image')->store('courses', 'files');
             $validated['image_url'] = $path;
         }
 

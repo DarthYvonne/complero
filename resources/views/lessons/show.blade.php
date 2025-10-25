@@ -42,22 +42,26 @@
                 @if($lesson->video_path)
                     <div class="card mb-4">
                         <div class="card-body p-0" style="position: relative; padding-top: 56.25%; /* 16:9 Aspect Ratio */">
+                            @php
+                                $extension = strtolower(pathinfo($lesson->video_path, PATHINFO_EXTENSION));
+                                $mimeTypes = [
+                                    'mp4' => 'video/mp4',
+                                    'webm' => 'video/webm',
+                                    'mov' => 'video/quicktime',
+                                    'avi' => 'video/x-msvideo',
+                                ];
+                                $mimeType = $mimeTypes[$extension] ?? 'video/mp4';
+                                $videoUrl = $lesson->getVideoUrl();
+                            @endphp
                             <video id="lesson-video"
                                    controls
                                    controlsList="nodownload"
+                                   playsinline
                                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000;"
-                                   preload="metadata">
-                                @php
-                                    $extension = strtolower(pathinfo($lesson->video_path, PATHINFO_EXTENSION));
-                                    $mimeTypes = [
-                                        'mp4' => 'video/mp4',
-                                        'webm' => 'video/webm',
-                                        'mov' => 'video/quicktime',
-                                        'avi' => 'video/x-msvideo',
-                                    ];
-                                    $mimeType = $mimeTypes[$extension] ?? 'video/mp4';
-                                @endphp
-                                <source src="{{ $lesson->getVideoUrl() }}" type="{{ $mimeType }}">
+                                   preload="metadata"
+                                   src="{{ $videoUrl }}"
+                                   type="{{ $mimeType }}">
+                                <source src="{{ $videoUrl }}" type="{{ $mimeType }}">
                                 Din browser understøtter ikke videoafspilning.
                             </video>
                         </div>
@@ -72,7 +76,7 @@
                             <ul class="nav nav-tabs card-header-tabs" id="lessonTabs" role="tablist" style="border-bottom: none; margin-bottom: 0;">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="intro-tab" data-bs-toggle="tab" data-bs-target="#intro" type="button" role="tab" aria-controls="intro" aria-selected="true">
-                                        Introduktion
+                                        {{ $lesson->intro_title ?: 'Introduktion' }}
                                     </button>
                                 </li>
                                 @foreach($lesson->tabs as $index => $tab)
@@ -117,42 +121,6 @@
                     @endif
                 </div>
 
-                <!-- Downloadable Files -->
-                @if($lesson->files->count() > 0)
-                    <div class="card mb-4">
-                        <div class="card-header bg-white border-0 py-3">
-                            <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
-                                <i class="fa-solid fa-download" style="color: #2563eb;"></i> Filer til download
-                                <span class="badge bg-secondary ms-2">{{ $lesson->files->count() }}</span>
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="list-group list-group-flush">
-                                @foreach($lesson->files as $file)
-                                    <div class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fa-solid fa-file me-2" style="color: #2563eb; font-size: 1.2rem;"></i>
-                                                    <div>
-                                                        <strong style="font-size: 16px; font-weight: 600; color: #333;">{{ $file->filename }}</strong>
-                                                        <div style="font-size: 13px; font-weight: 300; color: #999;">{{ number_format($file->file_size / 1024, 2) }} KB</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <a href="{{ Storage::url($file->file_path) }}" download class="btn btn-primary">
-                                                    <i class="fa-solid fa-download me-1"></i> Download
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
                 <!-- Lesson Navigation -->
                 <div class="card">
                     <div class="card-body">
@@ -191,6 +159,39 @@
 
             <!-- Sidebar -->
             <div class="col-lg-4">
+                <!-- Downloadable Files -->
+                @if($lesson->files->count() > 0)
+                    <div class="card mb-4">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0" style="font-size: 16px; font-weight: 600; color: #333;">
+                                <i class="fa-solid fa-download" style="color: var(--primary-color);"></i> Filer til download
+                            </h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                @foreach($lesson->files as $file)
+                                    <div class="list-group-item" style="border-left: none; border-right: none; padding: 12px 16px;">
+                                        <div class="d-flex align-items-start justify-content-between">
+                                            <div class="flex-grow-1 me-2">
+                                                <div class="d-flex align-items-start">
+                                                    <i class="fa-solid fa-file me-2" style="color: var(--primary-color); font-size: 1rem; margin-top: 2px;"></i>
+                                                    <div>
+                                                        <div style="font-size: 14px; font-weight: 500; color: #333; word-break: break-word;">{{ $file->filename }}</div>
+                                                        <small style="font-size: 12px; font-weight: 300; color: #999;">{{ number_format($file->file_size / 1024, 2) }} KB</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <a href="{{ Storage::disk('files')->url($file->file_path) }}" download class="btn btn-sm btn-primary" style="flex-shrink: 0;">
+                                                <i class="fa-solid fa-download"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Course Lessons -->
                 <div class="card">
                     <div class="card-header bg-white border-bottom py-3">
