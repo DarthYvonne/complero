@@ -55,7 +55,7 @@
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-muted mb-1 small" style="font-weight: 300;">Mine Lister</p>
+                        <p class="text-muted mb-1 small" style="font-weight: 300;">Mine Grupper</p>
                         <h2 class="mb-0" style="font-size: 28px; font-weight: 700;">{{ $stats['total_mailing_lists'] }}</h2>
                     </div>
                 </div>

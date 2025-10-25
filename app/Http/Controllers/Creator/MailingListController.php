@@ -548,4 +548,175 @@ class MailingListController extends Controller
 
         return back()->with('success', 'Downloads tilbudt succesfuldt');
     }
+
+    /**
+     * Display welcome page editor for the mailing list
+     */
+    public function welcome(MailingList $mailingList)
+    {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
+            abort(403, 'Du har ikke adgang til denne gruppe');
+        }
+
+        return view('creator.mailing-lists.welcome', compact('mailingList'));
+    }
+
+    /**
+     * Update welcome content for the mailing list
+     */
+    public function updateWelcome(Request $request, MailingList $mailingList)
+    {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'welcome_header' => ['nullable', 'string', 'max:255'],
+            'welcome_text' => ['nullable', 'string'],
+            'welcome_image' => ['nullable', 'image', 'max:2048'],
+        ]);
+
+        $data = [
+            'welcome_header' => $validated['welcome_header'],
+            'welcome_text' => $validated['welcome_text'],
+        ];
+
+        // Handle image upload
+        if ($request->hasFile('welcome_image')) {
+            $path = $request->file('welcome_image')->store('welcome-images', 'files');
+            $data['welcome_image'] = $path;
+        }
+
+        $mailingList->update($data);
+
+        return back()->with('success', 'Velkomst opdateret succesfuldt');
+    }
+
+    /**
+     * Display settings page for the mailing list
+     */
+    public function settings(MailingList $mailingList)
+    {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
+            abort(403, 'Du har ikke adgang til denne gruppe');
+        }
+
+        return view('creator.mailing-lists.settings', compact('mailingList'));
+    }
+
+    /**
+     * Update settings for the mailing list
+     */
+    public function updateSettings(Request $request, MailingList $mailingList)
+    {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'organization_name' => ['nullable', 'string', 'max:255'],
+            'website' => ['nullable', 'url', 'max:255'],
+            'responsible_person' => ['nullable', 'string', 'max:255'],
+            'support_email' => ['nullable', 'email', 'max:255'],
+            'primary_color' => ['required', 'string', 'regex:/^#[0-9A-F]{6}$/i'],
+            'secondary_color' => ['required', 'string', 'regex:/^#[0-9A-F]{6}$/i'],
+        ]);
+
+        $mailingList->update($validated);
+
+        return back()->with('success', 'Indstillinger opdateret succesfuldt');
+    }
+
+    /**
+     * Display landing page editor for the mailing list
+     */
+    public function landingPage(MailingList $mailingList)
+    {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
+            abort(403, 'Du har ikke adgang til denne gruppe');
+        }
+
+        return view('creator.mailing-lists.landing-page', compact('mailingList'));
+    }
+
+    /**
+     * Update landing page for the mailing list
+     */
+    public function updateLandingPage(Request $request, MailingList $mailingList)
+    {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'landing_hero_title' => ['nullable', 'string', 'max:255'],
+            'landing_hero_subtitle' => ['nullable', 'string', 'max:255'],
+            'landing_hero_image' => ['nullable', 'image', 'max:2048'],
+            'landing_feature_1' => ['nullable', 'string'],
+            'landing_feature_2' => ['nullable', 'string'],
+            'landing_feature_3' => ['nullable', 'string'],
+            'landing_cta_text' => ['nullable', 'string', 'max:50'],
+            'remove_image' => ['nullable', 'string'],
+        ]);
+
+        $data = [
+            'landing_hero_title' => $validated['landing_hero_title'],
+            'landing_hero_subtitle' => $validated['landing_hero_subtitle'],
+            'landing_feature_1' => $validated['landing_feature_1'],
+            'landing_feature_2' => $validated['landing_feature_2'],
+            'landing_feature_3' => $validated['landing_feature_3'],
+            'landing_cta_text' => $validated['landing_cta_text'],
+        ];
+
+        // Handle image removal
+        if ($request->input('remove_image') == '1') {
+            $data['landing_hero_image'] = null;
+        }
+
+        // Handle image upload
+        if ($request->hasFile('landing_hero_image')) {
+            $path = $request->file('landing_hero_image')->store('landing-images', 'files');
+            $data['landing_hero_image'] = $path;
+        }
+
+        $mailingList->update($data);
+
+        return back()->with('success', 'Landing page opdateret succesfuldt');
+    }
+
+    /**
+     * Display content page for the mailing list
+     */
+    public function content(MailingList $mailingList)
+    {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
+            abort(403, 'Du har ikke adgang til denne gruppe');
+        }
+
+        $mailingList->load(['courses', 'resources']);
+
+        // Get available courses and resources (not yet assigned to this list)
+        $courseQuery = \App\Models\Course::where(function($q) use ($mailingList) {
+            $q->where('mailing_list_id', '!=', $mailingList->id)
+              ->orWhereNull('mailing_list_id');
+        });
+
+        $resourceQuery = \App\Models\Resource::where(function($q) use ($mailingList) {
+            $q->where('mailing_list_id', '!=', $mailingList->id)
+              ->orWhereNull('mailing_list_id');
+        });
+
+        // Only show own content if NOT admin
+        if (auth()->user()->role !== 'admin') {
+            $courseQuery->where('creator_id', auth()->id());
+            $resourceQuery->where('creator_id', auth()->id());
+        }
+
+        $availableCourses = $courseQuery->get();
+        $availableResources = $resourceQuery->get();
+
+        return view('creator.mailing-lists.content', compact('mailingList', 'availableCourses', 'availableResources'));
+    }
 }

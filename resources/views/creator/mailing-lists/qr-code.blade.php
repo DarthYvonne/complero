@@ -1,7 +1,7 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('creator.mailing-lists.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Mailing lister</a>
+    <a href="{{ route('creator.mailing-lists.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Grupper</a>
     <span style="margin: 0 8px;">/</span>
     <a href="{{ route('creator.mailing-lists.show', $mailingList) }}" style="color: #999; text-decoration: none; transition: color 0.2s;">{{ $mailingList->name }}</a>
     <span style="margin: 0 8px;">/</span>
@@ -11,46 +11,58 @@
     <div class="container-fluid">
         <!-- Page Header -->
         <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 0;">
-                        QR Kode: <span style="font-weight: 100;">{{ $mailingList->name }}</span>
-                    </h1>
-                </div>
-                <div class="d-flex gap-2">
-                    <a href="{{ route('creator.mailing-lists.edit', $mailingList) }}" class="btn btn-primary">
-                        <i class="fa-solid fa-pen me-1"></i> Rediger
-                    </a>
-                    <a href="{{ route('creator.mailing-lists.index') }}" class="btn btn-outline-secondary">
-                        <i class="fa-solid fa-arrow-left me-1"></i> Tilbage
-                    </a>
-                </div>
-            </div>
+            <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 0;">
+                Gruppe: <span style="font-weight: 100;">{{ $mailingList->name }}</span>
+            </h1>
         </div>
 
         <!-- Horizontal Tab Menu -->
-        <ul class="nav nav-tabs mb-4" role="tablist">
+        <ul class="nav nav-tabs" style="margin-bottom: 44px;" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link" href="{{ route('creator.mailing-lists.show', $mailingList) }}">
-                    <i class="fa-solid fa-list me-1"></i> Mailingliste
+                    <i class="fa-solid fa-circle-user me-1"></i> Medlemmer
+                </a>
+            </li>
+            <li class="nav-item dropdown" role="presentation">
+                <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                    <i class="fa-solid fa-plus me-1"></i> Sign up
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{{ route('creator.mailing-lists.signup-forms', $mailingList) }}">
+                        <i class="fa-solid fa-code me-2"></i> Forms
+                    </a></li>
+                    <li><a class="dropdown-item active" href="{{ route('creator.mailing-lists.qr-code', $mailingList) }}">
+                        <i class="fa-solid fa-qrcode me-2"></i> QR Code
+                    </a></li>
+                    <li><a class="dropdown-item" href="{{ route('creator.mailing-lists.landing-page', $mailingList) }}">
+                        <i class="fa-solid fa-image me-2"></i> Landing page
+                    </a></li>
+                </ul>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" href="{{ route('creator.mailing-lists.welcome', $mailingList) }}">
+                    <i class="fa-solid fa-heart me-1"></i> Velkomst
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" href="{{ route('creator.mailing-lists.signup-forms', $mailingList) }}">
-                    <i class="fa-solid fa-code me-1"></i> Signup forms
+                <a class="nav-link" href="{{ route('creator.mailing-lists.content', $mailingList) }}">
+                    <i class="fa-solid fa-circle-play me-1"></i> Indhold
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link active" href="{{ route('creator.mailing-lists.qr-code', $mailingList) }}">
-                    <i class="fa-solid fa-qrcode me-1"></i> QR Kode
-                </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link" href="{{ route('creator.mailing-lists.import', $mailingList) }}">
-                    <i class="fa-solid fa-file-import me-1"></i> Importer
+                <a class="nav-link" href="{{ route('creator.mailing-lists.settings', $mailingList) }}">
+                    <i class="fa-solid fa-gear me-1"></i> Indstillinger
                 </a>
             </li>
         </ul>
+
+        <!-- Page Description -->
+        <div class="mb-4">
+            <h2 style="font-size: 20px; font-weight: 600; color: #333;">
+                <i class="fa-solid fa-qrcode me-2" style="color: var(--primary-color);"></i>
+                QR kode - linker til <a href="{{ route('creator.mailing-lists.landing-page', $mailingList) }}" style="color: var(--primary-color); text-decoration: none; font-weight: 100;">landing page</a>
+            </h2>
+        </div>
 
         <div class="row g-4">
             <!-- Main Content -->
@@ -64,25 +76,25 @@
                     </div>
                     <div class="card-body text-center">
                         <p style="font-weight: 300; color: #666; margin-bottom: 30px;">
-                            Scan denne QR kode med en smartphone for at blive ført direkte til tilmeldingsformularen.
+                            Scan denne QR kode med en smartphone for at blive ført direkte til landing page.
                         </p>
 
                         <!-- QR Code Image -->
                         <div class="mb-4">
                             <img id="qrCode"
-                                 src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={{ urlencode(url('/signup/' . $mailingList->slug)) }}"
+                                 src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={{ urlencode(url('/landing/' . $mailingList->slug)) }}"
                                  alt="QR Code for {{ $mailingList->name }}"
                                  style="max-width: 400px; width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; background: white;">
                         </div>
 
                         <!-- Download Buttons -->
                         <div class="d-flex justify-content-center gap-2">
-                            <a href="https://api.qrserver.com/v1/create-qr-code/?size=800x800&data={{ urlencode(url('/signup/' . $mailingList->slug)) }}"
+                            <a href="https://api.qrserver.com/v1/create-qr-code/?size=800x800&data={{ urlencode(url('/landing/' . $mailingList->slug)) }}"
                                download="qr-code-{{ $mailingList->slug }}.png"
                                class="btn btn-primary">
                                 <i class="fa-solid fa-download me-1"></i> Download PNG (800x800)
                             </a>
-                            <a href="https://api.qrserver.com/v1/create-qr-code/?size=2000x2000&data={{ urlencode(url('/signup/' . $mailingList->slug)) }}"
+                            <a href="https://api.qrserver.com/v1/create-qr-code/?size=2000x2000&data={{ urlencode(url('/landing/' . $mailingList->slug)) }}"
                                download="qr-code-{{ $mailingList->slug }}-large.png"
                                class="btn btn-outline-primary">
                                 <i class="fa-solid fa-download me-1"></i> Download PNG (2000x2000)
@@ -107,7 +119,7 @@
                             <input type="text"
                                    class="form-control"
                                    id="qrLink"
-                                   value="{{ url('/signup/' . $mailingList->slug) }}"
+                                   value="{{ url('/landing/' . $mailingList->slug) }}"
                                    readonly>
                             <button class="btn btn-outline-primary"
                                     type="button"
@@ -248,6 +260,14 @@
         .nav-tabs .nav-link:hover {
             color: var(--primary-color);
             border-bottom-color: var(--primary-color);
+        }
+
+        /* Dropdown on hover */
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        .dropdown-menu {
+            margin-top: 0;
         }
     </style>
 </x-app-layout>

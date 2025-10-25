@@ -1,7 +1,7 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <strong style="color: #333; font-weight: 600;">Mailing lister</strong>
+    <strong style="color: #333; font-weight: 600;">Grupper</strong>
 @endsection
 
     <div class="container-fluid">
@@ -10,14 +10,14 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                        <i class="fa-solid fa-envelope" style="color: var(--primary-color);"></i> Mailing lister
+                        <i class="fa-solid fa-users" style="color: var(--primary-color);"></i> Grupper
                     </h1>
                     <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
-                        Administrer mailing lister og medlemmer
+                        Administrer grupper og medlemmer
                     </p>
                 </div>
                 <a href="{{ route('creator.mailing-lists.create') }}" class="btn btn-primary">
-                    <i class="fa-solid fa-circle-plus me-1"></i> Opret liste
+                    <i class="fa-solid fa-circle-plus me-1"></i> Opret gruppe
                 </a>
             </div>
         </div>
@@ -66,11 +66,11 @@
                     </div>
                 @else
                     <div class="text-center py-5">
-                        <i class="fa-solid fa-envelope" style="font-size: 4rem; color: #d1d5db;"></i>
-                        <h5 class="mt-3 mb-2">Ingen mailing lister endnu</h5>
-                        <p class="text-muted mb-3" style="font-weight: 300;">Kom i gang med at oprette din første mailing liste</p>
+                        <i class="fa-solid fa-users" style="font-size: 4rem; color: #d1d5db;"></i>
+                        <h5 class="mt-3 mb-2">Ingen grupper endnu</h5>
+                        <p class="text-muted mb-3" style="font-weight: 300;">Kom i gang med at oprette din første gruppe</p>
                         <a href="{{ route('creator.mailing-lists.create') }}" class="btn btn-primary">
-                            <i class="fa-solid fa-circle-plus me-1"></i> Opret liste
+                            <i class="fa-solid fa-circle-plus me-1"></i> Opret gruppe
                         </a>
                     </div>
                 @endif

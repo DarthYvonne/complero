@@ -20,10 +20,14 @@ Route::get('/', function () {
 Route::get('/signup/{slug}', [\App\Http\Controllers\SignupController::class, 'show'])->name('signup.show');
 Route::post('/signup/{slug}', [\App\Http\Controllers\SignupController::class, 'store'])->name('signup.store');
 
+// Public landing pages
+Route::get('/landing/{slug}', [\App\Http\Controllers\LandingPageController::class, 'show'])->name('landing.show');
+Route::post('/landing/{slug}', [\App\Http\Controllers\LandingPageController::class, 'store'])->name('landing.store');
+
 // Brevo webhook (must be publicly accessible)
 Route::post('/webhooks/brevo', [\App\Http\Controllers\BrevoWebhookController::class, 'handle'])->name('webhooks.brevo');
 
-Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
+Route::get('/velkommen', [\App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -46,7 +50,11 @@ Route::middleware('auth')->group(function () {
 
 // Creator Routes
 Route::middleware(['auth', 'creator-or-admin'])->prefix('creator')->name('creator.')->group(function () {
-    Route::get('/dashboard', [CreatorDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/velkommen', [CreatorDashboardController::class, 'index'])->name('dashboard');
+
+    // Settings
+    Route::get('/settings', [\App\Http\Controllers\Creator\SettingsController::class, 'index'])->name('settings.index');
+    Route::patch('/settings', [\App\Http\Controllers\Creator\SettingsController::class, 'update'])->name('settings.update');
 
     // Course Management (scoped to creator's own courses)
     Route::resource('courses', CreatorCourseController::class);
@@ -79,9 +87,16 @@ Route::middleware(['auth', 'creator-or-admin'])->prefix('creator')->name('creato
 
     // Mailing List Management (scoped to creator's own lists)
     Route::resource('mailing-lists', CreatorMailingListController::class);
+    Route::get('/mailing-lists/{mailing_list}/content', [CreatorMailingListController::class, 'content'])->name('mailing-lists.content');
     Route::get('/mailing-lists/{mailing_list}/signup-forms', [CreatorMailingListController::class, 'signupForms'])->name('mailing-lists.signup-forms');
+    Route::get('/mailing-lists/{mailing_list}/welcome', [CreatorMailingListController::class, 'welcome'])->name('mailing-lists.welcome');
+    Route::patch('/mailing-lists/{mailing_list}/welcome', [CreatorMailingListController::class, 'updateWelcome'])->name('mailing-lists.update-welcome');
     Route::get('/mailing-lists/{mailing_list}/qr-code', [CreatorMailingListController::class, 'qrCode'])->name('mailing-lists.qr-code');
     Route::get('/mailing-lists/{mailing_list}/import', [CreatorMailingListController::class, 'import'])->name('mailing-lists.import');
+    Route::get('/mailing-lists/{mailing_list}/landing-page', [CreatorMailingListController::class, 'landingPage'])->name('mailing-lists.landing-page');
+    Route::patch('/mailing-lists/{mailing_list}/landing-page', [CreatorMailingListController::class, 'updateLandingPage'])->name('mailing-lists.update-landing-page');
+    Route::get('/mailing-lists/{mailing_list}/settings', [CreatorMailingListController::class, 'settings'])->name('mailing-lists.settings');
+    Route::patch('/mailing-lists/{mailing_list}/settings', [CreatorMailingListController::class, 'updateSettings'])->name('mailing-lists.update-settings');
     Route::get('/mailing-lists/download-template', [CreatorMailingListController::class, 'downloadTemplate'])->name('mailing-lists.download-template');
     Route::post('/mailing-lists/{mailing_list}/parse-import', [CreatorMailingListController::class, 'parseImport'])->name('mailing-lists.parse-import');
     Route::post('/mailing-lists/{mailing_list}/process-import', [CreatorMailingListController::class, 'processImport'])->name('mailing-lists.process-import');
@@ -101,7 +116,7 @@ Route::middleware(['auth', 'creator-or-admin'])->prefix('creator')->name('creato
 
 // Admin Routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/velkommen', [DashboardController::class, 'index'])->name('dashboard');
 
     // User Management
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
@@ -162,9 +177,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/mailing-lists/{mailing_list}/edit', [CreatorMailingListController::class, 'edit'])->name('mailing-lists.edit');
     Route::patch('/mailing-lists/{mailing_list}', [CreatorMailingListController::class, 'update'])->name('mailing-lists.update');
     Route::delete('/mailing-lists/{mailing_list}', [CreatorMailingListController::class, 'destroy'])->name('mailing-lists.destroy');
+    Route::get('/mailing-lists/{mailing_list}/content', [CreatorMailingListController::class, 'content'])->name('mailing-lists.content');
     Route::get('/mailing-lists/{mailing_list}/signup-forms', [CreatorMailingListController::class, 'signupForms'])->name('mailing-lists.signup-forms');
+    Route::get('/mailing-lists/{mailing_list}/welcome', [CreatorMailingListController::class, 'welcome'])->name('mailing-lists.welcome');
+    Route::patch('/mailing-lists/{mailing_list}/welcome', [CreatorMailingListController::class, 'updateWelcome'])->name('mailing-lists.update-welcome');
     Route::get('/mailing-lists/{mailing_list}/qr-code', [CreatorMailingListController::class, 'qrCode'])->name('mailing-lists.qr-code');
     Route::get('/mailing-lists/{mailing_list}/import', [CreatorMailingListController::class, 'import'])->name('mailing-lists.import');
+    Route::get('/mailing-lists/{mailing_list}/landing-page', [CreatorMailingListController::class, 'landingPage'])->name('mailing-lists.landing-page');
+    Route::patch('/mailing-lists/{mailing_list}/landing-page', [CreatorMailingListController::class, 'updateLandingPage'])->name('mailing-lists.update-landing-page');
+    Route::get('/mailing-lists/{mailing_list}/settings', [CreatorMailingListController::class, 'settings'])->name('mailing-lists.settings');
+    Route::patch('/mailing-lists/{mailing_list}/settings', [CreatorMailingListController::class, 'updateSettings'])->name('mailing-lists.update-settings');
     Route::get('/mailing-lists/download-template', [CreatorMailingListController::class, 'downloadTemplate'])->name('mailing-lists.download-template');
     Route::post('/mailing-lists/{mailing_list}/parse-import', [CreatorMailingListController::class, 'parseImport'])->name('mailing-lists.parse-import');
     Route::post('/mailing-lists/{mailing_list}/process-import', [CreatorMailingListController::class, 'processImport'])->name('mailing-lists.process-import');

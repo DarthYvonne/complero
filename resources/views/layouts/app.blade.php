@@ -292,7 +292,7 @@
                 <li class="sidebar-label">BRUGER MENU</li>
                 <li>
                     <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                        <i class="fa-solid fa-heart" style="color: var(--primary-color);"></i> Start
+                        <i class="fa-solid fa-heart" style="color: var(--primary-color);"></i> Velkommen
                     </a>
                 </li>
                 <li>
@@ -327,12 +327,17 @@
                     </li>
                     <li>
                         <a href="{{ route('creator.mailing-lists.index') }}" class="{{ request()->routeIs('creator.mailing-lists.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-envelope" style="color: #666;"></i> Mine Lister <span class="menu-badge">{{ $mailingListsCount ?? 0 }}</span>
+                            <i class="fa-solid fa-users" style="color: #666;"></i> Mine Grupper <span class="menu-badge">{{ $mailingListsCount ?? 0 }}</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('creator.emails.index') }}" class="{{ request()->routeIs('creator.emails.*') ? 'active' : '' }}">
                             <i class="fa-solid fa-paper-plane" style="color: #666;"></i> Mine Emails
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('creator.settings.index') }}" class="{{ request()->routeIs('creator.settings.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-gear" style="color: #666;"></i> Indstillinger
                         </a>
                     </li>
                 @endif

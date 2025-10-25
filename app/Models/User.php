@@ -54,6 +54,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get courses created by this user
+     */
+    public function courses()
+    {
+        return $this->hasMany(Course::class, 'creator_id');
+    }
+
+    /**
+     * Get resources created by this user
+     */
+    public function resources()
+    {
+        return $this->hasMany(Resource::class, 'creator_id');
+    }
+
+    /**
      * Get all mailing lists this user is subscribed to
      */
     public function mailingLists()

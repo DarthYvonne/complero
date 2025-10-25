@@ -1,7 +1,7 @@
 <x-app-layout>
 @section('breadcrumbs')
     <span style="margin: 0 8px;">/</span>
-    <a href="{{ route('creator.mailing-lists.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Mailing lister</a>
+    <a href="{{ route('creator.mailing-lists.index') }}" style="color: #999; text-decoration: none; transition: color 0.2s;">Grupper</a>
     <span style="margin: 0 8px;">/</span>
     <a href="{{ route('creator.mailing-lists.show', $mailingList) }}" style="color: #999; text-decoration: none; transition: color 0.2s;">{{ $mailingList->name }}</a>
     <span style="margin: 0 8px;">/</span>
@@ -32,12 +32,22 @@
         <ul class="nav nav-tabs mb-4" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link" href="{{ route('creator.mailing-lists.show', $mailingList) }}">
-                    <i class="fa-solid fa-list me-1"></i> Mailingliste
+                    <i class="fa-solid fa-circle-user me-1"></i> Medlemmer
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" href="{{ route('creator.mailing-lists.content', $mailingList) }}">
+                    <i class="fa-solid fa-box me-1"></i> Indhold
                 </a>
             </li>
             <li class="nav-item" role="presentation">
                 <a class="nav-link" href="{{ route('creator.mailing-lists.signup-forms', $mailingList) }}">
                     <i class="fa-solid fa-code me-1"></i> Signup forms
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" href="{{ route('creator.mailing-lists.welcome', $mailingList) }}">
+                    <i class="fa-solid fa-heart me-1"></i> Velkomst
                 </a>
             </li>
             <li class="nav-item" role="presentation">
@@ -48,6 +58,11 @@
             <li class="nav-item" role="presentation">
                 <a class="nav-link active" href="{{ route('creator.mailing-lists.import', $mailingList) }}">
                     <i class="fa-solid fa-file-import me-1"></i> Importer
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" href="{{ route('creator.mailing-lists.settings', $mailingList) }}">
+                    <i class="fa-solid fa-gear me-1"></i> Indstillinger
                 </a>
             </li>
         </ul>

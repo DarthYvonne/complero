@@ -27,7 +27,13 @@
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_short_description_to_courses_table --table=courses)",
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_intro_title_to_lessons_table --table=lessons)",
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker --execute=\"echo json_encode(DB::select(''SELECT id, title, video_path FROM lessons WHERE video_path IS NOT NULL LIMIT 3''));\")",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker --execute=\"echo json_encode(DB::select(''SELECT id, title, video_path FROM resources WHERE video_path IS NOT NULL LIMIT 3''));\")"
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan tinker --execute=\"echo json_encode(DB::select(''SELECT id, title, video_path FROM resources WHERE video_path IS NOT NULL LIMIT 3''));\")",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/SettingsController)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration add_welcome_fields_to_mailing_lists_table --table=mailing_lists)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan migrate)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration:*)",
+      "Bash(C:\\Users\\Anders\\.config\\herd\\bin\\php.bat artisan make:migration:*)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller LandingPageController)"
     ],
     "deny": [],
     "ask": []
