@@ -12,6 +12,17 @@ use App\Http\Controllers\Creator\ResourceController as CreatorResourceController
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+// Subdomain routes for group authentication (must be first to take precedence)
+Route::domain('{subdomain}.complicero.com')->group(function () {
+    Route::get('/', [\App\Http\Controllers\SubdomainAuthController::class, 'index'])->name('subdomain.index');
+    Route::post('/', [\App\Http\Controllers\SubdomainAuthController::class, 'authenticate'])->name('subdomain.authenticate');
+    Route::get('/signup', [\App\Http\Controllers\SubdomainAuthController::class, 'signup'])->name('subdomain.signup');
+    Route::post('/signup', [\App\Http\Controllers\SubdomainAuthController::class, 'register'])->name('subdomain.register');
+    Route::get('/forgot-password', [\App\Http\Controllers\SubdomainAuthController::class, 'forgotPassword'])->name('subdomain.forgot-password');
+    Route::post('/forgot-password', [\App\Http\Controllers\SubdomainAuthController::class, 'sendResetLink'])->name('subdomain.send-reset-link');
+    Route::post('/logout', [\App\Http\Controllers\SubdomainAuthController::class, 'logout'])->name('subdomain.logout');
+});
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -26,17 +37,6 @@ Route::post('/landing/{slug}', [\App\Http\Controllers\LandingPageController::cla
 
 // Brevo webhook (must be publicly accessible)
 Route::post('/webhooks/brevo', [\App\Http\Controllers\BrevoWebhookController::class, 'handle'])->name('webhooks.brevo');
-
-// Subdomain routes for group authentication
-Route::domain('{subdomain}.complicero.com')->group(function () {
-    Route::get('/', [\App\Http\Controllers\SubdomainAuthController::class, 'index'])->name('subdomain.index');
-    Route::post('/', [\App\Http\Controllers\SubdomainAuthController::class, 'authenticate'])->name('subdomain.authenticate');
-    Route::get('/signup', [\App\Http\Controllers\SubdomainAuthController::class, 'signup'])->name('subdomain.signup');
-    Route::post('/signup', [\App\Http\Controllers\SubdomainAuthController::class, 'register'])->name('subdomain.register');
-    Route::get('/forgot-password', [\App\Http\Controllers\SubdomainAuthController::class, 'forgotPassword'])->name('subdomain.forgot-password');
-    Route::post('/forgot-password', [\App\Http\Controllers\SubdomainAuthController::class, 'sendResetLink'])->name('subdomain.send-reset-link');
-    Route::post('/logout', [\App\Http\Controllers\SubdomainAuthController::class, 'logout'])->name('subdomain.logout');
-});
 
 Route::get('/velkommen', [\App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
