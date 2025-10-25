@@ -445,10 +445,10 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.available) {
-                            statusElement.innerHTML = '<i class="fa-solid fa-check me-1"></i> ' + subdomain + '.complicero.com er ledig';
+                            statusElement.innerHTML = '<i class="fa-solid fa-check me-1"></i> Ledigt';
                             statusElement.className = 'form-text text-success d-block mt-2';
                         } else {
-                            statusElement.innerHTML = '<i class="fa-solid fa-xmark me-1"></i> Dette subdomain er allerede taget';
+                            statusElement.innerHTML = '<i class="fa-solid fa-xmark me-1"></i> Optaget';
                             statusElement.className = 'form-text text-danger d-block mt-2';
                         }
                     })

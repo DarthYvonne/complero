@@ -30,8 +30,7 @@ Route::post('/webhooks/brevo', [\App\Http\Controllers\BrevoWebhookController::cl
 // Subdomain routes for group authentication
 Route::domain('{subdomain}.complicero.com')->group(function () {
     Route::get('/', [\App\Http\Controllers\SubdomainAuthController::class, 'index'])->name('subdomain.index');
-    Route::get('/login', [\App\Http\Controllers\SubdomainAuthController::class, 'login'])->name('subdomain.login');
-    Route::post('/login', [\App\Http\Controllers\SubdomainAuthController::class, 'authenticate'])->name('subdomain.authenticate');
+    Route::post('/', [\App\Http\Controllers\SubdomainAuthController::class, 'authenticate'])->name('subdomain.authenticate');
     Route::get('/signup', [\App\Http\Controllers\SubdomainAuthController::class, 'signup'])->name('subdomain.signup');
     Route::post('/signup', [\App\Http\Controllers\SubdomainAuthController::class, 'register'])->name('subdomain.register');
     Route::get('/forgot-password', [\App\Http\Controllers\SubdomainAuthController::class, 'forgotPassword'])->name('subdomain.forgot-password');

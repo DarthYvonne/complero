@@ -378,7 +378,7 @@
             } else if (formName === 'forgotPassword') {
                 history.pushState({}, '', '{{ route('subdomain.forgot-password', $mailingList->subdomain) }}');
             } else {
-                history.pushState({}, '', '{{ route('subdomain.index', $mailingList->subdomain) }}');
+                history.pushState({}, '', '{{ route('subdomain.login', $mailingList->subdomain) }}');
             }
         }
     </script>

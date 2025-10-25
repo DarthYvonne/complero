@@ -32,16 +32,7 @@ class SubdomainAuthController extends Controller
             return redirect()->route('dashboard');
         }
 
-        // Otherwise show login page
-        return $this->login($request, $subdomain);
-    }
-
-    /**
-     * Show login form
-     */
-    public function login(Request $request, $subdomain)
-    {
-        $mailingList = $this->getMailingList($subdomain);
+        // Otherwise show login page at root
         return view('subdomain.auth', compact('mailingList'));
     }
 
