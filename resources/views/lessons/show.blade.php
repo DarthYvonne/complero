@@ -41,7 +41,7 @@
                 <!-- Video Player -->
                 @if($lesson->video_path)
                     <div class="card mb-4">
-                        <div class="card-body p-0" style="position: relative; padding-top: 56.25%; /* 16:9 Aspect Ratio */">
+                        <div class="card-body p-0">
                             @php
                                 $extension = strtolower(pathinfo($lesson->video_path, PATHINFO_EXTENSION));
                                 $mimeTypes = [
@@ -53,17 +53,17 @@
                                 $mimeType = $mimeTypes[$extension] ?? 'video/mp4';
                                 $videoUrl = $lesson->getVideoUrl();
                             @endphp
-                            <video id="lesson-video"
-                                   controls
-                                   controlsList="nodownload"
-                                   playsinline
-                                   style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000;"
-                                   preload="metadata"
-                                   src="{{ $videoUrl }}"
-                                   type="{{ $mimeType }}">
-                                <source src="{{ $videoUrl }}" type="{{ $mimeType }}">
-                                Din browser understøtter ikke videoafspilning.
-                            </video>
+                            <div style="position: relative; width: 100%; padding-top: 56.25%;">
+                                <video id="lesson-video"
+                                       controls
+                                       controlsList="nodownload"
+                                       playsinline
+                                       style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000;"
+                                       preload="metadata">
+                                    <source src="{{ $videoUrl }}" type="{{ $mimeType }}">
+                                    Din browser understøtter ikke videoafspilning.
+                                </video>
+                            </div>
                         </div>
                     </div>
                 @endif
