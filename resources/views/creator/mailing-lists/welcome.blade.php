@@ -12,7 +12,7 @@
         <!-- Page Header -->
         <div class="mb-4">
             <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 0;">
-                Gruppe: <span style="font-weight: 100;">{{ $mailingList->name }}</span>
+                Gruppe: <span style="font-weight: 100;">{{ $mailingList->name }} ({{ $mailingList->activeMembers->count() }})</span>
             </h1>
         </div>
 
@@ -21,6 +21,11 @@
             <li class="nav-item" role="presentation">
                 <a class="nav-link" href="{{ route('creator.mailing-lists.show', $mailingList) }}">
                     <i class="fa-solid fa-circle-user me-1"></i> Medlemmer
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" href="{{ route('creator.mailing-lists.emails', $mailingList) }}">
+                    <i class="fa-solid fa-paper-plane me-1"></i> Email
                 </a>
             </li>
             <li class="nav-item dropdown" role="presentation">
@@ -135,40 +140,39 @@
                                 Upload et billede der vises sammen med velkomstteksten.
                             </p>
 
-                            <!-- Current Image Preview -->
-                            @if($mailingList->welcome_image)
-                                <div class="mb-3">
-                                    <label class="form-label" style="font-weight: 500;">Nuværende billede</label>
-                                    <div class="text-center">
+                            <!-- Image Upload -->
+                            <div class="mb-0">
+                                <label for="welcome_image" class="form-label" style="font-weight: 500;">Billede</label>
+                                @if($mailingList->welcome_image)
+                                    <div class="mb-3">
                                         <img src="{{ asset('files/' . $mailingList->welcome_image) }}"
                                              alt="Velkomstbillede"
-                                             style="max-width: 100%; border: 1px solid #e0e0e0; border-radius: 8px;">
+                                             style="max-width: 100%; border-radius: 4px;">
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeWelcomeImage()">
+                                                <i class="fa-solid fa-trash me-1"></i> Fjern billede
+                                            </button>
+                                        </div>
+                                        <input type="hidden" id="remove_welcome_image" name="remove_welcome_image" value="0">
                                     </div>
-                                </div>
-                            @endif
-
-                            <!-- Image Upload -->
-                            <div class="mb-3">
-                                <label for="welcome_image" class="form-label" style="font-weight: 500;">
-                                    {{ $mailingList->welcome_image ? 'Skift billede' : 'Upload billede' }}
-                                </label>
-                                <input type="file"
-                                       class="form-control"
-                                       id="welcome_image"
-                                       name="welcome_image"
-                                       accept="image/*"
-                                       onchange="previewImage(this)">
-                                <div class="form-text">Maksimal filstørrelse: 2MB</div>
-                            </div>
-
-                            <!-- Image Preview -->
-                            <div id="image-preview" class="mt-3" style="display: none;">
-                                <label class="form-label" style="font-weight: 500;">Forhåndsvisning</label>
-                                <div class="text-center">
-                                    <img id="preview-img"
-                                         src=""
-                                         alt="Forhåndsvisning"
-                                         style="max-width: 100%; border: 1px solid #e0e0e0; border-radius: 8px;">
+                                @endif
+                                <div class="upload-zone" id="upload-zone-welcome" onclick="document.getElementById('welcome_image').click()">
+                                    <input type="file" class="d-none" id="welcome_image" name="welcome_image" accept="image/*" onchange="previewWelcomeImage(this)">
+                                    <div class="text-center py-4">
+                                        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 3rem; color: #cbd5e1;"></i>
+                                        <p class="mb-1 mt-3" style="font-weight: 500; color: #64748b;">
+                                            @if($mailingList->welcome_image)
+                                                Klik for at uploade nyt billede
+                                            @else
+                                                Klik for at uploade billede
+                                            @endif
+                                        </p>
+                                        <p class="small mb-0" style="color: #94a3b8;">eller træk og slip en fil her</p>
+                                        <p class="small text-muted mt-2">Max 2MB. JPG, PNG eller WebP</p>
+                                    </div>
+                                    <div id="image-preview-welcome" class="mt-3" style="display: none;">
+                                        <img src="" alt="Preview" class="img-thumbnail" style="max-height: 200px;">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -222,6 +226,18 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+        .upload-zone:hover {
+            border-color: var(--primary-color);
+            background: #f1f5f9;
+        }
+
         /* Dropdown on hover */
         .nav-item.dropdown:hover .dropdown-menu {
             display: block;
@@ -267,16 +283,68 @@
         });
 
         // Image preview function
-        function previewImage(input) {
+        function previewWelcomeImage(input) {
+            const preview = document.getElementById('image-preview-welcome');
+            const previewImg = preview.querySelector('img');
+
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-
                 reader.onload = function(e) {
-                    document.getElementById('preview-img').src = e.target.result;
-                    document.getElementById('image-preview').style.display = 'block';
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
                 };
-
                 reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Remove image function
+        function removeWelcomeImage() {
+            if (confirm('Er du sikker på at du vil fjerne billedet?')) {
+                document.getElementById('remove_welcome_image').value = '1';
+                document.querySelector('form').submit();
+            }
+        }
+
+        // Drag and drop functionality
+        const uploadZoneWelcome = document.getElementById('upload-zone-welcome');
+        const fileInputWelcome = document.getElementById('welcome_image');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadZoneWelcome.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadZoneWelcome.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadZoneWelcome.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            uploadZoneWelcome.style.borderColor = 'var(--primary-color)';
+            uploadZoneWelcome.style.background = '#f1f5f9';
+        }
+
+        function unhighlight(e) {
+            uploadZoneWelcome.style.borderColor = '#cbd5e1';
+            uploadZoneWelcome.style.background = '#f8fafc';
+        }
+
+        uploadZoneWelcome.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length) {
+                fileInputWelcome.files = files;
+                previewWelcomeImage(fileInputWelcome);
             }
         }
     </script>

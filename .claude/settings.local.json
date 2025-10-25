@@ -33,7 +33,10 @@
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan migrate)",
       "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:migration:*)",
       "Bash(C:\\Users\\Anders\\.config\\herd\\bin\\php.bat artisan make:migration:*)",
-      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller LandingPageController)"
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller LandingPageController)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller ContentController)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller Creator/ContentController)",
+      "Bash(\"C:\\Users\\Anders\\.config\\herd\\bin\\php.bat\" artisan make:controller SubdomainAuthController)"
     ],
     "deny": [],
     "ask": []

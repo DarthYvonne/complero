@@ -29,7 +29,7 @@
                 @endphp
                 <div class="col-md-6 col-lg-4">
                     <div class="card clickable-card" data-href="{{ route('resources.show', $resource) }}" style="cursor: pointer;">
-                        <img src="{{ $resource->image }}" class="card-img-top" alt="{{ $resource->title }}" style="height: 200px; object-fit: cover;">
+                        <img src="{{ $resource->image }}" class="card-img-top" alt="{{ $resource->title }}" style="aspect-ratio: 16/9; object-fit: cover;">
                         <div class="card-body">
                             <h5 class="card-title" style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 10px;">
                                 <i class="fa-solid fa-photo-film" style="color: {{ $resourceColor }};"></i> {{ $resource->title }}

@@ -12,7 +12,7 @@
         <!-- Page Header -->
         <div class="mb-4">
             <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 0;">
-                Gruppe: <span style="font-weight: 100;">{{ $mailingList->name }}</span>
+                Gruppe: <span style="font-weight: 100;">{{ $mailingList->name }} ({{ $mailingList->activeMembers->count() }})</span>
             </h1>
         </div>
 
@@ -21,6 +21,11 @@
             <li class="nav-item" role="presentation">
                 <a class="nav-link" href="{{ route('creator.mailing-lists.show', $mailingList) }}">
                     <i class="fa-solid fa-circle-user me-1"></i> Medlemmer
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" href="{{ route('creator.mailing-lists.emails', $mailingList) }}">
+                    <i class="fa-solid fa-paper-plane me-1"></i> Email
                 </a>
             </li>
             <li class="nav-item dropdown" role="presentation">

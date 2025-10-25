@@ -316,23 +316,13 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('creator.courses.index') }}" class="{{ request()->routeIs('creator.courses.*') || request()->routeIs('creator.lessons.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-circle-play" style="color: #666;"></i> Mine Forløb <span class="menu-badge">{{ $coursesCount ?? 0 }}</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('creator.resources.index') }}" class="{{ request()->routeIs('creator.resources.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-photo-film" style="color: #666;"></i> Mine Materialer <span class="menu-badge">{{ $resourcesCount ?? 0 }}</span>
+                        <a href="{{ route('creator.content.index') }}" class="{{ request()->routeIs('creator.content.*') || request()->routeIs('creator.courses.*') || request()->routeIs('creator.resources.*') || request()->routeIs('creator.lessons.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-book-open" style="color: #666;"></i> Indhold <span class="menu-badge">{{ ($coursesCount ?? 0) + ($resourcesCount ?? 0) }}</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('creator.mailing-lists.index') }}" class="{{ request()->routeIs('creator.mailing-lists.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-users" style="color: #666;"></i> Mine Grupper <span class="menu-badge">{{ $mailingListsCount ?? 0 }}</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('creator.emails.index') }}" class="{{ request()->routeIs('creator.emails.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-paper-plane" style="color: #666;"></i> Mine Emails
+                            <i class="fa-solid fa-user-group" style="color: #666;"></i> Grupper <span class="menu-badge">{{ $mailingListsCount ?? 0 }}</span>
                         </a>
                     </li>
                     <li>

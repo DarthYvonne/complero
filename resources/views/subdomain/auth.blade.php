@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log ind på {{ $mailingList->name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: {{ $mailingList->primary_color ?? '#be185d' }};
+            --primary-hover: {{ $mailingList->secondary_color ?? '#9f1239' }};
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            max-width: 480px;
+            width: 100%;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 40px 40px 30px;
+            text-align: center;
+        }
+
+        .auth-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 10px;
+        }
+
+        .auth-header p {
+            font-size: 16px;
+            font-weight: 300;
+            margin: 0;
+            opacity: 0.95;
+        }
+
+        .auth-body {
+            padding: 40px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 12px 16px;
+            font-size: 15px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(190, 24, 93, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .auth-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .auth-links a:hover {
+            opacity: 0.8;
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>{{ $mailingList->name }}</h1>
+                @if($mailingList->description)
+                    <p>{{ $mailingList->description }}</p>
+                @endif
+            </div>
+
+            <div class="auth-body">
+                <!-- Login Form -->
+                <div class="form-section {{ !isset($showSignup) && !isset($showForgotPassword) ? 'active' : '' }}" id="loginForm">
+                    <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align: center;">
+                        Log ind på {{ $mailingList->name }}
+                    </h2>
+
+                    @if ($errors->any() && !isset($showSignup) && !isset($showForgotPassword))
+                        <div class="alert alert-danger">
+                            @foreach ($errors->all() as $error)
+                                {{ $error }}
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <form action="{{ route('subdomain.authenticate', $mailingList->subdomain) }}" method="POST">
+                        @csrf
+
+                        <div class="mb-3">
+                            <label for="login_email" class="form-label">Email</label>
+                            <input type="email"
+                                   class="form-control"
+                                   id="login_email"
+                                   name="email"
+                                   value="{{ old('email') }}"
+                                   required
+                                   autofocus>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="login_password" class="form-label">Adgangskode</label>
+                            <input type="password"
+                                   class="form-control"
+                                   id="login_password"
+                                   name="password"
+                                   required>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="remember"
+                                   name="remember">
+                            <label class="form-check-label" for="remember">
+                                Husk mig
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i> Log ind
+                        </button>
+                    </form>
+
+                    <div class="auth-links">
+                        <div class="mb-2">
+                            <a href="#" onclick="showForm('signup'); return false;">
+                                <i class="fa-solid fa-user-plus me-1"></i> Ikke medlem? Bliv medlem her
+                            </a>
+                        </div>
+                        <div>
+                            <a href="#" onclick="showForm('forgotPassword'); return false;">
+                                <i class="fa-solid fa-key me-1"></i> Glemt adgangskode?
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signup Form -->
+                <div class="form-section {{ isset($showSignup) ? 'active' : '' }}" id="signupForm">
+                    <a href="#" class="back-link" onclick="showForm('login'); return false;">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til login
+                    </a>
+
+                    <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align: center;">
+                        Bliv medlem
+                    </h2>
+
+                    @if ($errors->any() && isset($showSignup))
+                        <div class="alert alert-danger">
+                            @foreach ($errors->all() as $error)
+                                {{ $error }}
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <form action="{{ route('subdomain.register', $mailingList->subdomain) }}" method="POST">
+                        @csrf
+
+                        <div class="mb-3">
+                            <label for="signup_name" class="form-label">Navn</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="signup_name"
+                                   name="name"
+                                   value="{{ old('name') }}"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="signup_email" class="form-label">Email</label>
+                            <input type="email"
+                                   class="form-control"
+                                   id="signup_email"
+                                   name="email"
+                                   value="{{ old('email') }}"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="signup_password" class="form-label">Adgangskode</label>
+                            <input type="password"
+                                   class="form-control"
+                                   id="signup_password"
+                                   name="password"
+                                   required>
+                            <small class="form-text text-muted">Minimum 8 tegn</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="signup_password_confirmation" class="form-label">Bekræft adgangskode</label>
+                            <input type="password"
+                                   class="form-control"
+                                   id="signup_password_confirmation"
+                                   name="password_confirmation"
+                                   required>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="signup_remember"
+                                   name="remember">
+                            <label class="form-check-label" for="signup_remember">
+                                Husk mig
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-user-plus me-2"></i> Opret konto
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Forgot Password Form -->
+                <div class="form-section {{ isset($showForgotPassword) ? 'active' : '' }}" id="forgotPasswordForm">
+                    <a href="#" class="back-link" onclick="showForm('login'); return false;">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Tilbage til login
+                    </a>
+
+                    <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align: center;">
+                        Glemt adgangskode
+                    </h2>
+
+                    @if (session('status'))
+                        <div class="alert alert-success">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                    @if ($errors->any() && isset($showForgotPassword))
+                        <div class="alert alert-danger">
+                            @foreach ($errors->all() as $error)
+                                {{ $error }}
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <p style="color: #666; margin-bottom: 24px; text-align: center;">
+                        Indtast din email, så sender vi dig et link til at nulstille din adgangskode.
+                    </p>
+
+                    <form action="{{ route('subdomain.send-reset-link', $mailingList->subdomain) }}" method="POST">
+                        @csrf
+
+                        <div class="mb-3">
+                            <label for="forgot_email" class="form-label">Email</label>
+                            <input type="email"
+                                   class="form-control"
+                                   id="forgot_email"
+                                   name="email"
+                                   required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-paper-plane me-2"></i> Send link
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        @if($mailingList->organization_name)
+            <div style="text-align: center; margin-top: 20px; color: white;">
+                <small>
+                    Leveret af
+                    @if($mailingList->website)
+                        <a href="{{ $mailingList->website }}" target="_blank" style="color: white; text-decoration: underline;">
+                            {{ $mailingList->organization_name }}
+                        </a>
+                    @else
+                        {{ $mailingList->organization_name }}
+                    @endif
+                </small>
+            </div>
+        @endif
+    </div>
+
+    <script>
+        function showForm(formName) {
+            // Hide all forms
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected form
+            document.getElementById(formName + 'Form').classList.add('active');
+
+            // Update URL without page reload
+            if (formName === 'signup') {
+                history.pushState({}, '', '{{ route('subdomain.signup', $mailingList->subdomain) }}');
+            } else if (formName === 'forgotPassword') {
+                history.pushState({}, '', '{{ route('subdomain.forgot-password', $mailingList->subdomain) }}');
+            } else {
+                history.pushState({}, '', '{{ route('subdomain.login', $mailingList->subdomain) }}');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -11,7 +11,7 @@
 
 <div class="col-md-6 col-lg-4">
     <div class="card clickable-card" data-href="{{ route('creator.courses.show', $course) }}" style="cursor: pointer;">
-        <img src="{{ $course->image }}" class="card-img-top" alt="{{ $course->title }}" style="height: 200px; object-fit: cover;">
+        <img src="{{ $course->image }}" class="card-img-top" alt="{{ $course->title }}" style="aspect-ratio: 16/9; object-fit: cover;">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <h5 class="card-title mb-0" style="font-size: 18px; font-weight: 600; color: #333;">

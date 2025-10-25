@@ -12,7 +12,7 @@
         <!-- Page Header -->
         <div class="mb-4">
             <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 0;">
-                Gruppe: <span style="font-weight: 100;">{{ $mailingList->name }}</span>
+                Gruppe: <span style="font-weight: 100;">{{ $mailingList->name }} ({{ $mailingList->activeMembers->count() }})</span>
             </h1>
         </div>
 
@@ -21,6 +21,11 @@
             <li class="nav-item" role="presentation">
                 <a class="nav-link" href="{{ route('creator.mailing-lists.show', $mailingList) }}">
                     <i class="fa-solid fa-circle-user me-1"></i> Medlemmer
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" href="{{ route('creator.mailing-lists.emails', $mailingList) }}">
+                    <i class="fa-solid fa-paper-plane me-1"></i> Email
                 </a>
             </li>
             <li class="nav-item dropdown" role="presentation">
@@ -118,6 +123,38 @@
                                 @error('description')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subdomain -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0" style="font-size: 18px; font-weight: 600; color: #333;">
+                                URL for gruppen
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p style="font-weight: 300; color: #666; margin-bottom: 20px;">
+                                Opret en dedikeret login-side til denne gruppe på et subdomæne.
+                            </p>
+                            <div class="mb-0">
+                                <div class="input-group">
+                                    <input type="text"
+                                           class="form-control @error('subdomain') is-invalid @enderror"
+                                           id="subdomain"
+                                           name="subdomain"
+                                           value="{{ old('subdomain', $mailingList->subdomain) }}"
+                                           placeholder="mingruppe"
+                                           oninput="this.value = this.value.toLowerCase(); checkSubdomainAvailability(this.value)">
+                                    <span class="input-group-text">.complicero.com</span>
+                                    @error('subdomain')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <small id="subdomain-status" class="form-text d-block mt-2"></small>
                             </div>
                         </div>
                     </div>
@@ -386,6 +423,40 @@
                 document.body.appendChild(form);
                 form.submit();
             }
+        }
+
+        // Check subdomain availability
+        let subdomainCheckTimeout;
+        function checkSubdomainAvailability(subdomain) {
+            clearTimeout(subdomainCheckTimeout);
+            const statusElement = document.getElementById('subdomain-status');
+
+            if (!subdomain) {
+                statusElement.textContent = '';
+                statusElement.className = 'form-text';
+                return;
+            }
+
+            statusElement.textContent = 'Tjekker...';
+            statusElement.className = 'form-text text-muted d-block mt-2';
+
+            subdomainCheckTimeout = setTimeout(() => {
+                fetch('/creator/mailing-lists/check-subdomain?subdomain=' + encodeURIComponent(subdomain) + '&current_id={{ $mailingList->id }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.available) {
+                            statusElement.innerHTML = '<i class="fa-solid fa-check me-1"></i> ' + subdomain + '.complicero.com er ledig';
+                            statusElement.className = 'form-text text-success d-block mt-2';
+                        } else {
+                            statusElement.innerHTML = '<i class="fa-solid fa-xmark me-1"></i> Dette subdomain er allerede taget';
+                            statusElement.className = 'form-text text-danger d-block mt-2';
+                        }
+                    })
+                    .catch(error => {
+                        statusElement.textContent = '';
+                        statusElement.className = 'form-text d-block mt-2';
+                    });
+            }, 500);
         }
     </script>
 </x-app-layout>

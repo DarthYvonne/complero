@@ -14,6 +14,7 @@ class MailingList extends Model
         'creator_id',
         'name',
         'slug',
+        'subdomain',
         'description',
         'is_active',
         'signup_form_template',

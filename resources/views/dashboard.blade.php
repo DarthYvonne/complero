@@ -33,7 +33,7 @@
                             </select>
                         </div>
                     @endif
-                    @if($selectedGroup && in_array($user->role, ['creator', 'admin']))
+                    @if($selectedGroup && ($user->role === 'admin' || ($user->role === 'creator' && $selectedGroup->creator_id === $user->id)))
                         <div>
                             <a href="{{ route('creator.mailing-lists.welcome', $selectedGroup) }}" class="btn btn-outline-primary">
                                 <i class="fa-solid fa-pen me-1"></i> REDIGER VELKOMST
@@ -50,7 +50,7 @@
                 <div class="card-body p-0">
                     <div class="row g-0">
                         <!-- Left: Text Content -->
-                        <div class="col-md-6 p-4">
+                        <div class="col-md-7 p-4">
                             <h2 style="font-size: 28px; font-weight: 700; color: #333; margin-bottom: 10px;">
                                 {{ $selectedGroup->name }}
                             </h2>
@@ -74,7 +74,7 @@
                         </div>
                         <!-- Right: Image -->
                         @if($selectedGroup->welcome_image)
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <img src="{{ asset('files/' . $selectedGroup->welcome_image) }}"
                                      alt="{{ $selectedGroup->name }}"
                                      style="width: 100%; height: 100%; object-fit: cover; min-height: 300px;"
@@ -89,18 +89,15 @@
         <!-- Two Column Layout -->
         <div class="row g-4">
             <!-- Left Column: Continue Learning -->
-            <div class="col-lg-6">
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-header bg-white py-3">
                         <h2 style="font-size: 20px; font-weight: 600; color: #333; margin: 0;">Fortsæt forløb</h2>
-                        @if($enrolledCourses->count() > 0)
-                            <a href="{{ route('courses.index') }}" class="text-decoration-none" style="color: var(--primary-color); font-size: 14px; font-weight: 400;">Se alle forløb</a>
-                        @endif
                     </div>
-
-                    @if($enrolledCourses->count() > 0)
-                        <!-- Enrolled Courses Grid -->
-                        @foreach($enrolledCourses as $enrollment)
+                    <div class="card-body">
+                        @if($enrolledCourses->count() > 0)
+                            <!-- Enrolled Courses Grid -->
+                            @foreach($enrolledCourses as $enrollment)
                             @php
                                 $course = $enrollment->course;
                                 $courseColor = $course->primary_color ?? '#be185d';
@@ -111,7 +108,7 @@
                                 $hoverColor = sprintf("#%02x%02x%02x", $r, $g, $b);
                             @endphp
                             <div class="card mb-3">
-                                <img src="{{ $course->image }}" class="card-img-top" alt="{{ $course->title }}" style="height: 200px; object-fit: cover;">
+                                <img src="{{ $course->image }}" class="card-img-top" alt="{{ $course->title }}" style="aspect-ratio: 16/9; object-fit: cover;">
                                 <div class="card-body">
                                     <h5 class="card-title" style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 10px;">
                                         <i class="fa-solid fa-circle-play" style="color: {{ $courseColor }};"></i> {{ $course->title }}
@@ -138,38 +135,38 @@
                                     @endif
                                 </div>
                             </div>
-                        @endforeach
-                    @else
-                        <!-- Placeholder for no enrolled courses -->
-                        <div class="card text-center py-5">
-                            <div class="card-body">
+                            @endforeach
+                        @else
+                            <!-- Placeholder for no enrolled courses -->
+                            <div class="text-center py-5">
                                 <i class="fa-solid fa-circle-play" style="font-size: 3rem; color: #d1d5db;"></i>
                                 <h5 class="mt-3 mb-2">Ingen igangværende kurser</h5>
                                 <p class="text-muted mb-3" style="font-weight: 300;">Start med at udforske vores tilgængelige indhold</p>
                                 <a href="{{ route('courses.index') }}" class="btn btn-primary">Udforsk indhold</a>
                             </div>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
             </div>
 
             <!-- Right Column: Email Archive -->
-            <div class="col-lg-6">
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header bg-white py-3">
                         <h2 style="font-size: 20px; font-weight: 600; color: #333; margin: 0;">Nyhedsbreve du har modtaget</h2>
                     </div>
-
-                    @if($selectedGroup && $groupEmails->count() > 0)
-                        <!-- Email List -->
-                        <div class="d-flex flex-column gap-3">
-                            @foreach($groupEmails as $email)
-                                <div class="card email-card" style="cursor: pointer;" onclick="openEmailModal({{ json_encode([
-                                    'subject' => $email->subject,
-                                    'sent_at' => $email->sent_at ? $email->sent_at->format('d/m/Y H:i') : 'Ikke sendt endnu',
-                                    'body' => $email->body
-                                ]) }})">
-                                    <div class="card-body">
+                    <div class="card-body p-0">
+                        @if($selectedGroup && $groupEmails->count() > 0)
+                            <!-- Email List -->
+                            <div style="height: 500px; overflow-y: auto; padding: 1rem;">
+                                <div class="d-flex flex-column gap-3">
+                                    @foreach($groupEmails as $email)
+                                        <div class="card email-card" style="cursor: pointer;" onclick="openEmailModal({{ json_encode([
+                                            'subject' => $email->subject,
+                                            'sent_at' => $email->sent_at ? $email->sent_at->format('d/m/Y H:i') : 'Ikke sendt endnu',
+                                            'body' => $email->body
+                                        ]) }})">
+                                            <div class="card-body">
                                         <h5 class="card-title" style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 5px;">
                                             <i class="fa-solid fa-envelope" style="color: var(--primary-color);"></i> {{ $email->subject }}
                                         </h5>
@@ -181,20 +178,20 @@
                                                 {{ Str::limit(strip_tags($email->body), 100) }}
                                             </p>
                                         @endif
-                                    </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <!-- Placeholder for no emails -->
-                        <div class="card text-center py-5">
-                            <div class="card-body">
+                            </div>
+                        @else
+                            <!-- Placeholder for no emails -->
+                            <div class="text-center py-5">
                                 <i class="fa-solid fa-envelope" style="font-size: 3rem; color: #d1d5db;"></i>
                                 <h5 class="mt-3 mb-2">Ingen nyhedsbreve endnu</h5>
                                 <p class="text-muted mb-0" style="font-weight: 300;">Du har ikke modtaget nogen nyhedsbreve fra denne gruppe</p>
                             </div>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -271,10 +268,23 @@
             box-shadow: 0 0 0 0.2rem rgba(190, 24, 93, 0.1);
         }
 
+        .email-card {
+            border: 1px solid #e0e0e0;
+            transition: all 0.2s;
+        }
+
         .email-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
             transform: translateY(-2px);
-            transition: all 0.2s;
+        }
+
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .modal-header {

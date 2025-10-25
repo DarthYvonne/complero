@@ -35,6 +35,7 @@ class EmailController extends Controller
             'mailing_list_id' => 'nullable|exists:mailing_lists,id',
             'subject' => 'required|string|max:255',
             'body_html' => 'required|string',
+            'test_email' => 'nullable|email',
         ]);
 
         $user = Auth::user();
@@ -42,7 +43,15 @@ class EmailController extends Controller
         // Get recipients
         $recipients = [];
         $recipientData = [];
-        if ($request->mailing_list_id) {
+
+        // Check if this is a test email
+        if ($request->test_email) {
+            $recipientData = [[
+                'email' => $request->test_email,
+                'name' => $user->name,
+            ]];
+            $recipients = [$request->test_email];
+        } elseif ($request->mailing_list_id) {
             $mailingList = MailingList::findOrFail($request->mailing_list_id);
             $recipientData = $mailingList->activeMembers()->get()->map(function($member) {
                 return [
@@ -99,12 +108,21 @@ class EmailController extends Controller
             }
         }
 
+        // Determine redirect route
+        $redirectRoute = $request->mailing_list_id && !$request->test_email
+            ? route('creator.mailing-lists.emails', $request->mailing_list_id)
+            : route('creator.emails.index');
+
         if (count($errors) > 0) {
-            return redirect()->route('creator.emails.index')
+            return redirect($redirectRoute)
                 ->with('warning', 'Email sendt til ' . $successCount . ' af ' . count($recipients) . ' modtagere. ' . count($errors) . ' fejlede.');
         }
 
-        return redirect()->route('creator.emails.index')
-            ->with('success', 'Email sendt til ' . count($recipients) . ' modtagere');
+        $successMessage = $request->test_email
+            ? 'Testmail sendt til ' . $request->test_email
+            : 'Email sendt til ' . count($recipients) . ' modtagere';
+
+        return redirect($redirectRoute)
+            ->with('success', $successMessage);
     }
 }

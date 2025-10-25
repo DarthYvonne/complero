@@ -574,12 +574,18 @@ class MailingListController extends Controller
             'welcome_header' => ['nullable', 'string', 'max:255'],
             'welcome_text' => ['nullable', 'string'],
             'welcome_image' => ['nullable', 'image', 'max:2048'],
+            'remove_welcome_image' => ['nullable', 'string'],
         ]);
 
         $data = [
             'welcome_header' => $validated['welcome_header'],
             'welcome_text' => $validated['welcome_text'],
         ];
+
+        // Handle image removal
+        if ($request->input('remove_welcome_image') == '1') {
+            $data['welcome_image'] = null;
+        }
 
         // Handle image upload
         if ($request->hasFile('welcome_image')) {
@@ -616,6 +622,7 @@ class MailingListController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'subdomain' => ['nullable', 'string', 'regex:/^[a-zA-Z0-9-]+$/', 'max:63', 'unique:mailing_lists,subdomain,' . $mailingList->id],
             'organization_name' => ['nullable', 'string', 'max:255'],
             'website' => ['nullable', 'url', 'max:255'],
             'responsible_person' => ['nullable', 'string', 'max:255'],
@@ -624,9 +631,29 @@ class MailingListController extends Controller
             'secondary_color' => ['required', 'string', 'regex:/^#[0-9A-F]{6}$/i'],
         ]);
 
+        // Convert subdomain to lowercase
+        if (!empty($validated['subdomain'])) {
+            $validated['subdomain'] = strtolower($validated['subdomain']);
+        }
+
         $mailingList->update($validated);
 
         return back()->with('success', 'Indstillinger opdateret succesfuldt');
+    }
+
+    /**
+     * Check if subdomain is available
+     */
+    public function checkSubdomain(Request $request)
+    {
+        $subdomain = $request->input('subdomain');
+        $currentId = $request->input('current_id');
+
+        $available = !MailingList::where('subdomain', $subdomain)
+            ->where('id', '!=', $currentId)
+            ->exists();
+
+        return response()->json(['available' => $available]);
     }
 
     /**
@@ -718,5 +745,24 @@ class MailingListController extends Controller
         $availableResources = $resourceQuery->get();
 
         return view('creator.mailing-lists.content', compact('mailingList', 'availableCourses', 'availableResources'));
+    }
+
+    /**
+     * Display emails page for the mailing list
+     */
+    public function emails(MailingList $mailingList)
+    {
+        if (auth()->user()->role !== 'admin' && $mailingList->creator_id !== auth()->id()) {
+            abort(403, 'Du har ikke adgang til denne gruppe');
+        }
+
+        $mailingList->loadCount('activeMembers');
+
+        // Get emails sent to this mailing list
+        $emails = \App\Models\Email::where('mailing_list_id', $mailingList->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('creator.mailing-lists.emails', compact('mailingList', 'emails'));
     }
 }

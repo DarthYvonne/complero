@@ -27,6 +27,18 @@ Route::post('/landing/{slug}', [\App\Http\Controllers\LandingPageController::cla
 // Brevo webhook (must be publicly accessible)
 Route::post('/webhooks/brevo', [\App\Http\Controllers\BrevoWebhookController::class, 'handle'])->name('webhooks.brevo');
 
+// Subdomain routes for group authentication
+Route::domain('{subdomain}.complicero.com')->group(function () {
+    Route::get('/', [\App\Http\Controllers\SubdomainAuthController::class, 'index'])->name('subdomain.index');
+    Route::get('/login', [\App\Http\Controllers\SubdomainAuthController::class, 'login'])->name('subdomain.login');
+    Route::post('/login', [\App\Http\Controllers\SubdomainAuthController::class, 'authenticate'])->name('subdomain.authenticate');
+    Route::get('/signup', [\App\Http\Controllers\SubdomainAuthController::class, 'signup'])->name('subdomain.signup');
+    Route::post('/signup', [\App\Http\Controllers\SubdomainAuthController::class, 'register'])->name('subdomain.register');
+    Route::get('/forgot-password', [\App\Http\Controllers\SubdomainAuthController::class, 'forgotPassword'])->name('subdomain.forgot-password');
+    Route::post('/forgot-password', [\App\Http\Controllers\SubdomainAuthController::class, 'sendResetLink'])->name('subdomain.send-reset-link');
+    Route::post('/logout', [\App\Http\Controllers\SubdomainAuthController::class, 'logout'])->name('subdomain.logout');
+});
+
 Route::get('/velkommen', [\App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -38,6 +50,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/view-as/{role}', [\App\Http\Controllers\ViewAsController::class, 'switch'])->name('view-as');
 
     // Member-facing content
+    Route::get('/indhold', [\App\Http\Controllers\ContentController::class, 'index'])->name('content.index');
+
     Route::get('/courses', [\App\Http\Controllers\CourseController::class, 'index'])->name('courses.index');
     Route::get('/courses/{course}', [\App\Http\Controllers\CourseController::class, 'show'])->name('courses.show');
     Route::post('/courses/{course}/enroll', [\App\Http\Controllers\CourseController::class, 'enroll'])->name('courses.enroll');
@@ -51,6 +65,9 @@ Route::middleware('auth')->group(function () {
 // Creator Routes
 Route::middleware(['auth', 'creator-or-admin'])->prefix('creator')->name('creator.')->group(function () {
     Route::get('/velkommen', [CreatorDashboardController::class, 'index'])->name('dashboard');
+
+    // Content page with tabs
+    Route::get('/indhold', [\App\Http\Controllers\Creator\ContentController::class, 'index'])->name('content.index');
 
     // Settings
     Route::get('/settings', [\App\Http\Controllers\Creator\SettingsController::class, 'index'])->name('settings.index');
@@ -87,6 +104,8 @@ Route::middleware(['auth', 'creator-or-admin'])->prefix('creator')->name('creato
 
     // Mailing List Management (scoped to creator's own lists)
     Route::resource('mailing-lists', CreatorMailingListController::class);
+    Route::get('/mailing-lists/check-subdomain', [CreatorMailingListController::class, 'checkSubdomain'])->name('mailing-lists.check-subdomain');
+    Route::get('/mailing-lists/{mailing_list}/emails', [CreatorMailingListController::class, 'emails'])->name('mailing-lists.emails');
     Route::get('/mailing-lists/{mailing_list}/content', [CreatorMailingListController::class, 'content'])->name('mailing-lists.content');
     Route::get('/mailing-lists/{mailing_list}/signup-forms', [CreatorMailingListController::class, 'signupForms'])->name('mailing-lists.signup-forms');
     Route::get('/mailing-lists/{mailing_list}/welcome', [CreatorMailingListController::class, 'welcome'])->name('mailing-lists.welcome');
@@ -177,6 +196,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/mailing-lists/{mailing_list}/edit', [CreatorMailingListController::class, 'edit'])->name('mailing-lists.edit');
     Route::patch('/mailing-lists/{mailing_list}', [CreatorMailingListController::class, 'update'])->name('mailing-lists.update');
     Route::delete('/mailing-lists/{mailing_list}', [CreatorMailingListController::class, 'destroy'])->name('mailing-lists.destroy');
+    Route::get('/mailing-lists/{mailing_list}/emails', [CreatorMailingListController::class, 'emails'])->name('mailing-lists.emails');
     Route::get('/mailing-lists/{mailing_list}/content', [CreatorMailingListController::class, 'content'])->name('mailing-lists.content');
     Route::get('/mailing-lists/{mailing_list}/signup-forms', [CreatorMailingListController::class, 'signupForms'])->name('mailing-lists.signup-forms');
     Route::get('/mailing-lists/{mailing_list}/welcome', [CreatorMailingListController::class, 'welcome'])->name('mailing-lists.welcome');

@@ -10,7 +10,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 5px;">
-                        <i class="fa-solid fa-users" style="color: var(--primary-color);"></i> Grupper
+                        <i class="fa-solid fa-user-group" style="color: var(--primary-color);"></i> Grupper
                     </h1>
                     <p style="font-size: 14px; font-weight: 300; color: #999; margin: 0;">
                         Administrer grupper og medlemmer
@@ -47,7 +47,7 @@
                                 @foreach($mailingLists as $list)
                                     <tr style="cursor: pointer;" onclick="window.location='{{ route('creator.mailing-lists.show', $list) }}'">
                                         <td style="font-weight: 500; color: #333; text-align: left;">
-                                            {{ $list->name }}
+                                            <i class="fa-solid fa-user-group me-2" style="color: var(--primary-color);"></i> {{ $list->name }}
                                         </td>
                                         <td style="font-weight: 300; color: #666; text-align: left;">
                                             {{ $list->members_count }}
@@ -66,7 +66,7 @@
                     </div>
                 @else
                     <div class="text-center py-5">
-                        <i class="fa-solid fa-users" style="font-size: 4rem; color: #d1d5db;"></i>
+                        <i class="fa-solid fa-user-group" style="font-size: 4rem; color: #d1d5db;"></i>
                         <h5 class="mt-3 mb-2">Ingen grupper endnu</h5>
                         <p class="text-muted mb-3" style="font-weight: 300;">Kom i gang med at oprette din første gruppe</p>
                         <a href="{{ route('creator.mailing-lists.create') }}" class="btn btn-primary">

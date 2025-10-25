@@ -14,7 +14,7 @@
         <!-- Page Header -->
         <div class="mb-4">
             <h1 style="font-size: 32px; font-weight: 700; color: #333; margin-bottom: 0;">
-                Gruppe: <span style="font-weight: 100;">{{ $mailingList->name }}</span>
+                Gruppe: <span style="font-weight: 100;">{{ $mailingList->name }} ({{ $mailingList->activeMembers->count() }})</span>
             </h1>
         </div>
 
@@ -38,6 +38,11 @@
             <li class="nav-item" role="presentation">
                 <a class="nav-link active" href="{{ route('creator.mailing-lists.show', $mailingList) }}">
                     <i class="fa-solid fa-circle-user me-1"></i> Medlemmer
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" href="{{ route('creator.mailing-lists.emails', $mailingList) }}">
+                    <i class="fa-solid fa-paper-plane me-1"></i> Email
                 </a>
             </li>
             <li class="nav-item dropdown" role="presentation">
@@ -133,7 +138,7 @@
                             </div>
                         @else
                             <div class="text-center py-4">
-                                <i class="fa-solid fa-users" style="font-size: 3rem; color: #d1d5db;"></i>
+                                <i class="fa-solid fa-user-group" style="font-size: 3rem; color: #d1d5db;"></i>
                                 <p class="mt-3 mb-0" style="font-weight: 300; color: #666;">Ingen medlemmer endnu</p>
                             </div>
                         @endif
